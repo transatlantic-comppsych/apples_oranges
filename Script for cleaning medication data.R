@@ -1,5 +1,20 @@
 # script for cleaning medication data
 # open working_dataset_medication
+library(readxl)
+Working_Dataset_Medication <- read_excel("Working_Dataset_Medication.xlsx", 
+                                         col_types = c("text", "text", "text", 
+                                                       "text", "text", "numeric", "numeric", 
+                                                       "text", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "numeric", "text", 
+                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "text", "numeric", 
+                                                       "text", "text", "text", "text", 
+                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "text", "text"))
+View(Working_Dataset_Medication)
 
 #add vector indicating whether psychotherapy or medication, where 1 is psych and 0 is med
 psy_or_med <- rep(0, nrow(Working_Dataset_Medication))
@@ -60,5 +75,5 @@ clean_med <- cbind(clean_med, responders_active, responders_control)
 df_responders_med <- clean_med %>% select(c(Column1, responders_active, responders_control))
 df_full_med <- full_join(Working_Dataset_Medication, df_responders_med) # add vectors to full dataset
 
-
+write.csv(df_full_med, "Full Medication Dataset.csv")
 

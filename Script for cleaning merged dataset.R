@@ -1,10 +1,13 @@
 # create and clean new merged dataset
+library(readr)
+df_full_psych <- read_csv("Full Psychotherapy Dataset.csv")
+df_full_med <- read.csv("Full Medication Dataset.csv")
 
 # merge datasets
 merged_dataset <- bind_rows(df_full_med, df_full_psych)
 
 # fix column ordering
-merged_dataset <- select(merged_dataset, -c(primary, hierarchy, time, index))
+merged_dataset <- select(merged_dataset, -c(primary, hierarchy, time))
 merged_dataset <- merged_dataset %>% relocate(descr_active, .after = control_type)
 merged_dataset <- merged_dataset %>% relocate(descr_control, .after = descr_active)
 merged_dataset <- merged_dataset %>% relocate(mean_age, .after = age_group)
@@ -57,6 +60,24 @@ merged_dataset <- merged_dataset %>%
     resp_rate_control_completers = round(resp_rate_control_completers, 4)
   )
 
-write.csv(merged_dataset, "Apples vs Oranges Dataset.csv") 
+#calculate response rate for studies that reported no of responders
+calc_observed_resp_rate_active <- (merged_dataset$observed_responders_active)/(merged_dataset$observed_responders_active_n)
+calc_observed_resp_rate_control <- (merged_dataset$observed_responders_control)/(merged_dataset$observed_responders_control_n)
+merged_dataset$observed_resp_rate_active <- coalesce(calc_observed_resp_rate_active, merged_dataset$observed_resp_rate_active)
+merged_dataset$observed_resp_rate_control <- coalesce(calc_observed_resp_rate_control, merged_dataset$observed_resp_rate_control)
 
-for_visual_inspection <- cbind(merged_dataset$study, merged_dataset$year, merged_dataset$instrument_value, merged_dataset$resp_rate_active, merged_dataset$resp_rate_control)
+plot(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, 
+     xlab = "Response rates calculated by us", ylab = "Observed response rates",
+     main = "Comparison of estimated vs observed response rates for medication trials",
+     pch = 19, col = "blue")
+cor(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, method = "pearson", use = "pairwise.complete.obs")
+
+#calculate cohens d
+cohens_d_active <- (merged_dataset$post_mean_active - merged_dataset$baseline_mean_active)/
+                  ((merged_dataset$post_sd_active + merged_dataset$baseline_sd_active)/2)
+cohens_d_control <- (merged_dataset$post_mean_control - merged_dataset$baseline_mean_control)/
+  ((merged_dataset$post_sd_control + merged_dataset$baseline_sd_control)/2)
+
+merged_dataset <- cbind(merged_dataset, cohens_d_active, cohens_d_control)
+
+write.csv(merged_dataset, "Apples vs Oranges Dataset.csv") 
