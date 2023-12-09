@@ -1,0 +1,124 @@
+"","study","instrument","Column1","condition_arm1","condition_arm2","multi_arm1","multi_arm2","responders_arm1","responders_arm2","ee","ec"
+"1","Ackerson, 1998","cbcl-d",3,"cbt","wl","NA","NA",0,0,NA,NA
+"2","Ackerson, 1998","cdi",2,"cbt","wl","NA","NA",7,0,NA,NA
+"3","Ackerson, 1998","ham-d",1,"cbt","wl","NA","NA",7,0,7,0.2
+"4","Arnarson, 2009","DSM",4,"cbt","cau","NA","NA",NA,NA,NA,NA
+"5","Asarnow, 2002","cdi",5,"cbt","wl","NA","NA",NA,NA,NA,NA
+"6","Bolton, 2007","Acholi Psychosocial Assessment Instrument (APAI): a local instrument",7,"ipt","other ctr","ipt","creative play",32,21,39,14
+"7","Bolton, 2007","Acholi Psychosocial Assessment Instrument (APAI): a local instrument",6,"ipt","wl","ipt","wlc",33,22,39,14
+"8","Charkhandeh, 2016","cdi",8,"cbt","wl","cbt","wlc",16,0,NA,NA
+"9","Charkhandeh, 2016","cdi",9,"cbt","other ctr","cbt","other ctr",13,2,NA,NA
+"10","Clarke, 1995","ces-d",10,"cbt","cau","NA","NA",13,10,NA,NA
+"11","Clarke, 1995","ham-d",11,"cbt","cau","NA","NA",20,25,25,28
+"12","Clarke, 1999","bdi",13,"cbt","wl","cbt","wlc",22,12,NA,NA
+"13","Clarke, 1999","bdi",16,"cbt","wl","cbt + parenting group","wlc",20,11,NA,NA
+"14","Clarke, 1999","cbcl-d",14,"cbt","wl","cbt","wlc",7,11,NA,NA
+"15","Clarke, 1999","cbcl-d",17,"cbt","wl","cbt + parenting group","wlc",9,9,NA,NA
+"16","Clarke, 1999","ham-d",12,"cbt","wl","cbt","wlc",24,14,NA,NA
+"17","Clarke, 1999","ham-d",15,"cbt","wl","cbt + parenting group","wlc",16,18,NA,NA
+"18","Clarke, 2001","cbcl-d",20,"cbt","cau","NA","NA",11,13,NA,NA
+"19","Clarke, 2001","ces-d",18,"cbt","cau","NA","NA",13,9,NA,NA
+"20","Clarke, 2001","ham-d",19,"cbt","cau","NA","NA",22,15,18,18
+"21","Clarke, 2002","cbcl-d",23,"cbt","cau","NA","NA",5,13,NA,NA
+"22","Clarke, 2002","ces-d",21,"cbt","cau","NA","NA",5,7,NA,NA
+"23","Clarke, 2002","ham-d",22,"cbt","cau","NA","NA",23,22,22,22
+"24","Curry, 2021","cdrs-r",24,"cbt","cau","NA","NA",3,3,NA,NA
+"25","De Cuyper, 2004","cdi",25,"cbt","wl","NA","NA",4,3,2,3
+"26","De Jonge-Heesen, 2020","cdi",26,"cbt","other ctr","NA","NA",14,15,15,14
+"27","De Jonge-Heesen, 2020","cdi",27,"cbt","other ctr","NA","NA",6,1,15,14
+"28","Diamond, 2002","bdi",28,"other psy","wl","NA","NA",5,7,9,5
+"29","Diamond, 2010","bdi-ii",119,"other psy","cau","NA","NA",21,18,NA,NA
+"30","Do, 2021","ces-d",30,"cbt","wl","NA","NA",8,4,NA,NA
+"31","Do, 2021","phq-9",29,"cbt","wl","NA","NA",8,9,NA,NA
+"32","Esposito-Smythers, 2019","cdi",31,"cbt","cau","NA","NA",31,33,NA,NA
+"33","Fristad, 2019","cdrs-r",32,"cbt","other ctr","NA","NA",2,3,NA,NA
+"34","Gillham, 2006","cdi",33,"cbt","cau","NA","NA",29,23,31,27
+"35","Idsoe, 2019","ces-d",34,"cbt","cau","NA","NA",26,13,25,10
+"36","Israel, 2013","bdi",36,"other psy","cau","NA","NA",3,0,NA,NA
+"37","Israel, 2013","ham-d",35,"other psy","cau","NA","NA",4,1,4,0.2
+"38","Kahn, 1990","bid",39,"cbt","wl","cbt","wlc",13,5,NA,NA
+"39","Kahn, 1990","bid",42,"other psy","wl","other psy (self-modeling)","wlc",13,10,NA,NA
+"40","Kahn, 1990","bid",45,"cbt","other ctr","cbt","Relaxation",12,10,NA,NA
+"41","Kahn, 1990","cdi",37,"cbt","wl","cbt","wlc",11,1,NA,NA
+"42","Kahn, 1990","cdi",40,"other psy","wl","other psy (self-modeling)","wlc",6,7,NA,NA
+"43","Kahn, 1990","cdi",43,"cbt","other ctr","cbt","Relaxation",10,7,NA,NA
+"44","Kahn, 1990","rads",41,"other psy","wl","other psy (self-modeling)","wlc",1,0,NA,NA
+"45","Kahn, 1990","rads",38,"cbt","wl","cbt","wlc",5,0,NA,NA
+"46","Kahn, 1990","rads",44,"cbt","other ctr","cbt","Relaxation",6,2,NA,NA
+"47","Kitchen, 2021","mfq",46,"bat","cau","NA","NA",1,4,NA,NA
+"48","Kitchen, 2021","mfq",47,"bat","cau","NA","NA",0,1,NA,NA
+"49","Lewinsohn, 1990","bdi",49,"cbt","wl","cbt (adolescents)","wlc",9,2,NA,NA
+"50","Lewinsohn, 1990","bdi",52,"cbt","wl","cbt (adolescents + parents)","wlc",12,3,NA,NA
+"51","Lewinsohn, 1990","cbcl-d",50,"cbt","wl","cbt (adolescents)","wlc",4,8,NA,NA
+"52","Lewinsohn, 1990","cbcl-d",53,"cbt","wl","cbt (adolescents + parents)","wlc",19,0,NA,NA
+"53","Lewinsohn, 1990","ces-d",51,"cbt","wl","cbt (adolescents + parents)","wlc",11,4,NA,NA
+"54","Lewinsohn, 1990","ces-d",48,"cbt","wl","cbt (adolescents)","wlc",12,2,NA,NA
+"55","Liddle, 1990","cdi",54,"cbt","wl","NA","NA",2,1,3,2
+"56","Liddle, 1990","cdi",55,"cbt","other ctr","cbt","other ctr",3,1,3,2
+"57","Listug-Lunde, 2013","cdi",56,"cbt","cau","NA","NA",3,3,3,3
+"58","Luby, 2012","PAPA",58,"other psy","other ctr","NA","NA",8,4,NA,NA
+"59","Luby, 2012","PFCâ€“S",57,"other psy","other ctr","NA","NA",7,2,NA,NA
+"60","Makover, 2019","smfq",59,"other psy","cau","NA","NA",NA,NA,NA,NA
+"61","March, 2004","cdrs-r",60,"cbt","other ctr","cbt","other ctr",12,9,NA,NA
+"62","March, 2004","rads",61,"cbt","other ctr","cbt","other ctr",5,0,NA,NA
+"63","Martinovic, 2006","bdi",63,"cbt","cau","NA","NA",3,1,NA,NA
+"64","Martinovic, 2006","ces-d",64,"cbt","cau","NA","NA",5,2,NA,NA
+"65","Martinovic, 2006","ham-d",62,"cbt","cau","NA","NA",5,1,6,1
+"66","Moeini, 2019","ces-d",65,"cbt","cau","NA","NA",22,21,21,16
+"67","Mufson, 1999","bdi",67,"ipt","other ctr","NA","NA",18,12,NA,NA
+"68","Mufson, 1999","ham-d",66,"ipt","other ctr","NA","NA",17,10,16,9
+"69","Mufson, 2004","bdi",69,"ipt","cau","NA","NA",23,9,NA,NA
+"70","Mufson, 2004","ham-d",68,"ipt","cau","NA","NA",19,7,18,10
+"71","Reynolds, 1986","bdi",73,"cbt","other ctr","cbt","Relaxation training",6,6,5,2
+"72","Reynolds, 1986","bdi",70,"cbt","wl","cbt","wlc",5,3,5,2
+"73","Reynolds, 1986","bid",74,"cbt","other ctr","cbt","Relaxation training",5,8,NA,NA
+"74","Reynolds, 1986","bid",71,"cbt","wl","cbt","wlc",5,0,NA,NA
+"75","Reynolds, 1986","rads",75,"cbt","other ctr","cbt","Relaxation training",0,0,NA,NA
+"76","Reynolds, 1986","rads",72,"cbt","wl","cbt","wlc",0,0,NA,NA
+"77","Rohde, 2004","bdi",76,"cbt","other ctr","NA","NA",19,9,NA,NA
+"78","Rohde, 2004","ham-d",77,"cbt","other ctr","NA","NA",24,4,25,8
+"79","Rohde, 2014a","K-SADS (adapted)",118,"cbt","other ctr","cbt","other ctr",0,1,NA,NA
+"80","Rossello, 1999","cdi",78,"cbt","wl","cbt","wlc",7,4,NA,NA
+"81","Rossello, 1999","cdi",79,"ipt","wl","ipt","wlc",8,3,NA,NA
+"82","Sanford, 2006","rads",80,"other psy","cau","NA","NA",NA,NA,NA,NA
+"83","Santomauro, 2016","dass",81,"cbt","wl","NA","NA",2,2,3,1
+"84","Schniering, 2022","smfq",82,"cbt","wl","NA","NA",20,10,NA,NA
+"85","Schniering, 2022","smfq",83,"cbt","wl","NA","NA",15,14,NA,NA
+"86","Shomaker, 2016","ces-d",84,"cbt","other ctr","NA","NA",NA,NA,NA,NA
+"87","Srivastava, 2020","bdi",85,"cbt","cau","NA","NA",9,2,NA,NA
+"88","Srivastava, 2020","cdrs-r",86,"cbt","cau","NA","NA",3,0,NA,NA
+"89","Stallard, 2012","smfq",87,"cbt","other ctr","cbt","other ctr",89,82,97,90
+"90","Stallard, 2012","smfq",88,"cbt","cau","cbt","cau",102,95,97,90
+"91","Stark, 1987","cbcl-d",96,"other psy","wl","other psy","wlc",0,0,NA,NA
+"92","Stark, 1987","cbcl-d",92,"pst","wl","pst","wlc",0,0,NA,NA
+"93","Stark, 1987","cdi",89,"pst","wl","pst","wlc",6,1,NA,NA
+"94","Stark, 1987","cdi",93,"other psy","wl","other psy","wlc",5,1,NA,NA
+"95","Stark, 1987","cdrs-r",91,"pst","wl","pst","wlc",0,0,NA,NA
+"96","Stark, 1987","cdrs-r",95,"other psy","wl","other psy","wlc",0,0,NA,NA
+"97","Stark, 1987","CDS",94,"other psy","wl","other psy","wlc",0,0,NA,NA
+"98","Stark, 1987","CDS",90,"pst","wl","pst","wlc",1,1,NA,NA
+"99","Stice, 2008","bdi",99,"cbt","cau","cbt (bibliotherapy)","cau",19,21,NA,NA
+"100","Stice, 2008","bdi",101,"sup","cau","sup","cau",27,27,NA,NA
+"101","Stice, 2008","bdi",97,"cbt","cau","cbt","cau",41,22,NA,NA
+"102","Stice, 2008","K-SADS",102,"sup","cau","sup","cau",0,2,NA,NA
+"103","Stice, 2008","K-SADS",98,"cbt","cau","cbt","cau",3,1,NA,NA
+"104","Stice, 2008","K-SADS",100,"cbt","cau","cbt (bibliotherapy)","cau",0,2,NA,NA
+"105","Stikkelbroek, 2020","K-SADS",103,"cbt","cau","NA","NA",NA,NA,NA,NA
+"106","Szigethy, 2007","cdi",104,"cbt","cau","NA","NA",11,6,13,6
+"107","Szigethy, 2007","K-SADS",105,"cbt","cau","NA","NA",12,5,NA,NA
+"108","Tang, 2009","bdi-ii",120,"ipt","cau","NA","NA",17,3,NA,NA
+"109","Topooco, 2018","bdi-ii",121,"cbt","other ctr","NA","NA",11,2,NA,NA
+"110","Topooco, 2018","phq-9",122,"cbt","other ctr","NA","NA",7,2,NA,NA
+"111","Topooco, 2019","bdi",106,"cbt","other ctr","NA","NA",12,4,NA,NA
+"112","Vostanis, 1996","mfq",108,"cbt","other ctr","NA","NA",15,11,NA,NA
+"113","Vostanis, 1996","mfq",107,"cbt","other ctr","NA","NA",15,12,NA,NA
+"114","Weisz, 1997","cdi",110,"cbt","cau","NA","NA",8,15,NA,NA
+"115","Weisz, 1997","cdrs-r",109,"cbt","cau","NA","NA",1,3,3,2
+"116","Weisz, 2009","cdi",111,"cbt","cau","NA","NA",12,10,NA,NA
+"117","Weisz, 2009","disc-c MDD symptom count",112,"cbt","cau","NA","NA",9,9,NA,NA
+"118","Wood, 1996","mfq",123,"cbt","other ctr","NA","NA",17,15,NA,NA
+"119","Young, 2006","ces-d",113,"ipt","other ctr","NA","NA",24,7,24,5
+"120","Young, 2010","cdrs-r",115,"ipt","cau","NA","NA",NA,NA,NA,NA
+"121","Young, 2010","ces-d",114,"ipt","cau","NA","NA",NA,NA,NA,NA
+"122","Young, 2016","ces-d",116,"ipt","other ctr","NA","NA",29,29,38,27
+"123","Yu, 2002","cdi",117,"cbt","cau","NA","NA",30,34,30,26

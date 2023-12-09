@@ -1,4 +1,11 @@
+library(tidyverse)
+library(dplyr)
+library(readxl)
+
 set.seed(1998) # to reproduce anything with random numbers
+
+Full_Dataset_Cuijpers_MA <- read_excel("Full_Dataset_Cuijpers_MA.xlsx")
+View(Full_Dataset_Cuijpers_MA)
 
 # Sub commas for dots and convert to numeric variables
 
@@ -18,8 +25,6 @@ Full_Dataset_Cuijpers_MA$n_arm2 <- as.numeric(Full_Dataset_Cuijpers_MA$n_arm2)
 Full_Dataset_Cuijpers_MA$mean_arm2 <- as.numeric(Full_Dataset_Cuijpers_MA$mean_arm2)
 Full_Dataset_Cuijpers_MA$sd_arm2 <- as.numeric(Full_Dataset_Cuijpers_MA$sd_arm2)
 Full_Dataset_Cuijpers_MA$baseline_m_arm2 <- as.numeric(Full_Dataset_Cuijpers_MA$baseline_m_arm2)
-
-library(tidyverse)
 
 # create dataframe with vectors needed to calculate no of responders
 
@@ -53,16 +58,16 @@ df_responders <- as.data.frame(cbind(df_clean$Column1, responders_arm1, responde
 df_responders <- df_responders %>% rename(Column1 = V1)
 df_full <- full_join(Full_Dataset_Cuijpers_MA, df_responders)
 
-#create dataframe with response rates calculated by us matched up to specific comparison as there are several per study
-df_responders <- cbind(df_full$study, df_full$condition_arm1, df_full$condition_arm2, df_full$multi_arm1, 
-                       df_full$multi_arm2, df_full$instrument, df_full$responders_arm1, df_full$responders_arm2)
-colnames(df_responders) <- c("study", "condition_arm1", "condition_arm2", "multi_arm1", "multi_arm2", "instrument",
-                             "responders_arm1", "responders_arm2")
+# add condition/arm description and instrument name to responders dataframe to ensure response estimates
+# are matched up to correct comparison as there are several per study
+df_responders <- df_full %>% select(Column1, study, condition_arm1, condition_arm2, multi_arm1, multi_arm2, instrument, 
+                                               responders_arm1, responders_arm2)
 
 #create dataframe with response rates calculated by Cuijpers
-df_cuijpers_calcs <- cbind(Cuijpers_response_rate_estimates$study, Cuijpers_response_rate_estimates$outcome, 
-                           Cuijpers_response_rate_estimates$ee, Cuijpers_response_rate_estimates$ec)
-colnames(df_cuijpers_calcs) <- c("study", "instrument", "ee", "ec")
+Cuijpers_response_rate_estimates <- read_excel("Cuijpers_response_rate_estimates.xlsx")
+
+df_cuijpers_calcs <- Cuijpers_response_rate_estimates %>% select(study, outcome, ee, ec)
+df_cuijpers_calcs <- df_cuijpers_calcs %>% rename(instrument = outcome)
 
 # merge datasets matching up study name and instrument used
 df_compare_response_rates <- merge(df_responders, df_cuijpers_calcs, by = c("study","instrument"), all.x = TRUE)
@@ -77,13 +82,14 @@ df_compare_response_rates <- read.csv("Response_rate_comparison_updated.csv")
 cor(df_compare_response_rates$responders_arm1, df_compare_response_rates$ee, method = "pearson", use = "pairwise.complete.obs")
 cor(df_compare_response_rates$responders_arm2, df_compare_response_rates$ec, method = "pearson", use = "pairwise.complete.obs")
 
-df_full <- cbind(df_full, df_compare_response_rates$ee, df_compare_response_rates$ec) # add response rates from Cuijpers as vector in full dataset
-
+for_merge <- df_compare_response_rates %>% select(Column1, ee, ec)
+df_full <- full_join(df_full, for_merge)
+                      
 # create dataframe with main variables needed for meta-analysis
 df_full_psych <- df_full %>% 
   select(c(Column1, study, year, condition_arm1, condition_arm2, descr_arm1, descr_arm2, instrument, rating,
            mean_arm1: n_arm2, baseline_m_arm1:baseline_n_arm2, mean_age, percent_women, responders_arm1, responders_arm2, 
-           `df_compare_response_rates$ee`, `df_compare_response_rates$ec`))#add empty vectors which feature in medication dataset
+           ee, ec, country, comorbid_mental, `comorbid_mental?`, diagnosis))
 
 # rename variables
 df_full_psych <- df_full_psych %>% rename(active_type = condition_arm1, control_type = condition_arm2, descr_active = descr_arm1, descr_control = descr_arm2, 
@@ -92,10 +98,10 @@ df_full_psych <- df_full_psych %>% rename(active_type = condition_arm1, control_
                                           baseline_mean_active = baseline_m_arm1, baseline_sd_active	= baseline_sd_arm1, baseline_n_active =	baseline_n_arm1,
                                           baseline_mean_control = baseline_m_arm2, baseline_sd_control	= baseline_sd_arm2, baseline_n_control =	baseline_n_arm2, 
                                           responders_active = responders_arm1, responders_control =	responders_arm2,	
-                                          cuij_responders_active = `df_compare_response_rates$ee`, cuij_responders_control = `df_compare_response_rates$ec`)
+                                          cuij_responders_active = ee, cuij_responders_control = ec)
 
 #add vector indicating whether psychotherapy or medication 
-library(dplyr)
+
 psy_or_med <- rep(1, nrow(df_full_psych))
 df_full_psych <- cbind(df_full_psych, psy_or_med)
 df_full_psych <- df_full_psych %>% relocate(psy_or_med, .after = year)
@@ -113,9 +119,5 @@ df_full_psych$baseline_n_active <- as.numeric(df_full_psych$baseline_n_active)
 df_full_psych$baseline_sd_control <- as.numeric(df_full_psych$baseline_sd_control)
 df_full_psych$baseline_n_control <- as.numeric(df_full_psych$baseline_n_control)
 df_full_psych$mean_age <- as.numeric(df_full_psych$mean_age)
-
-df_full_psych <- cbind(df_full_psych, df_full$country, df_full$comorbid_mental, df_full$`comorbid_mental?`, df_full$diagnosis)
-df_full_psych <- df_full_psych %>% rename(country = 'df_full$country', comorbid_mental = 'df_full$comorbid_mental', 
-                                          'comorbid_mental?' ='df_full$`comorbid_mental?`', diagnosis = 'df_full$diagnosis')
 
 write.csv(df_full_psych, "Full Psychotherapy Dataset.csv") 

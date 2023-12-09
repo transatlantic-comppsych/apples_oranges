@@ -1,6 +1,8 @@
 # create and clean new merged dataset
 library(readr)
-df_full_psych <- read_csv("Full Psychotherapy Dataset.csv")
+library(tidyverse)
+
+df_full_psych <- read_csv("Full Psychotherapy Dataset.csv", col_types = cols(year = col_character()))
 df_full_med <- read.csv("Full Medication Dataset.csv")
 
 # merge datasets
@@ -13,9 +15,6 @@ merged_dataset <- merged_dataset %>% relocate(descr_control, .after = descr_acti
 merged_dataset <- merged_dataset %>% relocate(mean_age, .after = age_group)
 merged_dataset <- merged_dataset %>% relocate(percent_women, .after = control_mean_age)
 merged_dataset <- merged_dataset %>% relocate(responders_active: cuij_responders_control, .after = observed_resp_rate_control)
-
-install.packages("tidyverse")
-library(tidyverse)
 
 #create vector indicating instrument primacy according to our hierarchy
 unique(merged_dataset$instrument) # check unique values to account for differences in formatting of instrument names
@@ -66,15 +65,40 @@ calc_observed_resp_rate_control <- (merged_dataset$observed_responders_control)/
 merged_dataset$observed_resp_rate_active <- coalesce(calc_observed_resp_rate_active, merged_dataset$observed_resp_rate_active)
 merged_dataset$observed_resp_rate_control <- coalesce(calc_observed_resp_rate_control, merged_dataset$observed_resp_rate_control)
 
+#plot and check correlation between our calculations and observed response rate, for active condition
 plot(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, 
      xlab = "Response rates calculated by us", ylab = "Observed response rates",
-     main = "Comparison of estimated vs observed response rates for medication trials",
+     main = "Comparison of estimated vs observed response rates for active arm of medication trials",
      pch = 19, col = "blue")
 cor(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, method = "pearson", use = "pairwise.complete.obs")
 
+#plot and check correlation between our calculations and observed response rate, for control condition
+plot(merged_dataset$resp_rate_control, merged_dataset$observed_resp_rate_control, 
+     xlab = "Response rates calculated by us", ylab = "Observed response rates",
+     main = "Comparison of estimated vs observed response rates for control arm of medication trials",
+     pch = 19, col = "blue")
+cor(merged_dataset$resp_rate_control, merged_dataset$observed_resp_rate_control, method = "pearson", use = "pairwise.complete.obs")
+
+#check correlation between our calculations and cuijpers' calculations 
+cor(merged_dataset$responders_active, merged_dataset$cuij_responders_active, method = "pearson", use = "pairwise.complete.obs")
+cor(merged_dataset$responders_control, merged_dataset$cuij_responders_control, method = "pearson", use = "pairwise.complete.obs")
+
+#check plots
+# for active arm
+plot(merged_dataset$responders_active, merged_dataset$cuij_responders_active, 
+     xlab = "No of responders estimated by us", ylab = "No of responders estimated by Cuijpers",
+     main = "Comparison of our estimations vs Cuijpers' for no of responders in active arm",
+     pch = 19, col = "blue")
+
+# for control arm
+plot(merged_dataset$responders_control, merged_dataset$cuij_responders_control, 
+     xlab = "No of responders estimated by us", ylab = "No of responders estimated by Cuijpers",
+     main = "Comparison of our estimations vs Cuijpers' for no of responders in control arm",
+     pch = 19, col = "blue")
+
 #calculate cohens d
 cohens_d_active <- (merged_dataset$post_mean_active - merged_dataset$baseline_mean_active)/
-                  ((merged_dataset$post_sd_active + merged_dataset$baseline_sd_active)/2)
+  ((merged_dataset$post_sd_active + merged_dataset$baseline_sd_active)/2)
 cohens_d_control <- (merged_dataset$post_mean_control - merged_dataset$baseline_mean_control)/
   ((merged_dataset$post_sd_control + merged_dataset$baseline_sd_control)/2)
 
