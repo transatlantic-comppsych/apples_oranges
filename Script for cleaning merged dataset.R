@@ -171,10 +171,16 @@ names(meds_d_means) <- inst_names
 names(psy_d_means) <- inst_names
 meds_d_means <- do.call(rbind,meds_d_means )
 psy_d_means <- do.call(rbind,psy_d_means)
+psy_d_means <- psy_d_means %>%  mutate(type = "psy")
+meds_d_means <- meds_d_means %>%  mutate(type = "med")
 meds_psy_combo_means <- rbind(meds_d_means,psy_d_means )
 
+row.names(meds_psy_combo_means)
+meds_psy_combo_means <- meds_psy_combo_means[order(rownames(meds_psy_combo_means)), ] 
+meds_psy_combo_means <- meds_psy_combo_means %>%  relocate(type, .before = n)
 meds_d_means,psy_d_means
 
+#check 30% response rate
 
 
 merged_dataset  %>% 
