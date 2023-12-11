@@ -105,3 +105,20 @@ cohens_d_control <- (merged_dataset$post_mean_control - merged_dataset$baseline_
 merged_dataset <- cbind(merged_dataset, cohens_d_active, cohens_d_control)
 
 write.csv(merged_dataset, "Apples vs Oranges Dataset.csv") 
+
+
+cor.test(Apples_vs_Oranges_Dataset$resp_rate_active, Apples_vs_Oranges_Dataset$observed_resp_rate_active)
+library(tidyverse) 
+
+# this is meds
+test_df <- Apples_vs_Oranges_Dataset %>% 
+  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
+  filter(!is.na(resp_rate_active) & !is.na(observed_resp_rate_active)  ) %>% 
+   dplyr:: select(resp_rate_active, observed_resp_rate_active, study, year, response_criterion, instrument) #%>% 
+#   filter(!is.na(resp_rate_active) & !is.na(observed_resp_rate_active)  )
+# 
+# Apples_vs_Oranges_Dataset %>% 
+#   mutate(cuij_rate_active = cuij_responders_active/baseline_n_active) %>% 
+#   filter(psy_or_med == 1) %>% 
+#   dplyr:: select(resp_rate_active, cuij_rate_active, study, year, response_criterion, instrument) %>% 
+#   filter(!is.na(resp_rate_active) & !is.na(cuij_rate_active)  )
