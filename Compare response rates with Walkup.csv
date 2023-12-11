@@ -1,0 +1,20 @@
+"","study","year","instrument","active_type","time_weeks","response_criterion","walkup_resp_rate_active","walkup_resp_rate_control","sites","total_n","Column1","observed_resp_rate_active","observed_resp_rate_control","discrepent","discrepent_active","discrepent_control"
+"1","003-045 (24)","NA.0","CDRS-R","Mirtazapine",8,"CDRS-R raw score",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+"2","Atkinson","2014.0","CDRS","Duloxetine",10,"CDRS",0.67,0.63,65,337,NA,NA,NA,NA,NA,NA
+"3","Berard","2006.0","CGI-I","Paroxetine",12,"CGI-I",0.69,0.57,33,286,7,0.691860465116279,0.573033707865168,FALSE,FALSE,FALSE
+"4","Bristol-Myers Squibb","2002a","CGI-I","Nefazodone",8,"CGI-I",0.63,0.44,15,206,11,0.63,0.44,FALSE,FALSE,FALSE
+"5","CN104-187 (23)","NA.0","CDRS-R","Nefazodone",8,"ΔCDRS-R",NA,NA,28,317,NA,NA,NA,NA,NA,NA
+"6","DelBello","2014.0","CGI-I","Selegiline",12,"CGI-I",0.59,0.59,26,308,NA,NA,NA,NA,NA,NA
+"7","Emslie","1997.0","CGI-I","Fluoxetine",8,"CGI-I",0.56,0.33,1,96,15,0.5625,0.333333333333333,FALSE,FALSE,FALSE
+"8","Emslie","2002a","CGI-I","Fluoxetine",8,"CGI-I",0.65,0.53,15,219,18,0.522935779816514,0.368,TRUE,TRUE,TRUE
+"9","Emslie","2006.0","CGI-I","Paroxetine",8,"CGI-I",0.49,0.46,40,206,23,0.485148514851485,0.46,FALSE,FALSE,FALSE
+"10","Emslie","2007.0","CGI-I","Venlafaxine XR",8,"CGI-I",0.61,0.52,50,367,NA,NA,NA,NA,NA,NA
+"11","Emslie","2009.0","CGI-I","Escitalopram",8,"CGI-I",0.64,0.53,40,312,29,0.642857142857143,0.528662420382166,FALSE,FALSE,FALSE
+"12","Emslie","2014.0","CDRS","Duloxetine",10,"ΔCDRS-R >50%",0.69,0.6,60,463,30,0.69,0.6,FALSE,FALSE,FALSE
+"13","Emslie","2014.0","CDRS","Duloxetine",10,"ΔCDRS-R >50%",0.69,0.6,60,463,31,0.69,0.6,FALSE,FALSE,FALSE
+"14","Keller","2001.0","CGI-I","Paroxetine",8,"CGI-I",0.66,0.48,12,275,44,0.655555555555556,0.482758620689655,FALSE,FALSE,FALSE
+"15","March","2004.0","CGI-I","Fluoxetine",12,"CGI-I",0.61,0.35,13,439,58,0.605504587155963,0.348214285714286,FALSE,FALSE,FALSE
+"16","Von Knorring","2006.0","K-SADS-L","Citalopram",12,"K-SADS-P",0.6,0.61,31,244,62,0.6,0.61,FALSE,FALSE,FALSE
+"17","Wagner","2003.0","CDRS","Sertraline",10,"CDRS-R",0.69,0.59,53,376,64,0.691891891891892,0.592178770949721,FALSE,FALSE,FALSE
+"18","Wagner","2004.0","CGI-I","Citalopram",8,"CGI-I",0.47,0.45,21,178,67,0.471910112359551,0.447058823529412,FALSE,FALSE,FALSE
+"19","Wagner","2006.0","CGI-I","Escitalopram",8,"CGI-I",0.63,0.62,25,264,69,0.627906976744186,0.522727272727273,FALSE,FALSE,TRUE
