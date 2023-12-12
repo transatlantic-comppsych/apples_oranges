@@ -2,7 +2,6 @@
 library(readr)
 library(tidyverse)
 library(knitr)
-install.packages("kableExtra")
 library(kableExtra)
 
 df_full_psych <- read_csv("Full Psychotherapy Dataset.csv", col_types = cols(year = col_character()))
@@ -132,35 +131,85 @@ merged_dataset <- merged_dataset %>%
 df_appl_v_orange <- merged_dataset
 
 inst_names <- unique(df_appl_v_orange$instrument_name)
-# this is meds
+
+#average statistics for each instrument, collapsed across studies for both med and psy categories 
+
 meds_d_means <- list()
 psy_d_means <- list()
+meds_baseline_means <- list()
+psy_baseline_means <- list()
+meds_post_means <- list()
+psy_post_means <- list()
+
 for(i in 1: length(inst_names)){
-meds_d_means[[i]] <- df_appl_v_orange  %>% 
+#cohens d for meds
+  meds_d_means[[i]] <- df_appl_v_orange  %>% 
   filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
    summarise(n = n(), avg_d_act = mean(cohens_d_active, na.rm = T), sd_d_act = sd(cohens_d_active, na.rm = T), 
              avg_d_ctrl = mean(cohens_d_control, na.rm = T), sd_d_ctrl = sd(cohens_d_control, na.rm = T))
   
-#this is psy
+# cohens d for psy
 psy_d_means[[i]] <-  df_appl_v_orange  %>% 
    filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
    summarise(n = n(), avg_d_act = mean(cohens_d_active, na.rm = T), sd_d_act = sd(cohens_d_active, na.rm = T), 
              avg_d_ctrl = mean(cohens_d_control, na.rm = T), sd_d_ctrl = sd(cohens_d_control, na.rm = T))
- 
+
+# for medication trials, average baseline mean scores for each instrument
+meds_baseline_means[[i]] <- df_appl_v_orange  %>% 
+  filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
+  summarise(n = n(), avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
+            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
+
+# for psychotherapy trials, average baseline mean scores for each instrument
+psy_baseline_means[[i]] <- df_appl_v_orange  %>% 
+  filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
+  summarise(n = n(), avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
+            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
+
+# for medication trials, average post-test mean scores for each instrument
+meds_post_means[[i]] <- df_appl_v_orange  %>% 
+  filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
+  summarise(n = n(), avg_post_mean_act = mean(post_mean_active, na.rm = T), sd_post_mean_act = sd(post_mean_active, na.rm = T), 
+            avg_post_mean_ctrl = mean(post_mean_control, na.rm = T), sd_post_mean_ctrl = sd(post_mean_control, na.rm = T))
+
+# for psychotherapy trials, average post-test mean scores for each instrument
+psy_post_means[[i]] <- df_appl_v_orange  %>% 
+  filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
+  summarise(n = n(), avg_post_mean_act = mean(post_mean_active, na.rm = T), sd_post_mean_act = sd(post_mean_active, na.rm = T), 
+            avg_post_mean_ctrl = mean(post_mean_control, na.rm = T), sd_post_mean_ctrl = sd(post_mean_control, na.rm = T))
+
 }
 
 names(meds_d_means) <- inst_names
 names(psy_d_means) <- inst_names
+names(meds_baseline_means) <- inst_names
+names(psy_baseline_means) <- inst_names
+names(meds_post_means) <- inst_names
+names(psy_post_means) <- inst_names
 meds_d_means <- do.call(rbind,meds_d_means )
 psy_d_means <- do.call(rbind,psy_d_means)
-psy_d_means <- psy_d_means %>%  mutate(type = "psy", 
-                                       instr = rownames(psy_d_means)
-                                       )
+meds_baseline_means <- do.call(rbind, meds_baseline_means)
+psy_baseline_means <- do.call(rbind, psy_baseline_means)
+meds_post_means <- do.call(rbind, meds_post_means)
+psy_post_means <- do.call(rbind, psy_post_means)
+
+psy_d_means <- psy_d_means %>%  mutate(type = "psy", instr = rownames(psy_d_means))
 meds_d_means <- meds_d_means %>%  mutate(type = "med", instr = rownames(psy_d_means) )
-meds_psy_combo_means <- rbind(meds_d_means,psy_d_means )
-rownames(meds_psy_combo_means) <- NULL
-meds_psy_combo_means %>% 
-  arrange(instr)
+psy_baseline_means <- psy_baseline_means %>%  mutate(type = "psy", instr = rownames(psy_baseline_means))
+meds_baseline_means <- meds_baseline_means %>%  mutate(type = "med", instr = rownames(meds_baseline_means))
+psy_post_means <- psy_post_means %>%  mutate(type = "psy", instr = rownames(psy_post_means))
+meds_post_means <- meds_post_means %>%  mutate(type = "med", instr = rownames(meds_post_means))
+
+meds_psy_combo_d_means <- rbind(meds_d_means,psy_d_means )
+meds_psy_combo_baseline_means <- rbind(meds_baseline_means, psy_baseline_means )
+meds_psy_combo_post_means <- rbind(meds_post_means, psy_post_means )
+
+df_stats_per_instrument <- full_join(meds_psy_combo_baseline_means, meds_psy_combo_post_means, by = c("type", "instr", "n"))
+df_stats_per_instrument <- full_join(df_stats_per_instrument, meds_psy_combo_d_means, by = c("type", "instr", "n"))
+
+df_stats_per_instrument <- df_stats_per_instrument %>% relocate(instr, .before = n)
+df_stats_per_instrument <- df_stats_per_instrument %>% relocate(type, .after = instr)
+df_stats_per_instrument <- df_stats_per_instrument %>% arrange(instr) 
 
 # create unique study ids to account for multiple active arms per study name 
 df_appl_v_orange <- df_appl_v_orange %>%
