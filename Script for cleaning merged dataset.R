@@ -1,6 +1,9 @@
 # create and clean new merged dataset
 library(readr)
 library(tidyverse)
+library(knitr)
+install.packages("kableExtra")
+library(kableExtra)
 
 df_full_psych <- read_csv("Full Psychotherapy Dataset.csv", col_types = cols(year = col_character()))
 df_full_med <- read.csv("Full Medication Dataset.csv")
@@ -56,10 +59,20 @@ merged_dataset <- merged_dataset %>%
       instrument %in% c("ces-d") ~ "ces_d",
       instrument %in% c("CAS") ~ "cas",
       instrument %in% c("cbcl-d") ~ "cbcl_d",
+      instrument %in% c("CGI", "CGI-I") ~ "cgi",
+      instrument %in% c("GAS") ~ "gas",
+      instrument %in% c("Acholi Psychosocial Assessment Instrument (APAI): a local instrument") ~ "apai",
+      instrument %in% c("phq-9") ~ "phq_9",
+      instrument %in% c("PFCâ€“S") ~ "pfc",
+      instrument %in% c("PAPA") ~ "papa",
+      instrument %in% c("dass") ~ "dass",
+      instrument %in% c("disc-c MDD symptom count") ~ "disc_c_mdd",
       # TRUE ~ 99 # Default case, if none of the above conditions match
     )
   )
 merged_dataset <- merged_dataset %>% relocate(instrument_name, .after = instrument)
+
+unique(merged_dataset$instrument)
 
 # create response rate variables
 # first create our primary response rate variable, which is estimated number of responders / n at randomisation
@@ -72,14 +85,6 @@ resp_rate_control_completers <- (merged_dataset$responders_control)/(merged_data
 
 merged_dataset <- cbind(merged_dataset, resp_rate_active, resp_rate_control, resp_rate_active_completers, resp_rate_control_completers)
 merged_dataset <- merged_dataset %>% relocate(resp_rate_active: resp_rate_control_completers, .after = responders_control)
-
-# merged_dataset <- merged_dataset %>%
-#   mutate(
-#     resp_rate_active = round(resp_rate_active, 4),
-#     resp_rate_control = round(resp_rate_control, 4),
-#     resp_rate_active_completers = round(resp_rate_active_completers, 4),
-#     resp_rate_control_completers = round(resp_rate_control_completers, 4)
-#   )
 
 #calculate response rate for studies that reported no of responders
 calc_observed_resp_rate_active <- (merged_dataset$observed_responders_active)/(merged_dataset$observed_responders_active_n)
@@ -123,30 +128,8 @@ merged_dataset <- merged_dataset %>%
   mutate(cohens_d_active = (post_mean_active - baseline_mean_active)/
   ((post_sd_active + baseline_sd_active)/2), cohens_d_control = (post_mean_control - baseline_mean_control)/
   ((post_sd_control + baseline_sd_control)/2))
-  
-  
-  
-  
-    
-  
-#   
-#   
-# cohens_d_active = (merged_dataset$post_mean_active - merged_dataset$baseline_mean_active)/
-#   ((merged_dataset$post_sd_active + merged_dataset$baseline_sd_active)/2)
-# cohens_d_control <- (merged_dataset$post_mean_control - merged_dataset$baseline_mean_control)/
-#   ((merged_dataset$post_sd_control + merged_dataset$baseline_sd_control)/2)
-# 
-# merged_dataset <- cbind(merged_dataset, cohens_d_active, cohens_d_control)
-# 
-# write.csv(merged_dataset, "Apples vs Oranges Dataset.csv") 
-# 
-# 
-# cor.test(Apples_vs_Oranges_Dataset$resp_rate_active, Apples_vs_Oranges_Dataset$observed_resp_rate_active)
-# library(tidyverse) 
 
 df_appl_v_orange <- merged_dataset
-
-
 
 inst_names <- unique(df_appl_v_orange$instrument_name)
 # this is meds
@@ -158,8 +141,7 @@ meds_d_means[[i]] <- df_appl_v_orange  %>%
    summarise(n = n(), avg_d_act = mean(cohens_d_active, na.rm = T), sd_d_act = sd(cohens_d_active, na.rm = T), 
              avg_d_ctrl = mean(cohens_d_control, na.rm = T), sd_d_ctrl = sd(cohens_d_control, na.rm = T))
   
-
-
+#this is psy
 psy_d_means[[i]] <-  df_appl_v_orange  %>% 
    filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
    summarise(n = n(), avg_d_act = mean(cohens_d_active, na.rm = T), sd_d_act = sd(cohens_d_active, na.rm = T), 
@@ -180,32 +162,53 @@ rownames(meds_psy_combo_means) <- NULL
 meds_psy_combo_means %>% 
   arrange(instr)
 
+# create unique study ids to account for multiple active arms per study name 
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(study_ID = ifelse(psy_or_med == 0, paste(study, year, active_type, sep = "_"), 
+                  paste(study, descr_active, sep = "_")))
+# arranging by instrument value
+df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
+# retain only first row
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
 
+# start looking at demographics
+df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
+                                           instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
+                                           baseline_mean_control, baseline_sd_control, baseline_n_control, 
+                                           mean_age, active_mean_age, control_mean_age, 
+                                           percent_women, active_percent_women, control_percent_women )
+# create overall mean age variable for all studies 
+df_demographics <- df_demographics %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
+                                               /(baseline_n_active + baseline_n_control))
+df_demographics <- df_demographics %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
 
+#create overall percent women variable for all studies
+df_demographics <- df_demographics %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
+                                               /(baseline_n_active + baseline_n_control))
+df_demographics <- df_demographics %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
 
+df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_age, overall_mean_age, 
+                                                  active_percent_women, control_percent_women, overall_percent_women))
 
-#check 30% response rate
+# combine arm description variables across psy and med
+df_demographics$descr_active <- ifelse(is.na(df_demographics$descr_active), df_demographics$active_type, df_demographics$descr_active)
+df_demographics$descr_control <- ifelse(is.na(df_demographics$descr_control), df_demographics$control_type, df_demographics$descr_control)
 
+df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_age, overall_mean_age, 
+                                                  active_percent_women, control_percent_women, overall_percent_women,
+                                                  active_type, control_type))
+df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
-merged_dataset  %>% 
-  filter(psy_or_med == 0) 
+#create a table
+table_demographics <- kable(df_demographics, caption = "Demographics")
+print(table_demographics)
 
+write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv") 
 
-names(psy_d_means) <- unique(Apples_vs_Oranges_Dataset$instrument_name)[1:10]
-
-
-meds_d_means
-
-meds_vs_psy <- data.frame(rbind(meds_d_means, psy_d_means))
-meds_vs_psy 
-
-
-
-
-test_df <- Apples_vs_Oranges_Dataset %>% 
-  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
-  filter(!is.na(resp_rate_active) & !is.na(observed_resp_rate_active)  ) %>% 
-   dplyr:: select(resp_rate_active, observed_resp_rate_active, study, year, response_criterion, instrument) #%>% 
+#test_df <- Apples_vs_Oranges_Dataset %>% 
+#  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
+#  filter(!is.na(resp_rate_active) & !is.na(observed_resp_rate_active)  ) %>% 
+#   dplyr:: select(resp_rate_active, observed_resp_rate_active, study, year, response_criterion, instrument) #%>% 
 #   filter(!is.na(resp_rate_active) & !is.na(observed_resp_rate_active)  )
 # 
 # Apples_vs_Oranges_Dataset %>% 
