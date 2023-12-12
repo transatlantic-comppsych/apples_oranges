@@ -21,3 +21,5 @@ df_compare_with_walkup <- df_compare_with_walkup %>%
   mutate(discrepent_active = abs(walkup_resp_rate_active - observed_resp_rate_active) > 0.02)
 df_compare_with_walkup <- df_compare_with_walkup %>%
   mutate(discrepent_control = abs(walkup_resp_rate_control - observed_resp_rate_control) > 0.02)
+
+write.csv(df_compare_with_walkup, "Compare response rates with Walkup.csv")
