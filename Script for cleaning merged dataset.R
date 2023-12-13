@@ -236,9 +236,6 @@ df_demographics <- df_demographics %>%  mutate(overall_percent_women = (active_p
                                                /(baseline_n_active + baseline_n_control))
 df_demographics <- df_demographics %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
 
-df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_age, overall_mean_age, 
-                                                  active_percent_women, control_percent_women, overall_percent_women))
-
 # combine arm description variables across psy and med
 df_demographics$descr_active <- ifelse(is.na(df_demographics$descr_active), df_demographics$active_type, df_demographics$descr_active)
 df_demographics$descr_control <- ifelse(is.na(df_demographics$descr_control), df_demographics$control_type, df_demographics$descr_control)
@@ -249,10 +246,15 @@ df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
 #create a table
-table_demographics <- kable(df_demographics, caption = "Demographics")
+table_demographics <- knitr:: kable(df_demographics, caption = "Demographics")
 print(table_demographics)
 
 write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv") 
+
+
+
+knitr:: kable(df_demographics,format = "pipe", caption = "Demographics")
+df_demographics
 
 #test_df <- Apples_vs_Oranges_Dataset %>% 
 #  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
