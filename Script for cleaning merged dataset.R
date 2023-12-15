@@ -230,7 +230,7 @@ df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
 # retain only first row
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
 
-# start looking at demographics
+# start looking at demographics, baseline and post means, and cohens d per arm
 df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
@@ -256,6 +256,13 @@ df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_
                                                   active_type, control_type))
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
+# check how many studies we have baseline means for
+df_summary_missing_data <- df_demographics %>% 
+  group_by(psy_or_med) %>% 
+  summarise(n_reporting_base_means_act = sum(!is.na(baseline_mean_active)), n_reporting_base_means_contr = sum(!is.na(baseline_mean_control)),
+  n_reporting_post_means_act = sum(!is.na(post_mean_active)), n_reporting_post_means_contr = sum(!is.na(post_mean_control)))
+
+# average cohens d, mean age and percent women, summarising across psy and med
 df_means_demo <- df_demographics %>%  
   group_by(psy_or_med) %>% 
   summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
@@ -264,22 +271,11 @@ df_means_demo <- df_demographics %>%
   mean_percent_women = mean(percent_women, na.rm = TRUE),
   missing_d = sum(is.na(cohens_d_active)))
 
-df_means_demo_w_instr <- df_demographics %>%  
-  group_by(psy_or_med, instrument_name) %>% 
-  summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
-            mean_cohens_d_control = mean(cohens_d_control, na.rm = TRUE),
-            mean_age = mean(mean_age, na.rm = TRUE), 
-            mean_percent_women = mean(percent_women, na.rm = TRUE))
+
             
-
-
 write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
 
 
-
-
-
-df_stats_per_instrument %>% 
 
 openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T, borders = "columns", asTable = F)
 
@@ -304,8 +300,4 @@ library(misty)
 test_2 <- df.duplicated(test_2, instr)
 test_2
 openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
-
-
-
-df_means_demo
 
