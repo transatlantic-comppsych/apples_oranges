@@ -161,13 +161,18 @@ psy_d_means[[i]] <-  df_appl_v_orange  %>%
 # for medication trials, average baseline mean scores for each instrument
 meds_baseline_means[[i]] <- df_appl_v_orange  %>% 
   filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
-  summarise(n = n(), avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
-            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
+  summarise(n = n(), total_n_control = sum(baseline_n_control), 
+            total_n_active = sum(baseline_n_active),
+            avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
+            sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
+            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
+            sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
 
 # for psychotherapy trials, average baseline mean scores for each instrument
 psy_baseline_means[[i]] <- df_appl_v_orange  %>% 
   filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
-  summarise(n = n(), avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
+  summarise(n = n(), total_n_control = sum(baseline_n_control), total_n_active = sum(baseline_n_active),
+            avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
 
 # for medication trials, average post-test mean scores for each instrument
