@@ -269,21 +269,15 @@ df_means_demo_w_instr <- df_demographics %>%
   summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
             mean_cohens_d_control = mean(cohens_d_control, na.rm = TRUE),
             mean_age = mean(mean_age, na.rm = TRUE), 
-            mean_percent_women = mean(percent_women, na.rm = TRUE),
+            mean_percent_women = mean(percent_women, na.rm = TRUE))
             
 
-test <- df_demographics %>% 
-  filter(psy_or_med) %>% 
-  summsum((!is.na(cohen)))
 
 write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
 
 
 
-knitr:: kable(df_demographics,format = "pipe", caption = "Demographics")
 
-colnames(df_demographics)
-colnames(df_stats_per_instrument)
 
 df_stats_per_instrument %>% 
 
@@ -303,11 +297,15 @@ openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T,
 
 # keep only non_zero values
 test_2 <- df_stats_per_instrument %>% 
-  filter((type == "med" & n != 0) | (type == "psy" & n != 0) ) %>% 
+  filter((type == "med" & n != 0) | (type == "psy" & n != 0) )
 
 # keep only duplicated rows
 library(misty)
 test_2 <- df.duplicated(test_2, instr)
 test_2
 openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
+
+
+
+df_means_demo
 
