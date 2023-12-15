@@ -1,8 +1,9 @@
-# create and clean new merged dataset
 library(readr)
 library(tidyverse)
 library(knitr)
 library(kableExtra)
+
+# Merge and Clean Dataset -------------------------------------------------
 
 df_full_psych <- read_csv("Full Psychotherapy Dataset.csv", col_types = cols(year = col_character()))
 df_full_med <- read.csv("Full Medication Dataset.csv")
@@ -71,8 +72,6 @@ merged_dataset <- merged_dataset %>%
   )
 merged_dataset <- merged_dataset %>% relocate(instrument_name, .after = instrument)
 
-unique(merged_dataset$instrument)
-
 # create response rate variables
 # first create our primary response rate variable, which is estimated number of responders / n at randomisation
 resp_rate_active <- (merged_dataset$responders_active)/(merged_dataset$baseline_n_active)
@@ -131,6 +130,10 @@ merged_dataset <- merged_dataset %>%
 df_appl_v_orange <- merged_dataset
 
 inst_names <- unique(df_appl_v_orange$instrument_name)
+
+
+# Create summary statistics for each instrument  --------
+
 
 #average statistics for each instrument, collapsed across studies for both med and psy categories 
 
@@ -211,12 +214,18 @@ df_stats_per_instrument <- df_stats_per_instrument %>% relocate(instr, .before =
 df_stats_per_instrument <- df_stats_per_instrument %>% relocate(type, .after = instr)
 df_stats_per_instrument <- df_stats_per_instrument %>% arrange(instr) 
 
+
+# Look at demographics per study, for primary instrument ------------------
+
+
 # create unique study ids to account for multiple active arms per study name 
 df_appl_v_orange <- df_appl_v_orange %>%
   mutate(study_ID = ifelse(psy_or_med == 0, paste(study, year, active_type, sep = "_"), 
                   paste(study, descr_active, sep = "_")))
+
 # arranging by instrument value
 df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
+
 # retain only first row
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
 
@@ -224,6 +233,7 @@ df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE)
 df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
+                                           post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
                                            mean_age, active_mean_age, control_mean_age, 
                                            percent_women, active_percent_women, control_percent_women )
 # create overall mean age variable for all studies 
