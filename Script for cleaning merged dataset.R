@@ -136,6 +136,7 @@ inst_names <- unique(df_appl_v_orange$instrument_name)
 
 
 #average statistics for each instrument, collapsed across studies for both med and psy categories 
+# this includes duplicates of studies 
 
 meds_d_means <- list()
 psy_d_means <- list()
@@ -234,7 +235,7 @@ df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
                                            post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
-                                           mean_age, active_mean_age, control_mean_age, 
+                                           cohens_d_active, cohens_d_control,  mean_age, active_mean_age, control_mean_age, 
                                            percent_women, active_percent_women, control_percent_women )
 # create overall mean age variable for all studies 
 df_demographics <- df_demographics %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
@@ -255,11 +256,27 @@ df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_
                                                   active_type, control_type))
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
-#create a table
-table_demographics <- knitr:: kable(df_demographics, caption = "Demographics")
-print(table_demographics)
+df_means_demo <- df_demographics %>%  
+  group_by(psy_or_med) %>% 
+  summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
+  mean_cohens_d_control = mean(cohens_d_control, na.rm = TRUE),
+  mean_age = mean(mean_age, na.rm = TRUE), 
+  mean_percent_women = mean(percent_women, na.rm = TRUE),
+  missing_d = sum(is.na(cohens_d_active)))
 
-write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv") 
+df_means_demo_w_instr <- df_demographics %>%  
+  group_by(psy_or_med, instrument_name) %>% 
+  summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
+            mean_cohens_d_control = mean(cohens_d_control, na.rm = TRUE),
+            mean_age = mean(mean_age, na.rm = TRUE), 
+            mean_percent_women = mean(percent_women, na.rm = TRUE),
+            
+
+test <- df_demographics %>% 
+  filter(psy_or_med) %>% 
+  summsum((!is.na(cohen)))
+
+write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
 
 
 
