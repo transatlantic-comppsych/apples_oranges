@@ -161,19 +161,24 @@ psy_d_means[[i]] <-  df_appl_v_orange  %>%
 # for medication trials, average baseline mean scores for each instrument
 meds_baseline_means[[i]] <- df_appl_v_orange  %>% 
   filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
-  summarise(n = n(), total_n_control = sum(baseline_n_control), 
-            total_n_active = sum(baseline_n_active),
+  summarise(n = n(), total_n_control = sum(baseline_n_control, na.rm = T), 
+            total_n_active = sum(baseline_n_active, na.rm = T),
+            avg_age = mean(mean_age, na.rm = T),
             avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
-            sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
+            sd_baseline_mean_act = sd(baseline_sd_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
-            sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
+            sd_baseline_mean_ctrl = sd(baseline_sd_control, na.rm = T))
 
 # for psychotherapy trials, average baseline mean scores for each instrument
 psy_baseline_means[[i]] <- df_appl_v_orange  %>% 
   filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
-  summarise(n = n(), total_n_control = sum(baseline_n_control), total_n_active = sum(baseline_n_active),
-            avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
-            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
+  summarise(n = n(), total_n_control = sum(baseline_n_control, na.rm = T), 
+            total_n_active = sum(baseline_n_active, na.rm = T),
+             avg_age = mean(mean_age, na.rm = T),
+            avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
+            sd_baseline_mean_act = sd(baseline_sd_active, na.rm = T), 
+            avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
+            sd_baseline_mean_ctrl = sd(baseline_sd_control, na.rm = T))
 
 # for medication trials, average post-test mean scores for each instrument
 meds_post_means[[i]] <- df_appl_v_orange  %>% 
@@ -282,7 +287,7 @@ write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
 
 
 
-openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T, borders = "columns", asTable = F)
+#openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T, borders = "columns", asTable = F)
 
 #test_df <- Apples_vs_Oranges_Dataset %>% 
 #  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
@@ -303,6 +308,30 @@ test_2 <- df_stats_per_instrument %>%
 # keep only duplicated rows
 library(misty)
 test_2 <- df.duplicated(test_2, instr)
-test_2
-openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
+
+get_cdrs_means <- test_2 %>% 
+  filter(instr == "cdrs") 
+
+test_2 %>% 
+  filter(instr == "hamd") 
+
+
+test_2 %>% 
+  filter(instr == "bdi") 
+
+t.test.fromSummaryStats <- function(mu,n,s) {
+  -diff(mu) / sqrt( sum( s^2/n ) )
+}
+
+mu <- c(get_cdrs_means$avg_d_ctrl[1],get_cdrs_means$avg_d_ctrl[2])
+n <- c(get_cdrs_means$total_n_control[1],get_cdrs_means$total_n_control[2])
+s <- c(get_cdrs_means$sd_d_ctrl[1],get_cdrs_means$sd_d_ctrl[2])
+t.test.fromSummaryStats(mu,n,s)
+
+
+df_demographics %>% 
+  group_by(psy_or_med ) %>% 
+  summarise (avg_age = mean(mean_age, na.rm = T), sd_age = sd(mean_age, na.rm = T))
+
+#openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
 
