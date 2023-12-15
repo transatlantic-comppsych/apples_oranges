@@ -264,7 +264,13 @@ write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
 
 
 knitr:: kable(df_demographics,format = "pipe", caption = "Demographics")
-df_demographics
+
+colnames(df_demographics)
+colnames(df_stats_per_instrument)
+
+df_stats_per_instrument %>% 
+
+openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T, borders = "columns", asTable = F)
 
 #test_df <- Apples_vs_Oranges_Dataset %>% 
 #  filter(psy_or_med == 0, (instrument_value == 1|instrument_value == 2 |instrument_value == 3)) %>% 
@@ -277,3 +283,14 @@ df_demographics
 #   filter(psy_or_med == 1) %>% 
 #   dplyr:: select(resp_rate_active, cuij_rate_active, study, year, response_criterion, instrument) %>% 
 #   filter(!is.na(resp_rate_active) & !is.na(cuij_rate_active)  )
+
+# keep only non_zero values
+test_2 <- df_stats_per_instrument %>% 
+  filter((type == "med" & n != 0) | (type == "psy" & n != 0) ) %>% 
+
+# keep only duplicated rows
+library(misty)
+test_2 <- df.duplicated(test_2, instr)
+test_2
+openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
+
