@@ -335,3 +335,29 @@ df_demographics %>%
 
 #openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
 
+# check the Cohen's ds for medication and psychotherapy
+tapply(df_appl_v_orange$cohens_d_control,
+       df_appl_v_orange$psy_or_med, summary,na.rm = TRUE)
+# you see that I used tapply rather than dplyr's group_by. Here I am also using aggreagate, another
+# R base function. Neat, right :) 
+aggregate(df_appl_v_orange$cohens_d_control, by  = list(df_appl_v_orange$psy_or_med), summary)
+
+# from thea above it seemed like we had some studies where the controls have a positive d
+# here is a quick histogram to see what I mean
+tapply(df_appl_v_orange$cohens_d_control,df_appl_v_orange$psy_or_med, hist)
+
+# I have therefore re-run things here excluding those with positive ds. 
+tapply(df_appl_v_orange[df_appl_v_orange$cohens_d_control<=0, ]$cohens_d_control,
+       df_appl_v_orange[df_appl_v_orange$cohens_d_control<=0, ]$psy_or_med, summary,na.rm = TRUE)
+
+# which ones are the offending studies. As can be seen, nearly all of these studies are in the
+# psychotherapy part.
+
+
+
+studies_with_positive_cohens_ds <- tapply(df_appl_v_orange[df_appl_v_orange$cohens_d_control>=0
+                 , ]$study, df_appl_v_orange[df_appl_v_orange$cohens_d_control>=0
+                                             , ]$psy_or_med, na.omit)
+
+names(studies_with_positive_cohens_ds) <- c("meds", "psy")
+studies_with_positive_cohens_ds
