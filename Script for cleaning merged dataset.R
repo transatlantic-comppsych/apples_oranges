@@ -353,11 +353,9 @@ tapply(df_appl_v_orange[df_appl_v_orange$cohens_d_control<=0, ]$cohens_d_control
 # which ones are the offending studies. As can be seen, nearly all of these studies are in the
 # psychotherapy part.
 
-
-
 studies_with_positive_cohens_ds <- tapply(df_appl_v_orange[df_appl_v_orange$cohens_d_control>=0
                  , ]$study, df_appl_v_orange[df_appl_v_orange$cohens_d_control>=0
                                              , ]$psy_or_med, na.omit)
 
-names(studies_with_positive_cohens_ds) <- c("meds", "psy")
+names(studies_with_positive_cohens_ds) <- c("meds", "psy") # to make prettier
 studies_with_positive_cohens_ds
