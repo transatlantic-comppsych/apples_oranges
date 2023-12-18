@@ -2,6 +2,8 @@ library(readr)
 library(tidyverse)
 library(knitr)
 library(kableExtra)
+library(misty)
+library(openxlsx)
 
 # Merge and Clean Dataset -------------------------------------------------
 
@@ -42,7 +44,7 @@ merged_dataset <- merged_dataset %>%
   )
 merged_dataset <- merged_dataset %>% relocate(instrument_value, .after = instrument)
 
-# create an instrument name variable
+# create an instrument name variable to ensure consistency
 merged_dataset <- merged_dataset %>%
   mutate(
     instrument_name = case_when(
@@ -84,9 +86,10 @@ resp_rate_control_completers <- (merged_dataset$responders_control)/(merged_data
 merged_dataset <- cbind(merged_dataset, resp_rate_active, resp_rate_control, resp_rate_active_completers, resp_rate_control_completers)
 merged_dataset <- merged_dataset %>% relocate(resp_rate_active: resp_rate_control_completers, .after = responders_control)
 
-#calculate response rate for studies that reported no of responders
+#calculate response rate for studies that reported no of responders rather than a response rate
 calc_observed_resp_rate_active <- (merged_dataset$observed_responders_active)/(merged_dataset$observed_responders_active_n)
 calc_observed_resp_rate_control <- (merged_dataset$observed_responders_control)/(merged_dataset$observed_responders_control_n)
+# then concatenate with variable indicating reported response rates
 merged_dataset$observed_resp_rate_active <- coalesce(calc_observed_resp_rate_active, merged_dataset$observed_resp_rate_active)
 merged_dataset$observed_resp_rate_control <- coalesce(calc_observed_resp_rate_control, merged_dataset$observed_resp_rate_control)
 
@@ -228,42 +231,41 @@ df_stats_per_instrument <- df_stats_per_instrument %>% arrange(instr)
 
 # Look at demographics per study, for primary instrument ------------------
 
+#first I'm going to do some cleaning. We have mean_age and percent_women reported overall for psy trials but per arm for med trials
 
 # create unique study ids to account for multiple active arms per study name 
 df_appl_v_orange <- df_appl_v_orange %>%
   mutate(study_ID = ifelse(psy_or_med == 0, paste(study, year, active_type, sep = "_"), 
                   paste(study, descr_active, sep = "_")))
 
-# arranging by instrument value
+# create overall mean age variable for all studies 
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
+                                               /(baseline_n_active + baseline_n_control))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
+
+#create overall percent women variable for all studies
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
+                                               /(baseline_n_active + baseline_n_control))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+
+# arranging by study ID and instrument value
 df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
 
-# retain only first row
-df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+# retain only first row to look at demographics as this will keep one row per study_ID, taking the primary instrument
+df_demographics <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
 
 # start looking at demographics, baseline and post means, and cohens d per arm
-df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
+df_demographics <- df_demographics %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
                                            post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
-                                           cohens_d_active, cohens_d_control,  mean_age, active_mean_age, control_mean_age, 
-                                           percent_women, active_percent_women, control_percent_women )
-# create overall mean age variable for all studies 
-df_demographics <- df_demographics %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
-                                               /(baseline_n_active + baseline_n_control))
-df_demographics <- df_demographics %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
-
-#create overall percent women variable for all studies
-df_demographics <- df_demographics %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
-                                               /(baseline_n_active + baseline_n_control))
-df_demographics <- df_demographics %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+                                           cohens_d_active, cohens_d_control,  mean_age, percent_women)
 
 # combine arm description variables across psy and med
 df_demographics$descr_active <- ifelse(is.na(df_demographics$descr_active), df_demographics$active_type, df_demographics$descr_active)
 df_demographics$descr_control <- ifelse(is.na(df_demographics$descr_control), df_demographics$control_type, df_demographics$descr_control)
 
-df_demographics <- df_demographics %>%  select(-c(active_mean_age, control_mean_age, overall_mean_age, 
-                                                  active_percent_women, control_percent_women, overall_percent_women,
-                                                  active_type, control_type))
+df_demographics <- df_demographics %>%  select(-c(active_type, control_type))
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
 # check how many studies we have baseline means for
@@ -281,11 +283,7 @@ df_means_demo <- df_demographics %>%
   mean_percent_women = mean(percent_women, na.rm = TRUE),
   missing_d = sum(is.na(cohens_d_active)))
 
-
-            
 write.csv(df_appl_v_orange, "Apples vs Oranges Dataset.csv")
-
-
 
 #openxlsx:: write.xlsx(df_stats_per_instrument, file = "test.xlsx", colNames = T, borders = "columns", asTable = F)
 
@@ -338,11 +336,11 @@ df_demographics %>%
 # check the Cohen's ds for medication and psychotherapy
 tapply(df_appl_v_orange$cohens_d_control,
        df_appl_v_orange$psy_or_med, summary,na.rm = TRUE)
-# you see that I used tapply rather than dplyr's group_by. Here I am also using aggreagate, another
+# you see that I used tapply rather than dplyr's group_by. Here I am also using aggregate, another
 # R base function. Neat, right :) 
 aggregate(df_appl_v_orange$cohens_d_control, by  = list(df_appl_v_orange$psy_or_med), summary)
 
-# from thea above it seemed like we had some studies where the controls have a positive d
+# from the above it seemed like we had some studies where the controls have a positive d
 # here is a quick histogram to see what I mean
 tapply(df_appl_v_orange$cohens_d_control,df_appl_v_orange$psy_or_med, hist)
 
@@ -362,22 +360,12 @@ names(studies_with_positive_cohens_ds) <- c("meds", "psy") # to make prettier
 
 studies_with_positive_cohens_ds
 
+#we have inspected those with pos cohens d. It appears for some there is a genuine (small) deterioration in control arm.
+#detected one error for the De Jong Heesen study. Mistake in Cuijpers dataset. 
+# yet to do - correct this error and inform Cuipers
+
 #check which studies have missing means or sds at baseline or post 
-studies_with_missing_values <- df_appl_v_orange %>%
-  filter(
-     is.na(baseline_mean_active) |
-      is.na(baseline_sd_active) |
-      is.na(baseline_mean_control) |
-      is.na(baseline_sd_control) |
-      is.na(post_mean_active) |
-      is.na(post_sd_active) |
-      is.na(post_mean_control) |
-      is.na(post_sd_control)) %>%
-select(study_ID)
 
-unique(studies_with_missing_values$study_ID)
-
-# same thing different method
 # Specify the columns to check
 columns_to_check <- c(
   "baseline_mean_active", "baseline_sd_active",
@@ -395,8 +383,13 @@ columns_with_missing_values <- df_appl_v_orange %>%
 tapply(print(columns_with_missing_values[,1:2]
 ), columns_with_missing_values$psy_or_med)
 
+#create excel sheet to edit
+# we have created a notes column named how_handle_es_calc where we inspect each study and its missing data
+#from there we work out which method to use to impute / derive an appropriate value to substitute missing values
 
 openxlsx:: write.xlsx(columns_with_missing_values, file = "columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
 
-
+# Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessed
+# change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
+# titled "Chapter 6: Choosing effect measures and computing estimates of effect" https://training.cochrane.org/handbook/current/chapter-06#section-6-5
 
