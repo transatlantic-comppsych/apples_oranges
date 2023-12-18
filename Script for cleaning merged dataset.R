@@ -389,8 +389,14 @@ columns_to_check <- c(
 # Identify which columns have missing values for each study
 columns_with_missing_values <- df_appl_v_orange %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
-  select(study, year, where(function(x) any(is.na(x))))
+  select(psy_or_med, study, year, where(function(x) any(is.na(x))))
 
 # Print columns with missing values for each study
-print(columns_with_missing_values)
+tapply(print(columns_with_missing_values[,1:2]
+), columns_with_missing_values$psy_or_med)
+
+
+openxlsx:: write.xlsx(columns_with_missing_values, file = "columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
+
+
 
