@@ -362,7 +362,35 @@ names(studies_with_positive_cohens_ds) <- c("meds", "psy") # to make prettier
 
 studies_with_positive_cohens_ds
 
+#check which studies have missing means or sds at baseline or post 
+studies_with_missing_values <- df_appl_v_orange %>%
+  filter(
+     is.na(baseline_mean_active) |
+      is.na(baseline_sd_active) |
+      is.na(baseline_mean_control) |
+      is.na(baseline_sd_control) |
+      is.na(post_mean_active) |
+      is.na(post_sd_active) |
+      is.na(post_mean_control) |
+      is.na(post_sd_control)) %>%
+select(study_ID)
 
+unique(studies_with_missing_values$study_ID)
 
+# same thing different method
+# Specify the columns to check
+columns_to_check <- c(
+  "baseline_mean_active", "baseline_sd_active",
+  "baseline_mean_control", "baseline_sd_control",
+  "post_mean_active", "post_sd_active",
+  "post_mean_control", "post_sd_control"
+)
 
+# Identify which columns have missing values for each study
+columns_with_missing_values <- df_appl_v_orange %>%
+  filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
+  select(study, year, where(function(x) any(is.na(x))))
+
+# Print columns with missing values for each study
+print(columns_with_missing_values)
 
