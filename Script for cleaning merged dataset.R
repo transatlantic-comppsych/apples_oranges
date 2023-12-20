@@ -79,64 +79,56 @@ merged_dataset <- merged_dataset %>% relocate(instrument_name, .after = instrume
 resp_rate_active <- (merged_dataset$responders_active)/(merged_dataset$baseline_n_active)
 resp_rate_control <- (merged_dataset$responders_control)/(merged_dataset$baseline_n_control)
 
-#then calculate response rate using n at post-test (i.e. completers only) 
+# then calculate response rate using n at post-test (i.e. completers only) 
 resp_rate_active_completers <- (merged_dataset$responders_active)/(merged_dataset$post_n_active)
 resp_rate_control_completers <- (merged_dataset$responders_control)/(merged_dataset$post_n_control)
 
 merged_dataset <- cbind(merged_dataset, resp_rate_active, resp_rate_control, resp_rate_active_completers, resp_rate_control_completers)
 merged_dataset <- merged_dataset %>% relocate(resp_rate_active: resp_rate_control_completers, .after = responders_control)
 
-#calculate response rate for studies that reported no of responders rather than a response rate
+# calculate response rate for studies that reported no of responders rather than a response rate
 calc_observed_resp_rate_active <- (merged_dataset$observed_responders_active)/(merged_dataset$observed_responders_active_n)
 calc_observed_resp_rate_control <- (merged_dataset$observed_responders_control)/(merged_dataset$observed_responders_control_n)
+
 # then concatenate with variable indicating reported response rates
 merged_dataset$observed_resp_rate_active <- coalesce(calc_observed_resp_rate_active, merged_dataset$observed_resp_rate_active)
 merged_dataset$observed_resp_rate_control <- coalesce(calc_observed_resp_rate_control, merged_dataset$observed_resp_rate_control)
 
-#plot and check correlation between our calculations and observed response rate, for active condition
-plot(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, 
-     xlab = "Response rates calculated by us", ylab = "Observed response rates",
-     main = "Comparison of estimated vs observed response rates for active arm of medication trials",
-     pch = 19, col = "blue")
+# check correlation between our calculations and observed response rate
 cor(merged_dataset$resp_rate_active, merged_dataset$observed_resp_rate_active, method = "pearson", use = "pairwise.complete.obs")
-
-#plot and check correlation between our calculations and observed response rate, for control condition
-plot(merged_dataset$resp_rate_control, merged_dataset$observed_resp_rate_control, 
-     xlab = "Response rates calculated by us", ylab = "Observed response rates",
-     main = "Comparison of estimated vs observed response rates for control arm of medication trials",
-     pch = 19, col = "blue")
 cor(merged_dataset$resp_rate_control, merged_dataset$observed_resp_rate_control, method = "pearson", use = "pairwise.complete.obs")
 
-#check correlation between our calculations and cuijpers' calculations 
+# check correlation between our calculations and cuijpers' calculations 
 cor(merged_dataset$responders_active, merged_dataset$cuij_responders_active, method = "pearson", use = "pairwise.complete.obs")
 cor(merged_dataset$responders_control, merged_dataset$cuij_responders_control, method = "pearson", use = "pairwise.complete.obs")
 
-#check plots
-# for active arm
-plot(merged_dataset$responders_active, merged_dataset$cuij_responders_active, 
-     xlab = "No of responders estimated by us", ylab = "No of responders estimated by Cuijpers",
-     main = "Comparison of our estimations vs Cuijpers' for no of responders in active arm",
-     pch = 19, col = "blue")
+#rename dataframe
+df_appl_v_orange <- merged_dataset
 
-# for control arm
-plot(merged_dataset$responders_control, merged_dataset$cuij_responders_control, 
-     xlab = "No of responders estimated by us", ylab = "No of responders estimated by Cuijpers",
-     main = "Comparison of our estimations vs Cuijpers' for no of responders in control arm",
-     pch = 19, col = "blue")
+# We have mean_age and percent_women reported overall for psy trials but per arm for med trials
 
-#calculate cohens d
-merged_dataset <- merged_dataset %>% 
+# create overall mean age variable for all studies 
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
+                                                 /(baseline_n_active + baseline_n_control))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
+
+#create overall percent women variable for all studies
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
+                                                 /(baseline_n_active + baseline_n_control))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+
+# calculate cohens d
+df_appl_v_orange <- df_appl_v_orange %>% 
   mutate(cohens_d_active = (post_mean_active - baseline_mean_active)/
   ((post_sd_active + baseline_sd_active)/2), cohens_d_control = (post_mean_control - baseline_mean_control)/
   ((post_sd_control + baseline_sd_control)/2))
 
-df_appl_v_orange <- merged_dataset
-
-inst_names <- unique(df_appl_v_orange$instrument_name)
-
+#check how many med comparisons we cannot calc cohens d for
+filter_test <- df_appl_v_orange %>% filter(psy_or_med == 0)
+sum(is.na(filter_test$cohens_d_active))
+sum(is.na(filter_test$cohens_d_control))
 
 # Create summary statistics for each instrument  --------
-
 
 #average statistics for each instrument, collapsed across studies for both med and psy categories 
 # this includes duplicates of studies 
@@ -228,34 +220,26 @@ df_stats_per_instrument <- df_stats_per_instrument %>% relocate(instr, .before =
 df_stats_per_instrument <- df_stats_per_instrument %>% relocate(type, .after = instr)
 df_stats_per_instrument <- df_stats_per_instrument %>% arrange(instr) 
 
-
 # Look at demographics per study, for primary instrument ------------------
-
-#first I'm going to do some cleaning. We have mean_age and percent_women reported overall for psy trials but per arm for med trials
 
 # create unique study ids to account for multiple active arms per study name 
 df_appl_v_orange <- df_appl_v_orange %>%
   mutate(study_ID = ifelse(psy_or_med == 0, paste(study, year, active_type, sep = "_"), 
-                  paste(study, descr_active, sep = "_")))
-
-# create overall mean age variable for all studies 
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
-                                               /(baseline_n_active + baseline_n_control))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
-
-#create overall percent women variable for all studies
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
-                                               /(baseline_n_active + baseline_n_control))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+                           paste(study, descr_active, sep = "_")))
 
 # arranging by study ID and instrument value
 df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
 
 # retain only first row to look at demographics as this will keep one row per study_ID, taking the primary instrument
-df_demographics <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+
+#check how many med comparisons we cannot calc cohens d for (for primary instrument)
+filter_test <- df_first_row %>% filter(psy_or_med == 0)
+sum(is.na(filter_test$cohens_d_active))
+sum(is.na(filter_test$cohens_d_control))
 
 # start looking at demographics, baseline and post means, and cohens d per arm
-df_demographics <- df_demographics %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
+df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
                                            post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
@@ -326,7 +310,6 @@ n <- c(get_cdrs_means$total_n_control[1],get_cdrs_means$total_n_control[2])
 s <- c(get_cdrs_means$sd_d_ctrl[1],get_cdrs_means$sd_d_ctrl[2])
 t.test.fromSummaryStats(mu,n,s)
 
-
 df_demographics %>% 
   group_by(psy_or_med ) %>% 
   summarise (avg_age = mean(mean_age, na.rm = T), sd_age = sd(mean_age, na.rm = T))
@@ -355,13 +338,12 @@ studies_with_positive_cohens_ds <- tapply(df_appl_v_orange[df_appl_v_orange$cohe
                  , ]$study, df_appl_v_orange[df_appl_v_orange$cohens_d_control>=0
                                              , ]$psy_or_med, na.omit)
 
-
 names(studies_with_positive_cohens_ds) <- c("meds", "psy") # to make prettier
 
 studies_with_positive_cohens_ds
 
 #we have inspected those with pos cohens d. It appears for some there is a genuine (small) deterioration in control arm.
-#detected one error for the De Jong Heesen study. Mistake in Cuijpers dataset. 
+#detected one error for the De Jong Heesen study - there is a mistake in Cuijpers dataset. 
 # yet to do - correct this error and inform Cuipers
 
 #check which studies have missing means or sds at baseline or post 
@@ -383,13 +365,176 @@ columns_with_missing_values <- df_appl_v_orange %>%
 tapply(print(columns_with_missing_values[,1:2]
 ), columns_with_missing_values$psy_or_med)
 
-#create excel sheet to edit
+# create excel sheet to edit
 # we have created a notes column named how_handle_es_calc where we inspect each study and its missing data
-#from there we work out which method to use to impute / derive an appropriate value to substitute missing values
+# from there we work out which method to use to impute / derive an appropriate value to substitute missing values
 
 openxlsx:: write.xlsx(columns_with_missing_values, file = "columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
 
-# Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessed
-# change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
+# The updated version of this sheet with notes is called "columns_with_missing_values_updated.xlsx"
+
+# Please note that some studies report SE rather than SD. Initially these were incorrectly inputed into our 
+# original medication dataset however these errors have now been corrected in the original ("Working_Dataset_Medication")
+# This applied to Berard 2006, Emslie 2006, Emslie 2007, Emslie 2009, Findling 2009, Keller 2001, Paxil 2009
+
+# Now begin imputing missing values. We will start the the meds studies. The psy studies that are missing values
+# were not in Cuijper's MA table of included studies (I think because their primary outcome measures were not continuous).
+# We will need to decide our approach here - if we retain these studies, we will have to redo extraction. 
+
+# To check how many rows with missing SDs we have
+# Let's do this for only the primary instrument for each study (using df_first_row), starting with med studies.
+df_first_row_missing_sds <- df_first_row %>% 
+  filter(psy_or_med == 0) %>% 
+  summarise(
+    rows_with_na_sds = sum(rowSums(is.na(select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
+  )
+df_first_row_missing_sds
+
+# Now check how many rows with missing means
+df_first_row_missing_means <- df_first_row %>% 
+  filter(psy_or_med == 0) %>% 
+  summarise(
+    rows_with_na_means = sum(rowSums(is.na(select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
+  )
+df_first_row_missing_means
+
+# Let's impute missing SDs. If either the baseline or post-intervention SD is unavailable, it will be substituted by the other.
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(
+    baseline_sd_active = ifelse(psy_or_med == 0 & is.na(baseline_sd_active), post_sd_active, baseline_sd_active),
+    post_sd_active = ifelse(psy_or_med == 0 & is.na(post_sd_active), baseline_sd_active, post_sd_active),
+    baseline_sd_control = ifelse(psy_or_med == 0 & is.na(baseline_sd_control), post_sd_control, baseline_sd_control),
+    post_sd_control = ifelse(psy_or_med == 0 & is.na(post_sd_control), baseline_sd_control, post_sd_control)
+  )
+
+# Now lets impute missing means. If either the baseline or post mean is missing, use the change score to calculate this. 
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(
+    baseline_mean_active = ifelse(psy_or_med == 0 & is.na(baseline_mean_active), post_mean_active - active_mean_change, baseline_mean_active),
+    baseline_mean_control = ifelse(psy_or_med == 0 & is.na(baseline_mean_control), post_mean_control - control_mean_change, baseline_mean_control),
+    post_mean_active = ifelse(psy_or_med == 0 & is.na(post_mean_active), baseline_mean_active + active_mean_change, post_mean_active),
+    post_mean_control = ifelse(psy_or_med == 0 & is.na(post_mean_control), baseline_mean_control + control_mean_change, post_mean_control)
+  )
+
+# Check how many studies with missing SDs after performing imputation
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+
+df_first_row_missing_sds <- df_first_row %>% 
+  filter(psy_or_med == 0) %>% 
+  summarise(
+    rows_with_na_sds = sum(rowSums(is.na(select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
+  )
+df_first_row_missing_sds
+
+# We have gone from 21 to 8 studies with missing SDs. Great!
+
+# And check to see how many studies with missing means after performing imputation
+
+df_first_row_missing_means <- df_first_row %>% 
+  filter(psy_or_med == 0) %>% 
+  summarise(
+    rows_with_na_means = sum(rowSums(is.na(select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
+  )
+df_first_row_missing_means
+
+# We have gone from 15 to 9 studies with missing means. Great!
+
+# Lets recalculate cohens d now that we have more data
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(cohens_d_active = (post_mean_active - baseline_mean_active)/
+           ((post_sd_active + baseline_sd_active)/2), cohens_d_control = (post_mean_control - baseline_mean_control)/
+           ((post_sd_control + baseline_sd_control)/2))
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+filter_test <- df_first_row %>% filter(psy_or_med == 0)
+sum(!is.na(filter_test$cohens_d_active))
+sum(!is.na(filter_test$cohens_d_control))
+
+# Before we could only calculate cohens d for 12 med studies, now we can calculate this for 22
+
+# how many unique psy comparisons do we have
+unique_psy <- df_appl_v_orange %>% 
+  filter(psy_or_med == 1) %>% 
+  summarise(unique_psy = n_distinct(study_ID))
+unique_psy
+
+# and for med?
+unique_med <- df_appl_v_orange %>% 
+  filter(psy_or_med == 0) %>% 
+  summarise(unique_med = n_distinct(study_ID))
+unique_med
+
+unique(df_appl_v_orange)
+
+# Check again to identify which med studies still have missing values in our columns of interest after performing the imputation above
+new_columns_with_missing_values <- df_first_row %>%
+  filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
+  filter(psy_or_med == 0) %>% 
+  select(study, year, active_type, instrument_name, where(function(x) any(is.na(x))))
+tapply(print(new_columns_with_missing_values[,1:2]), new_columns_with_missing_values$psy_or_med)
+openxlsx:: write.xlsx(new_columns_with_missing_values, file = "new_columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
+
+# For studies missing all sds, we will sub in an average SD taken from similar studies in the dataset. We will calculate average SDs for each arm, pre and post.
+# We will just do this for the CDRS. The studies missing SDs for both pre and post are Bristol-Myers Squibb 2002a and 2002b, Emslie 2002b, Organon 2002a and 2002b, 
+# Paxil (GlaxoSmithKline) 2009, Wagner 2006
+
+# First calculate the average values
+calc_mean_sds <- df_appl_v_orange %>% 
+  filter(psy_or_med == 0, instrument_name == "cdrs") %>% 
+  summarise(mean_baseline_sd_active = mean(baseline_sd_active, na.rm = TRUE),
+            mean_baseline_sd_control = mean(baseline_sd_control, na.rm = TRUE),
+            mean_post_sd_active = mean(post_sd_active, na.rm = TRUE),
+            mean_post_sd_control = mean(post_sd_control, na.rm = TRUE))
+
+# I want these as numeric values
+mean_baseline_sd_active <- calc_mean_sds$mean_baseline_sd_active
+mean_baseline_sd_control <- calc_mean_sds$mean_baseline_sd_control
+mean_post_sd_active <- calc_mean_sds$mean_post_sd_active
+mean_post_sd_control <- calc_mean_sds$mean_post_sd_control
+
+# Then use these for imputation. Only use these mean values for med studies using the CDRS.
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(
+    baseline_sd_active = ifelse(psy_or_med == 0 & is.na(baseline_sd_active) & instrument_name == "cdrs", mean_baseline_sd_active, baseline_sd_active),
+    post_sd_active = ifelse(psy_or_med == 0 & is.na(post_sd_active) & instrument_name == "cdrs", mean_post_sd_active, post_sd_active),
+    baseline_sd_control = ifelse(psy_or_med == 0 & is.na(baseline_sd_control) & instrument_name == "cdrs", mean_baseline_sd_control, baseline_sd_control),
+    post_sd_control = ifelse(psy_or_med == 0 & is.na(post_sd_control) & instrument_name == "cdrs", mean_post_sd_control, post_sd_control)
+  )
+
+# Next turn to psy studies. Filter out studies published 2021, 2022, 2023. 
+
+# Read in Cipriani dataset ------------------------------------------------
+
+# We are going to now read in, clean and merge in Cipriani's data. For context, we have tried contacting Cipriani and Peng Xie
+# to request the full dataset for their MA but did not receive a reply. There is a more limited dataset provided online
+# as a PDF. The dataset I will now read in called "Full_Dataset_Cipriani_MA" is taken from the table in this PDF 
+# and converted to excel. I have added column names - this is the only thing I have changed. 
+
+df_cipriani <- read_excel("Full_Dataset_Cipriani_MA.xlsx", 
+                                       col_types = c("text", "text", "text", 
+                                                     "text", "numeric", "numeric", "numeric", 
+                                                     "numeric", "numeric", "numeric", 
+                                                     "numeric", "numeric", "numeric", 
+                                                     "numeric", "numeric", "numeric", 
+                                                     "numeric"))
+
+# Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessible
+# for psy studies change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
 # titled "Chapter 6: Choosing effect measures and computing estimates of effect" https://training.cochrane.org/handbook/current/chapter-06#section-6-5
+
+# First calculate change scores for psy studies. I will calculate this as post score - baseline for consistency with Cipriani
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(change_active = ifelse(psy_or_med ==1, post_mean_active - baseline_mean_active, NA)) %>% 
+  mutate(change_control = ifelse(psy_or_med ==1, post_mean_control - baseline_mean_control, NA))
+
+# Now calculate the correlation coefficients. For this we need a study with complete data (i.e. SDs for pre, post, and change).
+# We don't have this for psychotherapy (Cuijpers only reports pre and post), so let's check if we have this for any med studies
+studies_w_complete_sds <- df_appl_v_orange %>%
+  filter(psy_or_med == 0, complete.cases(baseline_sd_active, post_sd_active, active_sd_change))
+  
+unique(df_full_psych$study)
+another_test <- df_full_psych %>% 
+  filter(grepl("2021|2022|2023", study))
+another_test
+
+
 
