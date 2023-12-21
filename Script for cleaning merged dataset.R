@@ -504,7 +504,7 @@ df_appl_v_orange <- df_appl_v_orange %>%
 
 # Read in Cipriani dataset ------------------------------------------------
 
-# We are going to now read in, clean and merge in Cipriani's data. For context, we have tried contacting Cipriani and Peng Xie
+# We are going to now read in, clean and merge in Cipriani's data. For context, we have tried contacting Cipriani and Peng Xie multiple times
 # to request the full dataset for their MA but did not receive a reply. There is a more limited dataset provided online
 # as a PDF. The dataset I will now read in called "Full_Dataset_Cipriani_MA" is taken from the table in this PDF 
 # and converted to excel. I have added column names - this is the only thing I have changed. 
@@ -516,6 +516,47 @@ df_cipriani <- read_excel("Full_Dataset_Cipriani_MA.xlsx",
                                                      "numeric", "numeric", "numeric", 
                                                      "numeric", "numeric", "numeric", 
                                                      "numeric"))
+
+# Rename columns that we already have in master dataset to make sure we can identify that they have come from Cipriani
+colnames(df_cipriani)
+columns_to_rename <- c("change", "change_sd", "change_n", "responders", "responders_n", "responders_n_missing")
+df_cipriani <- df_cipriani %>%
+  rename_with(~paste0("cip_", .), columns_to_rename)
+df_cipriani
+
+# Cipriani has different rows for each condition whereas we have one row per actv vs ctrl comparison. We will need to 
+# subset his dataset to prepare to merge.
+
+# Start with placebo
+
+df_cipriani_ctrl <- df_cipriani %>%
+  filter(type == "Placebo")
+df_cipriani_ctrl <- df_cipriani_ctrl %>%
+  rename_with(~paste0(.x, "_ctrl"), c("cip_change": "suicide_n")) %>% 
+  rename(control_type = type)
+
+ # And then active
+
+df_cipriani_actv <- df_cipriani %>%
+  filter(type != "Placebo")
+df_cipriani_actv <- df_cipriani_actv %>%
+  rename_with(~paste0(.x, "_actv"), c("cip_change": "suicide_n")) %>% 
+  rename(active_type = type)
+
+# Now join them both in. Cipriani does not indicate which instrument his change scores apply to. However we do use the same 
+# instrument hierarchy. I'm going to use df_first_row for this reason, which is our dataset which includes only the primary
+# instrument for each comparison
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+df_first_row <- full_join(df_first_row, df_cipriani_actv , by = c("study", "year", "active_type"))
+df_first_row <- full_join(df_first_row, df_cipriani_ctrl, by = c("study", "year", "control_type"))
+
+# Now we want to join this back into primary dataset
+df_first_row_prepare <- df_first_row %>% 
+  select(c(study_ID, instrument_name, cip_change_actv: suicide_n_actv, cip_change_ctrl: suicide_n_ctrl))
+df_appl_v_orange <- full_join(df_appl_v_orange, df_first_row_prepare, by = c("study_ID", "instrument_name"))
+
+# A couple of formatting differences causing problems. For Almeida-Montes 2005, Eli Lilly 1986, Bristol-Myers Squibb 2002,
+# GlaxoSmithKline 2009, von Knorring 2006 - these exist in Cipriani's dataset but not ours. 
 
 # Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessible
 # for psy studies change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
