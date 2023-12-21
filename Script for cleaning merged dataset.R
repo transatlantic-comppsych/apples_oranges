@@ -4,6 +4,7 @@ library(knitr)
 library(kableExtra)
 library(misty)
 library(openxlsx)
+library(readxl)
 
 # Merge and Clean Dataset -------------------------------------------------
 
@@ -140,6 +141,8 @@ psy_baseline_means <- list()
 meds_post_means <- list()
 psy_post_means <- list()
 
+
+inst_names <- unique(df_appl_v_orange$instrument_name)[1:6]
 for(i in 1: length(inst_names)){
 #cohens d for meds
   meds_d_means[[i]] <- df_appl_v_orange  %>% 
@@ -160,9 +163,9 @@ meds_baseline_means[[i]] <- df_appl_v_orange  %>%
             total_n_active = sum(baseline_n_active, na.rm = T),
             avg_age = mean(mean_age, na.rm = T),
             avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
-            sd_baseline_mean_act = sd(baseline_sd_active, na.rm = T), 
+            sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
-            sd_baseline_mean_ctrl = sd(baseline_sd_control, na.rm = T))
+            sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
 
 # for psychotherapy trials, average baseline mean scores for each instrument
 psy_baseline_means[[i]] <- df_appl_v_orange  %>% 
@@ -171,9 +174,9 @@ psy_baseline_means[[i]] <- df_appl_v_orange  %>%
             total_n_active = sum(baseline_n_active, na.rm = T),
              avg_age = mean(mean_age, na.rm = T),
             avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
-            sd_baseline_mean_act = sd(baseline_sd_active, na.rm = T), 
+            sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
-            sd_baseline_mean_ctrl = sd(baseline_sd_control, na.rm = T))
+            sd_baseline_mean_ctrl = sd(baseline_mean_control, na.rm = T))
 
 # for medication trials, average post-test mean scores for each instrument
 meds_post_means[[i]] <- df_appl_v_orange  %>% 
@@ -601,4 +604,59 @@ another_test <- df_full_psych %>%
 another_test
 
 
+####### Argyris additions aide memoire
+test <- df_appl_v_orange  %>% 
+  group_by(study_ID) %>% 
+  filter(instrument_value == min(instrument_value)) %>% 
+  group_by(psy_or_med) %>% 
+  summarise(av_cohens_d_ctrl = mean(cohens_d_control, na.rm = T), sd_cohens_d_ctrl = sd(cohens_d_control, na.rm = T))
 
+# create new id
+test <- df_appl_v_orange  %>% 
+  mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+                        .default = study )) #case_when(psy_or_med == 1 ~ study))
+
+
+
+
+test[test$psy_or_med==0, ]$new_study_id == test[test$psy_or_med==0, ]$study
+test[test$psy_or_med==1, ]$new_study_id == test[test$psy_or_med==1, ]$study      
+
+
+# use this code only for examinig controls, for actives use distinct(active_type...)
+test_dist_contrl<-  test %>%          
+  group_by(new_study_id) %>% 
+  filter(instrument_value == min(instrument_value)) %>% 
+  distinct(control_type,.keep_all = TRUE)
+
+
+test_dist_contrl[duplicated(test_dist_contrl$study_ID),]
+
+test_dist_contrl[test_dist_contrl$new_study_id=="Atkinson, 2014",]
+
+
+
+test_2 <- test[duplicated(test$study_ID),]. #sorting out 
+dim(test_2)
+
+dups <- test_2$study_ID
+test_3 <- test[test$study_ID %in% dups,]
+
+head(test_3, 26)
+
+
+test%>% 
+  ggplot(aes(x = cohens_d_control))+
+  geom_histogram(bins= 10)+
+  facet_wrap(~psy_or_med, nrow = 2)
+
+
+test %>% 
+  filter(cohens_d_control<(-2) & psy_or_med == 1)
+
+
+test
+
+duplicated(test$study_ID)
+
+test[test$study=="Bolton, 2007",]
