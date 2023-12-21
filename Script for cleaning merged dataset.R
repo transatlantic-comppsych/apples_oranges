@@ -524,6 +524,15 @@ df_cipriani <- df_cipriani %>%
   rename_with(~paste0("cip_", .), columns_to_rename)
 df_cipriani
 
+# A couple of formatting differences causing problems. For Almeida-Montes 2005, Eli Lilly 1986, Bristol-Myers Squibb 2002,
+# GlaxoSmithKline 2009, von Knorring 2006 - these exist in Cipriani's dataset but not ours. 
+# Almeida-Montes and Eli Lilly we haven't been able to find the original papers, hence not in our dataset.
+# GlaxoSmithKline 2009, von Knorring 2006 - fix formatting differences.
+
+df_cipriani <- df_cipriani %>%
+  mutate(study = ifelse(study == "GlaxoSmithKline", "Paxil (GlaxoSmithKline)", study),
+         study = ifelse(study == "von Knorring", "Von Knorring", study))
+
 # Cipriani has different rows for each condition whereas we have one row per actv vs ctrl comparison. We will need to 
 # subset his dataset to prepare to merge.
 
@@ -543,20 +552,34 @@ df_cipriani_actv <- df_cipriani_actv %>%
   rename_with(~paste0(.x, "_actv"), c("cip_change": "suicide_n")) %>% 
   rename(active_type = type)
 
-# Now join them both in. Cipriani does not indicate which instrument his change scores apply to. However we do use the same 
+# Now join them both.
+df_cipriani_form <- full_join(df_cipriani_actv, df_cipriani_ctrl, by = c("study", "year"))
+
+# There are 3 studies that do not include a placebo. We will exclude these. 
+df_cipriani_form <- df_cipriani_form %>% 
+  filter(!is.na(control_type))
+
+#Cipriani does not indicate which instrument his change scores apply to. However we do use the same 
 # instrument hierarchy. I'm going to use df_first_row for this reason, which is our dataset which includes only the primary
 # instrument for each comparison
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
-df_first_row <- full_join(df_first_row, df_cipriani_actv , by = c("study", "year", "active_type"))
-df_first_row <- full_join(df_first_row, df_cipriani_ctrl, by = c("study", "year", "control_type"))
+df_first_row <- full_join(df_first_row, df_cipriani_form, by = c("study", "year", "active_type", "control_type"))
 
 # Now we want to join this back into primary dataset
 df_first_row_prepare <- df_first_row %>% 
   select(c(study_ID, instrument_name, cip_change_actv: suicide_n_actv, cip_change_ctrl: suicide_n_ctrl))
 df_appl_v_orange <- full_join(df_appl_v_orange, df_first_row_prepare, by = c("study_ID", "instrument_name"))
 
-# A couple of formatting differences causing problems. For Almeida-Montes 2005, Eli Lilly 1986, Bristol-Myers Squibb 2002,
-# GlaxoSmithKline 2009, von Knorring 2006 - these exist in Cipriani's dataset but not ours. 
+# Now use Cipriani's change scores to fill in missing means
+
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(
+    baseline_mean_active = ifelse(psy_or_med == 0 & is.na(baseline_mean_active), post_mean_active - cip_change_actv, baseline_mean_active),
+    baseline_mean_control = ifelse(psy_or_med == 0 & is.na(baseline_mean_control), post_mean_control - cip_change_ctrl, baseline_mean_control),
+    post_mean_active = ifelse(psy_or_med == 0 & is.na(post_mean_active), baseline_mean_active + cip_change_actv, post_mean_active),
+    post_mean_control = ifelse(psy_or_med == 0 & is.na(post_mean_control), baseline_mean_control + cip_change_ctrl, post_mean_control)
+  )
+
 
 # Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessible
 # for psy studies change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
