@@ -120,4 +120,14 @@ df_full_psych$baseline_sd_control <- as.numeric(df_full_psych$baseline_sd_contro
 df_full_psych$baseline_n_control <- as.numeric(df_full_psych$baseline_n_control)
 df_full_psych$mean_age <- as.numeric(df_full_psych$mean_age)
 
+# We have noticed a few errors in Cuijpers dataset
+# One is regarding the incorrect extraction of data for De Jong Heesen 2020. I have fixed this in full dataset Cuijpers MA. 
+# Error was for baseline mean and SD in control arm on the CDI parent
+
+# I am going to filter out recent studies published after the release of Cuijpers MA. This is because we are running a search for med
+# studies up to the last date of Cuijpers search (01/01/2021), and we want to be consistent.
+
+df_full_psych <- df_full_psych %>% 
+  filter(!(year %in% c(2021, 2022, 2023)))
+
 write.csv(df_full_psych, "Full Psychotherapy Dataset.csv") 
