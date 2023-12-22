@@ -75,6 +75,9 @@ merged_dataset <- merged_dataset %>%
   )
 merged_dataset <- merged_dataset %>% relocate(instrument_name, .after = instrument)
 
+# Charlotte note to self: Now that I am more familiar with R, I can see that it would have been better to do the below with mutate(). 
+# At some point, fix code below to make more tidy.
+
 # create response rate variables
 # first create our primary response rate variable, which is estimated number of responders / n at randomisation
 resp_rate_active <- (merged_dataset$responders_active)/(merged_dataset$baseline_n_active)
@@ -613,7 +616,7 @@ df_appl_v_orange <- df_appl_v_orange %>%
 
 # Let's look at missing ds for psy studies  -------------------------------
 
-# Check look at cohens d missing for psy studies
+# Look at cohens d missing for psy studies
 filter_test <- df_first_row %>% filter(psy_or_med == 1)
 sum(!is.na(filter_test$cohens_d_active))
 sum(!is.na(filter_test$cohens_d_control))
@@ -624,6 +627,39 @@ study_ids_with_missing_ds <- df_first_row %>%
   filter(psy_or_med == 1) %>% 
   select(study_ID)
 
+# None of these 8 studies are included in Cuijpers' MA because their primary outcome measure is not continuous.
+# For a few of them I may be able to extract some relevant data and impute other data using methods above. I can do this for Shomaker 2016 and Yu 2002. 
+# I have extracted additional data and added to "FUll_Dataset_Cuijpers_MA".
+# The 6 other studies do not report on a continuous outcome measure or do not provide sufficient data for us to impute missing means or SDs. See notes column
+# of "columns_with_missing_values_updated" for specific descriptions of each study. 
+
+# Shomaker 2016 has a missing sd at post, so I will perform imputation as above
+
+df_appl_v_orange <- df_appl_v_orange %>%
+  mutate(
+    baseline_sd_active = ifelse(psy_or_med == 1 & is.na(baseline_sd_active), post_sd_active, baseline_sd_active),
+    post_sd_active = ifelse(psy_or_med == 1 & is.na(post_sd_active), baseline_sd_active, post_sd_active),
+    baseline_sd_control = ifelse(psy_or_med == 1 & is.na(baseline_sd_control), post_sd_control, baseline_sd_control),
+    post_sd_control = ifelse(psy_or_med == 1 & is.na(post_sd_control), baseline_sd_control, post_sd_control)
+  )
+
+# And check whether we have more studies with cohens ds now
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(cohens_d_active = (post_mean_active - baseline_mean_active)/
+           ((post_sd_active + baseline_sd_active)/2), cohens_d_control = (post_mean_control - baseline_mean_control)/
+           ((post_sd_control + baseline_sd_control)/2))
+df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+filter_test <- df_first_row %>% filter(psy_or_med == 1)
+sum(!is.na(filter_test$cohens_d_active))
+sum(!is.na(filter_test$cohens_d_control))
+unique(filter_test$study_ID)
+
+study_ids_with_missing_ds <- df_first_row %>%
+  filter(is.na(cohens_d_active)) %>%
+  filter(psy_or_med == 1) %>% 
+  select(study_ID)
+
+# Great, now we have Cohens ds for Shomaker 2016 and Yu 2002. Hence we now have cohens d for 60 / 66 psy studies. 
 
 # Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessible
 # for psy studies change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
