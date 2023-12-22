@@ -111,5 +111,11 @@ df_responders_med <- clean_med %>% select(c(Column1, responders_active, responde
                                             responders_control_30, responders_active_35, responders_control_35))
 df_full_med <- full_join(Working_Dataset_Medication, df_responders_med) # add vectors to full dataset
 
+# Please note that some studies report SE rather than SD. Initially these were incorrectly inputed into our 
+# original medication dataset however these errors have now been corrected in the original ("Working_Dataset_Medication")
+# This applied to Berard 2006, Emslie 2006, Emslie 2007, Emslie 2009, Findling 2009, Keller 2001, Paxil 2009
+
+# Please also note some spelling errors for medication names that have also been corrected in original dataset.
+
 write.csv(df_full_med, "Full Medication Dataset.csv")
 

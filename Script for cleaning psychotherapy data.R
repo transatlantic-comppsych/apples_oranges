@@ -130,4 +130,10 @@ df_full_psych$mean_age <- as.numeric(df_full_psych$mean_age)
 df_full_psych <- df_full_psych %>% 
   filter(!(year %in% c(2021, 2022, 2023)))
 
+# I'm going to remove the control condition for March 2004 - psy - as the control is actually placebo but right now it is being incorrectly
+# considered as a psychological control.
+
+df_full_psych <- df_full_psych %>%
+  mutate_at(vars(contains("control")), ~ifelse(study == "March, 2004", NA, .))
+
 write.csv(df_full_psych, "Full Psychotherapy Dataset.csv") 
