@@ -344,15 +344,15 @@ columns_to_check <- c(
   "post_mean_control", "post_sd_control"
 )
 
-# Identify which columns have missing values for each study
+# Idemissing values for each study
+tapply(print(columns_with_missing_values[,1:2]
+), columns_with_missing_values$psy_or_med)
+#identify which columns have missing values for each study
 columns_with_missing_values <- df_appl_v_orange %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
   select(psy_or_med, study, year, where(function(x) any(is.na(x))))
 
-# Print columns with missing values for each study
-tapply(print(columns_with_missing_values[,1:2]
-), columns_with_missing_values$psy_or_med)
-
+# Print columns with 
 # create excel sheet to edit
 # we have created a notes column named how_handle_es_calc where we inspect each study and its missing data
 # from there we work out which method to use to impute / derive an appropriate value to substitute missing values
@@ -678,17 +678,20 @@ studies_w_complete_sds <- df_appl_v_orange %>%
 # We only have this for one study. Hence we decided to stick with cohens d for now and perform the imputations above.
 
 
-####### Argyris additions aide memoire
+####### Argyris additions aide memoir
 test <- df_appl_v_orange  %>% 
   group_by(study_ID) %>% 
   filter(instrument_value == min(instrument_value)) %>% 
   group_by(psy_or_med) %>% 
-  summarise(av_cohens_d_ctrl = mean(cohens_d_control, na.rm = T), sd_cohens_d_ctrl = sd(cohens_d_control, na.rm = T))
+  summarise(av_cohens_d_ctrl = mean(cohens_d_control, na.rm = T), sd_cohens_d_ctrl = sd(cohens_d_control, na.rm = T),
+            av_cohens_d_actuve = mean(cohens_d_active, na.rm = T), sd_cohens_d_active = sd(cohens_d_active, na.rm = T))
+
+test
 
 # create new id
 test <- df_appl_v_orange  %>% 
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
-                        .default = study )) #case_when(psy_or_med == 1 ~ study))
+                        .default = study )) 
 
 
 
@@ -708,7 +711,7 @@ test_dist_contrl[duplicated(test_dist_contrl$study_ID),]
 
 test_dist_contrl[test_dist_contrl$new_study_id=="Atkinson, 2014",]
 
-test_2 <- test[duplicated(test$study_ID),]. #sorting out 
+test_2 <- test[duplicated(test$study_ID),] #sorting out 
 dim(test_2)
 
 dups <- test_2$study_ID
@@ -721,6 +724,38 @@ test%>%
   ggplot(aes(x = cohens_d_control))+
   geom_histogram(bins= 10)+
   facet_wrap(~psy_or_med, nrow = 2)
+
+
+
+test%>% 
+  ggplot(aes(y = cohens_d_control, x = as.factor(psy_or_med)))+
+  geom_point(aes(y = cohens_d_control, x = as.factor(psy_or_med), size = baseline_n_control)) +
+  geom_boxplot(alpha = 0.5)
+
+
+test%>% 
+  ggplot(aes(y = cohens_d_control, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+  geom_point(aes(y = cohens_d_control, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+  geom_violin(alpha = 0.5)+
+  stat_summary(
+    mapping = aes(y = cohens_d_control, x = as.factor(psy_or_med)),
+    fun.min = function(z) { quantile(z,0.25) },
+    fun.max = function(z) { quantile(z,0.75) },
+    fun = median)+
+  ggtitle("Effect Sizes of the Control Arms of Anti-depressant\n and Psychotherapy Trials in Adolescent Depression", subtitle = "with medians and IQRs")+
+  ylab("Cohen's d of the primary outcome")+
+  scale_x_discrete(labels=c("0" = "Anti-depressant trial\nControls", "1" = "Psychotherapy trial\nControls"))+
+  theme(axis.text.x= element_text(size= 12)) +
+  theme(axis.text.y= element_text(size= 12)) +
+  theme(axis.title.y= element_text(size= 12))+
+  theme(axis.title.x= element_blank())+
+   theme(legend.position = "none")+
+  geom_hline(yintercept = 0, colour = "grey", linetype = "dashed") 
+  theme(plot.title = element_text(color="black", size=14, face="bold")) +
+  theme_minimal()
+
+  
+
 
 
 test %>% 

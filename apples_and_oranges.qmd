@@ -1,0 +1,125 @@
+---
+title: Fundamental Problems with the Evidence Base for Adolescent Depression Treatments.
+subtitle: A conceptual and quantiative re-appraisal.
+author:
+  - name: Argyris Stringaris
+    email: a.stringaris@ucl.ac.uk
+    affiliations: 
+        - id: ucl_1
+          name: University College London
+          department: Divisions of Psychiatry and Psychology and Language Science
+          address: 1-19 Torrington Place
+          city: London, UK
+          state: 
+          postal-code: WC1E 7HB
+          country: United Kingdom
+    attributes:
+        corresponding: true
+    note: 
+  - name: Charlotte Burman
+    email: c.burman@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note:
+  - name: Dayna Bhudia
+    email: d.bhudia@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note:
+  - name: Carmen Moreno
+    email: cmoreno@hggm.es
+    affiliations:
+        - id: HGM
+          name: Hospital Gregorio Marañón
+          department: Department of Psychiatry
+          address: 46 C. del Dr. Esquerdo
+          city: Madrid
+          state:
+          postal-code: 28007
+          country: Spain
+  - name: Samuele Cortese
+    email: samuele.cortese@soton.ac.uk
+    affiliations:
+        - id: soton
+          name: University of Southampton
+          department: Centre for Innovation in Mental Health (CIMH), School of Psychology
+          address: Highfield Campus, Building 44
+          city: Southampton
+          state:
+          postal-code: SO17 1BJ
+          country: United Kingdom
+  - name: Georgina Krebs
+    email: g.krebs@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note: 
+abstract: |
+  To follow
+keywords: 
+  - depression
+  - adolescents
+  - antidepressants
+  - psychotherapy
+date: last-modified
+bibliography: emotion_concepts_paper.bib
+format: 
+  elsevier-pdf:
+    keep-tex: true
+    journal:
+      name: Journal Name
+      formatting: preprint
+      model: 3p
+      cite-style: super
+---
+
+# Introduction
+
+Depression is the leading cause of disability in adolescents and influential guidelines recommend that it be treated with either psychotherapy or anti-depressant medication or their combination. The evidence base for this recommendation typically derives from the appraisal of randomised controlled trials (RCTs) in which one modality (psychotherapy or anti-depressants) are compared against a control condition. In this paper we identify a series of fundamental problems with this appraisal and make recommendations on how it can be improved.
+
+Guidelines make implicit and explicit ... comparisons...
+
+Network metanalyses...
+
+Jureidini approach...summarises.
+
+This state of affairs is reflected in textbooks and also in what trainees in psychiatry and psychology learn QUOTE.
+
+Yet, is this approach correct?
+
+This approach relies on a (explicit or more often implicit) comparison of the two treatment modalities. Ideally, a comparison between the treatment modalities should be direct, that is head to head. Only one such trial exists in adolescent depression (from the TADS study, see below) which showed that fluoxetine was superior to both cognitive and behavioural therapy (CBT) as well as placebo, and that CBT did not differentiate from placebo. Apart from this one study, all other comparisons indirect, that is, they have to be inferred from comparing studies where an antidepressant or a psychotherapy is compared to a control condition; the control conditions for antidepressant studies is the placebo (standard also in the rest of medicine), whilst controls for psychotherapy studies can vary substantially from waiting list, to treatment as usual to an attention control, such as psychoeducation. These comparisons therefore have to rely on testing whether the following simple equality holds or not,
+
+$$Effect_{Med} = Effect_{Psy}$$ {#eq-1}
+
+where *Effect* denotes the effect on depression that either medication (*Med* ) or psychotherapy (*Psy*) have. This comparison is achieved by comparing some measure of effect, e.g. percentage response or standardised mean difference, for each medication and psychotherapy. The simplest way of doing such a comparison is to take pooled estimates of such effects from metanalyses of each anti-depressants and psychotherapy and compare them informally. A more formal way of doing this is through a network metanalysis, which uses any direct comparisons to infer indirect ones.
+
+Yet for the indirect comparison to be valid, several assumptions need to hold. The most important of these assumptions can be summarised using the technical term *ceteris paribus*, meaning that the results of this comparison are valid if all else is equal. Two important such assumptions are: a) that the control conditions for each antidepressant and psychotherapy trials are equal—we call this the *equality of controls* assumption. b) that the effects of each treatment modality have been derived from the same underlying population, that is that the people who have received the treatment are similar on important parameters on average–this we call the *one population* assumption.
+
+Starting with the *equality of controls*, its importance can be easily intuited by expanding equation 1 to include the comparisons on which each side of that equation rests:
+
+$$Effect_{MedActive} - Effect_{MedControls} = Effect_{PsyActive} - Effect_{PsyControls}$$ {#eq-2}
+
+where MedActive and PsyActive are the active arms of antidepressant and psychotherapy trials, respectively, and MedControls and PsyControls the respective control arms. The assumption here has to be that the controls are equal, that is, $$ Effect_{MedControls} = Effect_{PsyControls}$$. A few simple examples help illustrate why this assumption is important Let the two modalities of treatment be medication and surgery, and let there be a trial for each modality. In the medication trial 80% of participants respond to the antihypertensive and only 40% to placebo; in the surgery trial, 40% of people respond to surgery and 0% to sham. If one relied on Equation 1 to compare the treatments they would arrive at the absurd conclusion that the two treatments are equal and recommend to a patient that it does not really matter which one they choose. Playing around with numbers in which no equality of the respective control arms is required, leads to other risible conclusions.
+
+Yet, surprisingly, a focus on the equality of controls is largely absent from appraisals of the evidence of medication and psychotherapy.
+
+Moving on to the *one population* assumption, this can be formalised
+
+@stringarisDevelopmentalPathwaysChildhood2014
+
+# Figures and tables
+
+![Forest Plot of Control Arms by the Control Arm of Each Treatment Modality.](forestplot.png){fig-align="left" width="1200"}
+
+```         
+```
+
+# Tables coming from RTable
+
+```{r}
+#| label: tbl-simple
+#| tbl-cap: Caption centered above table
+#| echo: true
+knitr::kable(head(mtcars)[,1:4])
+```
+
+# 
