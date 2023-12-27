@@ -344,15 +344,17 @@ columns_to_check <- c(
   "post_mean_control", "post_sd_control"
 )
 
-# Idemissing values for each study
-tapply(print(columns_with_missing_values[,1:2]
-), columns_with_missing_values$psy_or_med)
-#identify which columns have missing values for each study
+
+# Identify which columns have missing values for each study
 columns_with_missing_values <- df_appl_v_orange %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
   select(psy_or_med, study, year, where(function(x) any(is.na(x))))
 
-# Print columns with 
+# Print columns with missing values for each study THROWS UP ERROR TOLD CHARLOTTE
+# tapply(print(columns_with_missing_values[,1:2]
+# ), columns_with_missing_values$psy_or_med)
+
+
 # create excel sheet to edit
 # we have created a notes column named how_handle_es_calc where we inspect each study and its missing data
 # from there we work out which method to use to impute / derive an appropriate value to substitute missing values
@@ -457,7 +459,7 @@ new_columns_with_missing_values <- df_first_row %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
   filter(psy_or_med == 0) %>% 
   select(study, year, active_type, instrument_name, where(function(x) any(is.na(x))))
-tapply(print(new_columns_with_missing_values[,1:2]), new_columns_with_missing_values$psy_or_med)
+###tapply(print(new_columns_with_missing_values[,1:2]), new_columns_with_missing_values$psy_or_med) THROWS UP ERROR TOO
 openxlsx:: write.xlsx(new_columns_with_missing_values, file = "new_columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
 
 # For studies missing all sds, we will sub in an average SD taken from similar studies in the dataset. We will calculate average SDs for each arm, pre and post.
@@ -678,92 +680,1131 @@ studies_w_complete_sds <- df_appl_v_orange %>%
 # We only have this for one study. Hence we decided to stick with cohens d for now and perform the imputations above.
 
 
+############IGNORE from HERE to line 976
+
 ####### Argyris additions aide memoir
-test <- df_appl_v_orange  %>% 
-  group_by(study_ID) %>% 
-  filter(instrument_value == min(instrument_value)) %>% 
-  group_by(psy_or_med) %>% 
-  summarise(av_cohens_d_ctrl = mean(cohens_d_control, na.rm = T), sd_cohens_d_ctrl = sd(cohens_d_control, na.rm = T),
-            av_cohens_d_actuve = mean(cohens_d_active, na.rm = T), sd_cohens_d_active = sd(cohens_d_active, na.rm = T))
+# test <- df_appl_v_orange  %>% 
+#   group_by(study_ID) %>% 
+#   filter(instrument_value == min(instrument_value)) %>% 
+#   group_by(psy_or_med) %>% 
+#   summarise(av_cohens_d_ctrl = mean(cohens_d_control, na.rm = T), sd_cohens_d_ctrl = sd(cohens_d_control, na.rm = T),
+#             av_cohens_d_actuve = mean(cohens_d_active, na.rm = T), sd_cohens_d_active = sd(cohens_d_active, na.rm = T))
+# 
+# test
+# 
+# # create new id
+# test <- df_appl_v_orange  %>% 
+#   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+#                         .default = study )) 
+# 
+# 
+# 
+# 
+# test[test$psy_or_med==0, ]$new_study_id == test[test$psy_or_med==0, ]$study
+# test[test$psy_or_med==1, ]$new_study_id == test[test$psy_or_med==1, ]$study      
+# 
+# 
+# # USE THIS CODE only for examinig CONTROLS, for actives use distinct(active_type...)
+# 
+# # discovered an error in the above for the percentage women o fthe Fristad study. I have checked in the
+# # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
+# # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
+# # check again.
+# df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
+# 
+# 
+# df_appl_v_orange <-df_appl_v_orange  %>% 
+#   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+#                                   .default = study )) 
+# 
+# 
+# # We also need to calculate SE for proportion women
+# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
+# 
+# prodcut_perc_women <-  (df_appl_v_orange$percent_women/100)*
+#   (1-(df_appl_v_orange$percent_women/100) ) 
+# 
+# total_n <- df_appl_v_orange$baseline_n_active + 
+#   df_appl_v_orange$baseline_n_control
+# 
+# df_appl_v_orange$percent_women_std_error <- sqrt(prodcut_perc_women/total_women )
+# 
+# 
+# # We also need to calculate SE for baseline severity
+# 
+# df_appl_v_orange$baseline_st_error_active <- df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
+# 
+# df_appl_v_orange$baseline_st_error_control <-df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
+# 
+# 
+# 
+# 
+# test_dist_contrl<-  df_appl_v_orange %>%          
+#   group_by(new_study_id) %>% 
+#   filter(instrument_value == min(instrument_value)) %>% 
+#   distinct(control_type,.keep_all = TRUE)
+# 
+# test_dist_contrl[duplicated(test_dist_contrl$study_ID),]
+# 
+# test_dist_contrl[test_dist_contrl$new_study_id=="Atkinson, 2014",]
+# 
+# test_2 <- test[duplicated(test$study_ID),] #sorting out 
+# dim(test_2)
+# 
+# dups <- test_2$study_ID
+# test_3 <- test[test$study_ID %in% dups,]
+# 
+# head(test_3, 26)
+# 
+# 
+# 
+# test_dist_contrl%>% 
+#   ggplot(aes(y = cohens_d_control, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+#   geom_point(aes(y = cohens_d_control, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+#   geom_violin(alpha = 0.5)+
+#   stat_summary(
+#     mapping = aes(y = cohens_d_control, x = as.factor(psy_or_med)),
+#     fun.min = function(z) { quantile(z,0.25) },
+#     fun.max = function(z) { quantile(z,0.75) },
+#     fun = median)+
+#   ggtitle("Effect Sizes of the Control Arms of Anti-depressant\n and Psychotherapy Trials in Adolescent Depression", subtitle = "with medians and IQRs")+
+#   ylab("Cohen's d of the primary outcome")+
+#   scale_x_discrete(labels=c("0" = "Anti-depressant trial\nControls", "1" = "Psychotherapy trial\nControls"))+
+#   theme(axis.text.x= element_text(size= 12)) +
+#   theme(axis.text.y= element_text(size= 12)) +
+#   theme(axis.title.y= element_text(size= 12))+
+#   theme(axis.title.x= element_blank())+
+#    theme(legend.position = "none")+
+#   geom_hline(yintercept = 0, colour = "grey", linetype = "dashed") 
+#   theme(plot.title = element_text(color="black", size=14, face="bold")) +
+#   theme_minimal()
+# 
+#   
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "cdrs") %>% 
+#     ggplot(aes(y = baseline_mean_control, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+#     geom_point(aes(y = baseline_mean_control, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+#     geom_violin(alpha = 0.5)+
+#     stat_summary(
+#       mapping = aes(y = baseline_mean_control, x = as.factor(psy_or_med)),
+#       fun.min = function(z) { quantile(z,0.25) },
+#       fun.max = function(z) { quantile(z,0.75) },
+#       fun = median)
+#   
+#   
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "hamd") %>% 
+#     ggplot(aes(y = baseline_mean_control, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+#     geom_point(aes(y = baseline_mean_control, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+#     geom_violin(alpha = 0.5)+
+#     stat_summary(
+#       mapping = aes(y = baseline_mean_control, x = as.factor(psy_or_med)),
+#       fun.min = function(z) { quantile(z,0.25) },
+#       fun.max = function(z) { quantile(z,0.75) },
+#       fun = median)
+#   
+# 
+#   
+#   test_dist_contrl%>% 
+#     ggplot(aes(y = percent_women, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+#     geom_point(aes(y = percent_women, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+#     geom_violin(alpha = 0.5)+
+#     stat_summary(
+#       mapping = aes(y = percent_women, x = as.factor(psy_or_med)),
+#       fun.min = function(z) { quantile(z,0.25) },
+#       fun.max = function(z) { quantile(z,0.75) },
+#       fun = median)  
+#   t.test(test_dist_contrl$percent_women, test_dist_contrl$psy_or_med)  
+#   
+#   test_dist_contrl%>% 
+#     ggplot(aes(y = mean_age, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
+#     geom_point(aes(y = mean_age, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
+#     geom_violin(alpha = 0.5)+
+#     stat_summary(
+#       mapping = aes(y = mean_age, x = as.factor(psy_or_med)),
+#       fun.min = function(z) { quantile(z,0.25) },
+#       fun.max = function(z) { quantile(z,0.75) },
+#       fun = median)  
+# t.test(test_dist_contrl$mean_age, test_dist_contrl$psy_or_med)
+#   
+# 
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "cdrs") %>% 
+#     group_by(psy_or_med) %>% 
+#     summarise(n= n(), avg_baseline = mean(baseline_mean_control, na.rm = T))
+#   
+#   
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "hamd") %>% 
+#     group_by(psy_or_med) %>% 
+#     summarise(n= n(), avg_baseline = mean(baseline_mean_control, na.rm = T)) 
+#   
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "bdi") %>% 
+#     group_by(psy_or_med) %>% 
+#     summarise(n= n(), avg_baseline = mean(baseline_mean_control, na.rm = T)) 
+#   
+#   test_dist_contrl%>% 
+#     filter(instrument_name == "ces_d") %>% 
+#     group_by(psy_or_med) %>% 
+#     summarise(n= n(), avg_baseline = mean(baseline_mean_control, na.rm = T)) 
+#   
+# unique(test_dist_contrl$instrument_name)
+# 
+#   
+# 
+#   summarise(n= n(), avg_gender = mean(baseline_mean_control, na.rm = T)) 
+# 
+# ###
+#   library(tidyverse) # needed for 'glimpse'
+#   library(dmetar)
+#   library(meta)
+#   
+# 
+# 
+# met_perc_women <- metagen(TE = percent_women,
+#                  seTE = percent_women_std_error,
+#                  studlab = study,
+#                  data = df_appl_v_orange,
+#                  sm = "SMD",
+#                  fixed = FALSE,
+#                  random = TRUE,
+#                  method.tau = "REML",
+#                  hakn = TRUE,
+#                  title = "percentage women across studies")
+# update.meta(met_perc_women, 
+#             subgroup =psy_or_med, 
+#             tau.common = FALSE)
+# 
+# 
+# 
+# met_perc_women <- metagen(TE = percent_women,
+#                           seTE = percent_women_std_error,
+#                           studlab = study,
+#                           data = df_appl_v_orange,
+#                           sm = "SMD",
+#                           fixed = FALSE,
+#                           random = TRUE,
+#                           method.tau = "REML",
+#                           hakn = TRUE,
+#                           title = "percentage women across studies")
+# update.meta(met_perc_women, 
+#             subgroup =psy_or_med, 
+#             tau.common = FALSE)
+# 
+# 
+# df_for_cdrs <- test_dist_contrl %>% 
+#   filter(instrument_name == "cdrs")
+# 
+# met_baseline_severity_cdrs <- metagen(TE = baseline_mean_control,
+#                           seTE = baseline_st_error_control,
+#                           studlab = new_study_id,
+#                           data = df_for_cdrs,
+#                           sm = "MD",
+#                           fixed = FALSE,
+#                           random = TRUE,
+#                           method.tau = "REML",
+#                           hakn = TRUE,
+#                           title = "percentage women across studies")
+# update.meta(met_baseline_severity_cdrs, 
+#             subgroup =psy_or_med, 
+#             tau.common = FALSE)
+# 
+# 
+# 
+# df_for_hamd <- test_dist_contrl %>% 
+#   filter(instrument_name == "hamd")
+# 
+# met_baseline_severity_hamd <- metagen(TE = baseline_mean_control,
+#                                       seTE = baseline_st_error_control,
+#                                       studlab = new_study_id,
+#                                       data = df_for_hamd,
+#                                       sm = "MD",
+#                                       fixed = FALSE,
+#                                       random = TRUE,
+#                                       method.tau = "REML",
+#                                       hakn = TRUE,
+#                                       title = "percentage women across studies")
+# update.meta(met_baseline_severity_hamd, 
+#             subgroup =psy_or_med, 
+#             tau.common = FALSE)
+# 
+# 
+# 
+# 
+# 
+#  
+# pdf(file = "forestplot.pdf", width = 15, height = 20)
+# forest.meta(met_cohens_control_cbt_fluox_esc, 
+#             sortvar = TE,
+#             prediction = TRUE, 
+#             print.tau2 = FALSE,
+#             order = order(df_cbt_fluox_esc$psy_or_med),
+#              subgroup = TRUE,
+#              subgroup.name = df_cbt_fluox_esc$psy_or_med,
+#             test.subgroup.random,
+#             test.effect.subgroup.random,
+#             sep.subgroup = df_cbt_fluox_esc$psy_or_med,
+#             leftlabs = c("Study", "g", "SE"))
+# dev.off()
+# 
+# 
+# pdf(file = "forestplot.pdf", width = 15, height = 20)
+# par(mar = c(6, 6, 6, 6))
+# forest.meta(met_cohens_control_cbt_fluox_esc, layout = "JAMA",main = "Bigger margin: 6, 6, 6, 6")
+# dev.off()
+# 
+# 
+# 
+# met_cohens_control_cbt_fluox_esc <- metagen(TE = baseline_mean_control,
+#                                             seTE = baseline_st_error_control,
+#                                             studlab = new_study_id,
+#                                             data = df_cbt_fluox_esc,
+#                                             sm = "SMD",
+#                                             fixed = FALSE,
+#                                             random = TRUE,
+#                                             method.tau = "REML",
+#                                             hakn = TRUE,
+#                                             title = "percentage women across studies")
+# 
+# 
+# #### It is useful to have two metanalyses and combine them to one
+# ### the idea is that each metanalysis has its own heterogeneity, tau, and that it is reasonable 
+# ### to combine. 
+# 
+# 
+# 
+############IGNORE UP TO HERE
 
-test
+# Start here------------------------------------------------------
 
-# create new id
-test <- df_appl_v_orange  %>% 
+#Need to use SMD, ie our Cohen's d and then use Standard error of SMD, to achieve this
+# I need reliabilities.
+
+# note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
+# Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
+# Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
+# for the CDRS-R total score in 53 clinic-referred6- to 12-year-olds.
+
+
+# this is a loop that creates SEs for various test-retest correlation coefficients
+
+# the formula for the calculation of the standard error
+# comes from here: https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/effects.html#s-md
+
+range_test_retest_corr <- seq(0.5, 0.9, by =0.1)
+list_SE_active <- list()
+list_SE_control <- list()
+for (i in 1: length(range_test_retest_corr)){
+
+  list_SE_active[[i]] <- sqrt(((2*(1-range_test_retest_corr[i]))/df_appl_v_orange$baseline_n_active) + 
+                                      ( df_appl_v_orange$cohens_d_active^2/(2*df_appl_v_orange$baseline_n_active)))
+  
+  list_SE_control[[i]] <- sqrt(((2*(1-range_test_retest_corr[i]))/df_appl_v_orange$baseline_n_control) + 
+                                ( df_appl_v_orange$cohens_d_control^2/(2*df_appl_v_orange$baseline_n_control)))
+  
+  
+}
+
+df_ses <- do.call("cbind", c(list_SE_active, list_SE_control))
+colnames(df_ses) <- c(paste0("se_change_active_",range_test_retest_corr ), paste0("se_change_control_",range_test_retest_corr ))
+df_appl_v_orange <-  cbind(df_appl_v_orange, df_ses )
+
+
+### A few more tidying things from Argyris before doing metanalyses
+# # discovered an error in the percentage women o fthe Fristad study. I have checked in the
+# # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
+# # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
+# # check again.
+df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
+
+
+# # We also need to calculate SE for proportion women
+# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
+
+product_perc_women <-  (df_appl_v_orange$percent_women/100)*
+  (1-(df_appl_v_orange$percent_women/100) ) 
+
+total_n <- df_appl_v_orange$baseline_n_active + 
+  df_appl_v_orange$baseline_n_control
+
+df_appl_v_orange$percent_women_std_error <- sqrt(product_perc_women/total_n )
+
+# # We also need to calculate SE for baseline severity
+# 
+df_appl_v_orange$baseline_st_error_active <- 
+  df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
+# 
+df_appl_v_orange$baseline_st_error_control <-
+  df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
+# 
+
+
+### Important: create a dataset that will have unique control studies (see problem that we identified with Charlotte, 
+# namely common control conditions)
+
+# create new id with Charlotte to help with better identification and work with duplicates (see below) 
+df_appl_v_orange  <- df_appl_v_orange  %>%
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
-                        .default = study )) 
+                                  .default = study ))
 
 
+# check this is right
+df_appl_v_orange [df_appl_v_orange $psy_or_med==0, ]$new_study_id == 
+  df_appl_v_orange [df_appl_v_orange $psy_or_med==0, ]$study
+
+df_appl_v_orange [df_appl_v_orange $psy_or_med==1, ]$new_study_id == 
+  df_appl_v_orange[df_appl_v_orange $psy_or_med==1, ]$study
 
 
-test[test$psy_or_med==0, ]$new_study_id == test[test$psy_or_med==0, ]$study
-test[test$psy_or_med==1, ]$new_study_id == test[test$psy_or_med==1, ]$study      
-
-
-# use this code only for examinig controls, for actives use distinct(active_type...)
-test_dist_contrl<-  test %>%          
+# now create the distinct dataset
+df_appl_v_orange_distinct_control <-  df_appl_v_orange %>%          
   group_by(new_study_id) %>% 
   filter(instrument_value == min(instrument_value)) %>% 
   distinct(control_type,.keep_all = TRUE)
 
+# check that all are unique studies
+df_appl_v_orange_distinct_control [duplicated(df_appl_v_orange_distinct_control $study_ID),] 
 
-test_dist_contrl[duplicated(test_dist_contrl$study_ID),]
-
-test_dist_contrl[test_dist_contrl$new_study_id=="Atkinson, 2014",]
-
-test_2 <- test[duplicated(test$study_ID),] #sorting out 
-dim(test_2)
-
-dups <- test_2$study_ID
-test_3 <- test[test$study_ID %in% dups,]
-
-head(test_3, 26)
-
-
-test%>% 
-  ggplot(aes(x = cohens_d_control))+
-  geom_histogram(bins= 10)+
-  facet_wrap(~psy_or_med, nrow = 2)
+# check that the common control (placebo) was kept for a study that had two actives and one control                                                        
+df_appl_v_orange_distinct_control [df_appl_v_orange_distinct_control $new_study_id=="Atkinson, 2014",]
 
 
 
-test%>% 
-  ggplot(aes(y = cohens_d_control, x = as.factor(psy_or_med)))+
-  geom_point(aes(y = cohens_d_control, x = as.factor(psy_or_med), size = baseline_n_control)) +
-  geom_boxplot(alpha = 0.5)
+# now create a new dataframe that will only have the new_study_id, the cohensd and the ses
+
+df_for_test_control_change <- df_appl_v_orange_distinct_control %>% 
+  dplyr:: select (new_study_id, cohens_d_control, psy_or_med, active_type, starts_with("se_change_control"))
+
+colnames(df_for_test_control_change)
 
 
-test%>% 
-  ggplot(aes(y = cohens_d_control, x = as.factor(psy_or_med), colour = as.factor(psy_or_med) ))+
-  geom_point(aes(y = cohens_d_control, x = as.factor(psy_or_med), size = baseline_n_control),position = position_jitter(seed = .3, width = 0.08), alpha = 0.6) +
-  geom_violin(alpha = 0.5)+
-  stat_summary(
-    mapping = aes(y = cohens_d_control, x = as.factor(psy_or_med)),
-    fun.min = function(z) { quantile(z,0.25) },
-    fun.max = function(z) { quantile(z,0.75) },
-    fun = median)+
-  ggtitle("Effect Sizes of the Control Arms of Anti-depressant\n and Psychotherapy Trials in Adolescent Depression", subtitle = "with medians and IQRs")+
-  ylab("Cohen's d of the primary outcome")+
-  scale_x_discrete(labels=c("0" = "Anti-depressant trial\nControls", "1" = "Psychotherapy trial\nControls"))+
-  theme(axis.text.x= element_text(size= 12)) +
-  theme(axis.text.y= element_text(size= 12)) +
-  theme(axis.title.y= element_text(size= 12))+
-  theme(axis.title.x= element_blank())+
-   theme(legend.position = "none")+
-  geom_hline(yintercept = 0, colour = "grey", linetype = "dashed") 
-  theme(plot.title = element_text(color="black", size=14, face="bold")) +
-  theme_minimal()
 
+
+
+
+# # # 1a. Separate metanalyses for cohens d in keeping with 
+# # https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+# 
+# med_dataset_es <- df_for_test_control_change %>% 
+#    filter(psy_or_med == 0)
+#  med_dataset_es$yi <- med_dataset_es$cohens_d_control
+#  med_dataset_es$vi <- med_dataset_es$se_change_control_0.7
+#  
+#  
+# psy_dataset_es <- df_for_test_control_change %>% 
+#    filter(psy_or_med == 1)
+# psy_dataset_es$yi <- psy_dataset_es$cohens_d_control
+# psy_dataset_es$vi <- psy_dataset_es$se_change_control_0.7 
+#  
+#  
+# # now run the metanalyses using these different datasets
+# 
+# rand_eff_metanalysis_med_cohens_d <- metafor:: rma(yi, vi , data = med_dataset_es)
+# rand_eff_metanalysis_psy_cohens_d <- metafor:: rma(yi, vi,  data = psy_dataset_es)
+# 
+# # now comnbine their estimates
+#  df_combine_meta_psy_med <- data.frame(estimate = c(coef(rand_eff_metanalysis_med_cohens_d ), 
+#                                                     coef(rand_eff_metanalysis_psy_cohens_d)), 
+#                                        stderror = c(rand_eff_metanalysis_med_cohens_d$se, rand_eff_metanalysis_psy_cohens_d$se),
+#                                        meta = c("medication","psychotherapy"), tau2 = round(c(rand_eff_metanalysis_med_cohens_d$tau2, 
+#                                                                                               rand_eff_metanalysis_psy_cohens_d$tau2),3))
+# # and reanalyse
+#  combine_meta_psy_med <- metafor:: rma(estimate, sei=stderror, mods = ~ meta, 
+#                                        method="FE", data=df_combine_meta_psy_med, digits=3)
+#  
+# 
+# summary(combine_meta_psy_med) # notice the zvalue is identical with that above. 
+#  
+# z_value <- with(df_combine_meta_psy_med, 
+#                  round(c(zval = (estimate[1] - estimate[2])/sqrt(stderror[1]^2 + stderror[2]^2)), 3))
+# 
+# 
+# 
+# forest(rand_eff_metanalysis_psy_cohens_d, order = "obs", leftlabs = "new_study_id")
+# forest(rand_eff_metanalysis_med_cohens_d, order = "obs", leftlabs = "new_study_id")
+# 
+
+
+# 1b. Another way of doing this according to: https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/subgroup.html
+
+# first creating a variable with string labels to make easier the labelling
+library(metafor)
+library(dmetar)
+library(meta)
+   
+df_for_test_control_change$treatment_modality <-
+                  ifelse(df_for_test_control_change$psy_or_med == 0, "pill placebo",
+                         "psy control")
+
+# also exclude the NA rows 
+df_for_test_control_change <- df_for_test_control_change %>% 
+  filter_at(vars(cohens_d_control, se_change_control_0.7), all_vars(!is.na(.))) # chose one correlation will loop over others
+  
+  
+
+metan_overall <- metagen(TE = cohens_d_control,
+                 seTE = se_change_control_0.7,
+                 studlab = new_study_id,
+                 data = df_for_test_control_change,
+                 sm = "SMD",
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "REML",
+                 hakn = TRUE,
+                 title = "Apples vs Oranges")
+
+
+#### Now you can run the subgroup metanalysis here and extract the estimates for that
+
+subgroup_metan <-update.meta(metan_overall , 
+                             subgroup = df_for_test_control_change$treatment_modality, subgroup.name = "treatment modality",
+                             tau.common = FALSE)
+
+
+
+# summary(subgroup_metan)[[40]]
+# summary(subgroup_metan)[[46]]
+# summary(subgroup_metan)[[47]]
+
+summary(subgroup_metan)[21]$random # use another $ to get access to the between group difference, e.g. 
+summary(subgroup_metan)[21]$random$TE #is the between group effect and this is the SE
+summary(subgroup_metan)[21]$random$seTE # etc
+summary(subgroup_metan)[146] # this gives you the random effects for each group and
+summary(subgroup_metan)[146]$TE.random.w[1] # this woudl give you psychotherapy
+summary(subgroup_metan)[149]  # get p-value
+summary(subgroup_metan)[151] # get lower CI
+summary(subgroup_metan)[152]# get upper CI
+summary(subgroup_metan)[185] # USE THIS FOR THE Q value
+summary(subgroup_metan)[188]# Q value df
+summary(subgroup_metan)[190] # Q value p-value
+
+
+
+pdf(file = "forestplot_2.pdf", width = 10, height = 23)
+forest(subgroup_metan, layout = "JAMA",
+       col.by = "black", 
+       digits.sd = 2,
+       digits.tau2 = 2,
+       colgap = "0.5cm",
+       order = "obs",
+       xlim=c(-4,1), cex=0.9,
+       fonts = 12,
+       colgap.forest = "1cm",)
+dev.off()
+
+
+###### but it may be better to create the ggplot yourself as below using the metagen object
+summary(metan_overall)
+
+df_for_plotting <- data.frame(
+names_to_change = summary(metan_overall)[[1]], # just a trick to avoid duplicates see below
+names = summary(metan_overall)[[1]],
+treatment_modality = df_for_test_control_change[df_for_test_control_change$new_study_id %in% summary(metan_overall)[[1]], ]
+$treatment_modality,
+smds = summary(metan_overall)[[4]], # the SMDs
+lower_ci = summary(metan_overall)[[10]], # lower CIs
+upper_ci = summary(metan_overall)[[11]]# uppper CIs
+)
+
+# Also, to avoid the problem of duplicate values, try the following
+df_for_plotting  <- within(df_for_plotting , names <- ave(names, names_to_change, FUN = make.unique))
+
+# Also add two empty rows to add the stats for the groups
+# df_for_plotting [nrow(df_for_plotting )+2,] <- NA
+
+# try this to annotate the create the plot in ggplot
+# https://www.khstats.com/blog/forest-plots/
+
+library(forcats)
+
+
+
+p <- df_for_plotting %>% 
+  mutate(names = fct_reorder(names, smds)) %>%
+  ggplot(aes(y = names)) + 
+  theme_classic()
+
+p <- p +
+  geom_point(aes(x=smds, colour = factor(treatment_modality)), shape=15, size=4) +
+  geom_linerange(aes(xmin=lower_ci, xmax=upper_ci)) 
+p <- p 
   
 
 
+p <- p +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  labs(x="Standardised Mean Difference (negative is better)", y="")
+p <- p + ggtitle ("Metanalysis of Control Arms of Antidepressant and Psychotherapy Trials",
+                  subtitle = "Standardised Mead Differences (SMDs) with 95% CIs")
 
-test %>% 
-  filter(cohens_d_control<(-2) & psy_or_med == 1)
+
+ p <- p +
+   coord_cartesian(ylim=c(1,78))
+ p <-  p + scale_colour_manual(values = c("red", "blue"))
+
+  p <-  p +
+     annotate("rect", xmin = -1.96, xmax = -1.44, ymin = "Srivastava, 2020", ymax = "Rohde, 2004",
+              alpha = .4,fill = "red")+
+   
+   geom_vline(xintercept = summary(subgroup_metan)[146]$TE.random.w[[2]], colour = "white")
+ 
+  p <- p  + 
+     annotate("rect", xmin = -0.6393278, xmax =-0.3501107, ymin = "Srivastava, 2020", ymax = "Rohde, 2004",
+              alpha = .3,fill = "blue" ) +
+   geom_vline(xintercept = summary(subgroup_metan)[146]$TE.random.w[[1]], colour = "white")
+# 
+p <- p + xlim(-3.8,1)
+p <- p + theme(legend.title=element_blank()) +   theme(legend.text=element_text(size=12))
+p <-p + theme(
+  legend.position = c(.03, .5),
+  legend.justification = c("left", "bottom")
+)
 
 
-test
+# 
+p <- p + annotate("text", label = 
+                    paste0("group difference:\n", "chi_sq = ", 
+                                         round(summary(subgroup_metan)[185][[1]],2),",\np <0.01 "), 
+                  x = -3, y = "Diamond, 2002", size = 8)
 
-duplicated(test$study_ID)
+df_for_plotting_Sriv <- df_for_plotting %>% 
+  filter(names == "Srivastava, 2020")
 
-test[test$study=="Bolton, 2007",]
+p <- p+ geom_segment(aes(x = smds, xend = upper_ci, y = "Srivastava, 2020", 
+                    yend = "Srivastava, 2020"), 
+                data = df_for_plotting_Sriv)
+
+
+p <- p+ geom_segment(aes(x = smds, xend = -3.8, y = "Srivastava, 2020", 
+                      yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
+                  data = df_for_plotting_Sriv)
+p <- p + 
+  theme(legend.text = element_text(size=30)) +
+  theme(legend.key.height= unit(2, 'cm')) +
+  theme(axis.text.x=element_text(size=12))+
+  theme(axis.text.y = element_text(size=12))+
+  theme(plot.title=element_text(size=15),
+  plot.subtitle=element_text(size=12))
+
+p
+# now print as pdf
+
+pdf(file = "forestplot.pdf", width = 10, height = 20)
+p
+dev.off()
+
+
+
+
+# 1c. Do the above for CBT and Fluox Escitalopram only
+
+# # first creating a variable with string labels to make easier the labelling  DONE THIS ABOVE
+# df_for_test_control_change$treatment_modality <-
+#    ifelse(df_for_test_control_change$psy_or_med == 0, "placebo",
+#           "psy control")
+
+# also exclude the NA rows DONE THIS ABOVE
+# df_for_test_control_change_sri_cbt <- df_for_test_control_change %>% 
+#   filter_at(vars(cohens_d_control, se_change_control_0.7), all_vars(!is.na(.))) # chose one correlation will loop over others
+# 
+
+# create a new dataset 
+df_for_test_control_change_sri_cbt <- 
+  df_for_test_control_change %>% 
+  filter(active_type == "Fluoxetine"|active_type == "Escitalopram" |active_type == "cbt")
+
+metan_overall_sri_cbt <- metagen(TE = cohens_d_control,
+                         seTE = se_change_control_0.7,
+                         studlab = new_study_id,
+                         data = df_for_test_control_change_sri_cbt,
+                         sm = "SMD",
+                         fixed = FALSE,
+                         random = TRUE,
+                         method.tau = "REML",
+                         hakn = TRUE,
+                         title = "Apples vs Oranges SRI CBT")
+
+
+#### Now you can run the subgroup metanalysis here and extract the estimates for that
+
+subgroup_metan_sri_cbt <-update.meta(metan_overall_sri_cbt , 
+                             subgroup = df_for_test_control_change_sri_cbt$treatment_modality, subgroup.name = "treatment modality",
+                             tau.common = FALSE)
+
+# summary(subgroup_metan)[[40]]
+# summary(subgroup_metan)[[46]]
+# summary(subgroup_metan)[[47]]
+
+summary(subgroup_metan_sri_cbt)[21]$random # use another $ to get access to the between group difference, e.g. 
+summary(subgroup_metan_sri_cbt)[21]$random$TE #is the between group effect and this is the SE
+summary(subgroup_metan_sri_cbt)[21]$random$seTE # etc
+summary(subgroup_metan_sri_cbt)[146] # this gives you the random effects for each group and
+summary(subgroup_metan_sri_cbt)[146]$TE.random.w[1] # this woudl give you psychotherapy
+summary(subgroup_metan_sri_cbt)[149]  # get p-value
+summary(subgroup_metan_sri_cbt)[151] # get lower CI
+summary(subgroup_metan_sri_cbt)[152]# get upper CI
+summary(subgroup_metan_sri_cbt)[185] # USE THIS FOR THE Q value
+summary(subgroup_metan_sri_cbt)[188]# Q value df
+summary(subgroup_metan_sri_cbt)[190] # Q value p-value
+
+
+
+pdf(file = "forestplot_sri_cbt_2.pdf", width = 10, height = 23)
+forest(subgroup_metan, layout = "JAMA",
+       col.by = "black", 
+       digits.sd = 2,
+       digits.tau2 = 2,
+       colgap = "0.5cm",
+       order = "obs",
+       xlim=c(-4,1), cex=0.9,
+       fonts = 12,
+       colgap.forest = "1cm",)
+dev.off()
+
+
+###### but it may be better to create the ggplot yourself as below using the metagen object
+
+df_for_plotting_sri_cbt <- data.frame(
+  names_to_change = summary(metan_overall_sri_cbt )[[1]], # just a trick to avoid duplicates see below
+  names = summary(metan_overall_sri_cbt )[[1]],
+  treatment_modality = df_for_test_control_change_sri_cbt[df_for_test_control_change_sri_cbt$new_study_id %in% summary(metan_overall_sri_cbt )[[1]], ]
+  $treatment_modality,
+  smds = summary(metan_overall_sri_cbt )[[4]], # the SMDs
+  lower_ci = summary(metan_overall_sri_cbt )[[10]], # lower CIs
+  upper_ci = summary(metan_overall_sri_cbt )[[11]]# uppper CIs
+)
+
+# Also, to avoid the problem of duplicate values, try the following
+df_for_plotting_sri_cbt <- within(df_for_plotting_sri_cbt, names <- ave(names, names_to_change, FUN = make.unique))
+
+# Also add two empty rows to add the stats for the groups
+# df_for_plotting [nrow(df_for_plotting )+2,] <- NA
+
+# try this to annotate the create the plot in ggplot
+# https://www.khstats.com/blog/forest-plots/
+
+library(forcats)
+
+p_sri_cbt <- df_for_plotting_sri_cbt %>% 
+  mutate(names = fct_reorder(names, smds)) %>%
+  ggplot(aes(y = names)) + 
+  theme_classic()
+
+p_sri_cbt <- p_sri_cbt+
+  geom_point(aes(x=smds, colour = factor(treatment_modality)), shape=15, size=4) +
+  geom_linerange(aes(xmin=lower_ci, xmax=upper_ci)) 
+p_sri_cbt <- p_sri_cbt
+
+
+p_sri_cbt <- p_sri_cbt+
+  geom_vline(xintercept = 0, linetype="dashed") +
+  labs(x="Standardised Mean Difference (negative is better)", y="")
+p_sri_cbt <- p_sri_cbt + ggtitle ("Metanalysis of Control Arms of SRI and CBT Trials",
+                  subtitle = "Standardised Mead Differences (SMDs) with 95% CIs")
+
+
+p_sri_cbt <- p_sri_cbt +
+  coord_cartesian(ylim=c(1,48))
+p_sri_cbt <-  p_sri_cbt + scale_colour_manual(values = c("red", "blue"))
+
+p_sri_cbt <-  p_sri_cbt +
+  annotate("rect", xmin = summary(subgroup_metan_sri_cbt)[151]$lower.random.w[[1]], 
+           xmax = summary(subgroup_metan_sri_cbt)[152]$upper.random.w[[1]], 
+           ymin = "Srivastava, 2020", 
+           ymax = "Rohde, 2004",
+           alpha = .4,fill = "blue")+
+  
+  geom_vline(xintercept = summary(subgroup_metan_sri_cbt)[146]$TE.random.w[[1]], colour = "white")
+
+p_sri_cbt <- p_sri_cbt  + 
+  annotate("rect", xmin = summary(subgroup_metan_sri_cbt)[151]$lower.random.w[[2]], 
+           xmax = summary(subgroup_metan_sri_cbt)[152]$upper.random.w[[2]], 
+           ymin = "Srivastava, 2020", ymax = "Rohde, 2004",
+           alpha = .3,fill = "red" ) +
+  geom_vline(xintercept = summary(subgroup_metan_sri_cbt)[146]$TE.random.w[[2]], colour = "white")
+# 
+p_sri_cbt <- p_sri_cbt+ xlim(-3.8,1)
+p_sri_cbt <- p_sri_cbt + theme(legend.title=element_blank()) +   theme(legend.text=element_text(size=12))
+p_sri_cbt <- p_sri_cbt + theme(
+  legend.position = c(.03, .5),
+  legend.justification = c("left", "bottom")
+)
+
+
+# 
+p_sri_cbt <- p_sri_cbt + annotate("text", label = 
+                    paste0("group difference:\n", "chi_sq = ", 
+                           round(summary(subgroup_metan_sri_cbt)[185][[1]],2),",\np <0.01 "), 
+                  x = -3.3, y = "Vostanis, 1996", size = 8)
+
+# df_for_plotting_Sriv <- df_for_plotting %>% 
+#   filter(names == "Srivastava, 2020")
+# 
+# p_sri_cbt <- p_sri_cbt + geom_segment(aes(x = smds, xend = upper_ci, y = "Srivastava, 2020", 
+#                          yend = "Srivastava, 2020"), 
+#                      data = df_for_plotting_Sriv)
+
+
+# p_sri_cbt <- p_sri_cbt + geom_segment(aes(x = smds, xend = -3.8, y = "Srivastava, 2020", 
+#                          yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
+#                      data = df_for_plotting_Sriv)
+p_sri_cbt <- p_sri_cbt + 
+  theme(legend.text = element_text(size=30)) +
+  theme(legend.key.height= unit(2, 'cm')) +
+  theme(axis.text.x = element_text(size=15)) +
+  theme(axis.text.y = element_text(size=15))+
+  theme(plot.title = element_text(size=25),
+        plot.subtitle = element_text(size=20)) 
+
+p_sri_cbt <- p_sri_cbt + geom_segment(aes(x = smds, xend = upper_ci, y = "Srivastava, 2020", 
+                   yend = "Srivastava, 2020"), 
+               data = df_for_plotting_Sriv)
+
+p_sri_cbt <- p_sri_cbt + geom_segment(aes(x = smds, xend = -3.8, y = "Srivastava, 2020", 
+                         yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
+                     data = df_for_plotting_Sriv)  
+
+p_sri_cbt
+# now print as pdf
+
+pdf(file = "forestplot_sri_cbt.pdf", width = 15, height = 23)
+p_sri_cbt
+dev.off()
+
+
+
+
+
+# 1d. exclude waitlist controls -------------------------------------------
+
+# create a new dataset that excludes waitlist controls
+studies_with_wl <- df_appl_v_orange_distinct_control[df_appl_v_orange_distinct_control$control_type == "wl",]$new_study_id
+
+df_for_test_control_change_no_wl <- 
+  df_for_test_control_change[-which(df_for_test_control_change$new_study_id %in% studies_with_wl),]  # the small discrepancy
+                                                                                            # is due to common controls
+
+metan_overall_no_wl <- metagen(TE = cohens_d_control,
+                                 seTE = se_change_control_0.7,
+                                 studlab = new_study_id,
+                                 data = df_for_test_control_change_no_wl,
+                                 sm = "SMD",
+                                 fixed = FALSE,
+                                 random = TRUE,
+                                 method.tau = "REML",
+                                 hakn = TRUE,
+                                 title = "Apples vs Oranges no wl")
+
+
+#### Now you can run the subgroup metanalysis here and extract the estimates for that
+
+subgroup_metan_no_wl <-update.meta(metan_overall_no_wl , 
+                                     subgroup = df_for_test_control_change_no_wl$treatment_modality, subgroup.name = "treatment modality",
+                                     tau.common = FALSE)
+
+
+
+
+
+
+# 2.Separate metanalyses for percent female and  baseline severity 
+
+### I have before inspected graphically the individual studies, should return to it for the paper too. 
+
+################ create and test function for mean and sd combo ##################
+
+#In order to test for differences at baseline, we need to combine ns, means and sds
+
+# formalisms to combine means and sds from two samples from
+# https://math.stackexchange.com/questions/2971315/how-do-i-combine-standard-deviations-of-two-groups
+# derivation seems correct there and I am verifying this below in sim.
+
+set.seed(1974)
+x <- rnorm(100, 10, 5)
+x1 <- x[1:30]
+x2 <- x[-which(x %in% x1)]
+
+n1 <- length(x1)
+n2 <- length(x2)
+
+
+# get combined mean
+combined_mean <- (n1*mean(x1, na.rm = T)+n2*mean(x2, na.rm = T))/(n1+n2) # formula for deriving combined mean
+
+combined_mean == mean(x, na.rm = T) # checked it works. 
+
+# get combined sd
+q1 = (n1-1)*var(x1, na.rm = T) + n1*mean(x1, na.rm = T)^2 # helps avoid sums and squares
+
+q2 = (n2-1)*var(x2, na.rm = T) + n2*mean(x2, na.rm = T)^2 # helps avoid sums and squares
+
+qc = q1 + q2
+
+combined_sd = sqrt( (qc - (n1+n2)*mean(total_sample, na.rm = T)^2)/(n1+n2-1) )
+
+combined_sd  == sd(total_sample, na.rm = T) # checked it works
+
+
+## put in a generalisable function that takes means, sds and ns as arguments
+
+combined_means_sds_func <- function(mean_1, mean_2, sd_1, sd_2, n_1, n_2) {
+  # Check if mean_1 is missing
+  if (missing(mean_1)) {
+    combined_mean <- NA
+  } else {
+    # Check if mean_2 is missing
+    if (missing(mean_2)) {
+      combined_mean <- NA
+    } else {
+      combined_mean <- (n_1 * mean_1 + n_2 * mean_2) / (n_1 + n_2) # formula for deriving combined mean
+    }
+  }
+  
+  # Check if sd_1 is missing
+  if (missing(sd_1)) {
+    combined_sd <- NA
+  } else {
+    # Check if sd_2 is missing
+    if (missing(sd_2)) {
+      combined_sd <- NA
+    } else {
+      q1 <- (n_1 - 1) * (sd_1)^2 + n_1 * (mean_1)^2 # avoids dealing with sums of squares
+      q2 <- (n_2 - 1) * (sd_2)^2 + n_2 * (mean_2)^2
+      qc <- q1 + q2
+      combined_sd <- sqrt((qc - (n_1 + n_2) * (combined_mean)^2) / (n_1 + n_2 - 1)) # formula for deriving combined sd
+    }
+  }
+  
+  return(list(combined_mean, combined_sd))
+}
+
+
+
+# now validate the function on the vectors created above.
+test_the_function <- combined_means_sds_func(mean_1 = mean(x1, na.rm = T), 
+                        mean_2 = mean(x2, na.rm = T), 
+                        sd_1 = sd(x1, na.rm = T), 
+                        sd_2 = sd(x2, na.rm = T), 
+                        n_1 = n1, 
+                        n_2 = n2)
+
+test_the_function [[1]] ==    mean(x, na.rm = T)   
+
+test_the_function [[2]] ==    sd(x, na.rm = T)  
+
+################ function created and tested ##################
+
+
+## Now I will create a function that takes a dataframe as the argument and returns the necessary
+# means and sds so that I don't have to write too much code.
+create_combo_dataframe <- function(input_df) {
+  new_study_ids <- unique(input_df$new_study_id)
+  
+  combo_mean_1 <- numeric(length(new_study_ids))
+  combo_mean_2 <- numeric(length(new_study_ids))
+  combo_sd_1 <- numeric(length(new_study_ids))
+  combo_sd_2 <- numeric(length(new_study_ids))
+  combo_n_1 <- numeric(length(new_study_ids))
+  combo_n_2 <- numeric(length(new_study_ids))
+  study_ids <- numeric(length(new_study_ids))
+  treatment_group <- character(length(new_study_ids))
+  
+  for (i in 1:length(new_study_ids)) {
+    subset_df <- input_df[input_df$new_study_id == new_study_ids[i], ]
+    
+    combo_mean_1[i] <- subset_df$baseline_mean_active
+    combo_mean_2[i] <- subset_df$baseline_mean_control
+    combo_sd_1[i] <- subset_df$baseline_sd_active
+    combo_sd_2[i] <- subset_df$baseline_sd_control
+    combo_n_1[i] <- subset_df$baseline_n_active
+    combo_n_2[i] <- subset_df$baseline_n_control   
+    study_ids[i] <- new_study_ids[i]
+    treatment_group[i] <- subset_df$psy_or_med[1]  
+  }
+  
+  df_combo <- data.frame(
+    combo_study_ids = study_ids,
+    combo_treatment_group = treatment_group,
+    combo_mean_1 = combo_mean_1,
+    combo_mean_2 = combo_mean_2,
+    combo_sd_1 = combo_sd_1,
+    combo_sd_2 = combo_sd_2,
+    combo_n_1 = combo_n_1,
+    combo_n_2 = combo_n_2
+  )
+  
+  return(df_combo)
+}
+
+df_appl_v_orange_distinct_control_cdrs <-
+  df_appl_v_orange_distinct_control %>% 
+  filter(instrument_name == "cdrs")
+df_appl_v_orange_distinct_control_hamd <-
+  df_appl_v_orange_distinct_control %>% 
+  filter(instrument_name == "hamd")
+
+df_combo_cdrs <- create_combo_dataframe(df_appl_v_orange_distinct_control_cdrs)
+df_combo_hamd <- create_combo_dataframe(df_appl_v_orange_distinct_control_hamd)
+
+
+## now apply the combining function to add the combined estimates 
+
+# for CDRS
+combo_results_cdrs <- combined_means_sds_func(
+                        mean_1 = df_combo_cdrs$combo_mean_1,
+                        mean_2 = df_combo_cdrs$combo_mean_2,
+                        sd_1 = df_combo_cdrs$combo_sd_1,
+                        sd_2 = df_combo_cdrs$combo_sd_2,
+                        n_1 = df_combo_cdrs$combo_n_1,
+                        n_2 = df_combo_cdrs$combo_n_2)
+
+# add results to dataframe
+df_combo_cdrs$combo_mean_combined <- combo_results_cdrs[[1]]
+df_combo_cdrs$combo_sd_combined <- combo_results_cdrs[[2]]
+df_combo_cdrs$combo_n_combined <- df_combo_cdrs$combo_n_1 + df_combo_cdrs$combo_n_2
+
+
+# for HAMD
+combo_results_hamd <- combined_means_sds_func(
+  mean_1 = df_combo_hamd$combo_mean_1,
+  mean_2 = df_combo_hamd$combo_mean_2,
+  sd_1 = df_combo_hamd$combo_sd_1,
+  sd_2 = df_combo_hamd$combo_sd_2,
+  n_1 = df_combo_hamd$combo_n_1,
+  n_2 = df_combo_hamd$combo_n_2)
+
+# add results to dataframe
+df_combo_hamd$combo_mean_combined <- combo_results_hamd[[1]]
+df_combo_hamd$combo_sd_combined <- combo_results_hamd[[2]]
+df_combo_hamd$combo_n_combined <- df_combo_hamd$combo_n_1 + df_combo_hamd$combo_n_2
+
+
+# do the subgroup metanalysis for the CDRS
+cdrs_means <- metamean(n = combo_n_combined,
+                   mean = combo_mean_combined,
+                   sd = combo_sd_combined,
+                   studlab = combo_study_ids,
+                   data = df_combo_cdrs,
+                   sm = "MRAW",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.tau = "REML",
+                   hakn = TRUE,
+                   title = "CDRS at baseline")
+summary(cdrs_means)
+
+update.meta(cdrs_means, 
+            subgroup = df_combo_cdrs$combo_treatment_group, 
+            tau.common = FALSE)
+
+# do the subgroup analysis for the HAMD
+hamd_means <- metamean(n = combo_n_combined,
+                       mean = combo_mean_combined,
+                       sd = combo_sd_combined,
+                       studlab = combo_study_ids,
+                       data = df_combo_hamd,
+                       sm = "MRAW",
+                       fixed = FALSE,
+                       random = TRUE,
+                       method.tau = "REML",
+                       hakn = TRUE,
+                       title = "HAMD at baseline")
+summary(hamd_means)
+
+update.meta(hamd_means, 
+            subgroup = df_combo_hamd$combo_treatment_group, 
+            tau.common = FALSE)
+
+
+
+
+# 2b. Proportion women ----------------------------------------------------
+
+# first get the variables you need for this
+df_appl_v_orange_distinct_control$percent_women
+
+df_appl_v_orange_distinct_control$percent_women_std_error # I had calculated this further up.
+
+n_total <- (df_appl_v_orange_distinct_control$baseline_n_active+
+              df_appl_v_orange_distinct_control$baseline_n_control)
+
+df_appl_v_orange_distinct_control$n_women <- df_appl_v_orange_distinct_control$percent_women*n_total/100
+
+
+
+perc_women <- metamean(n = n_women,
+                       mean = percent_women,
+                       sd = percent_women_std_error, # for proportions se and sd are the same for practical purposes and large samples
+                       studlab = new_study_id,
+                       data = df_appl_v_orange_distinct_control,
+                       sm = "MRAW",
+                       fixed = FALSE,
+                       random = TRUE,
+                       method.tau = "REML",
+                       hakn = TRUE,
+                       title = "Perc women at baseline")
+summary(perc_women)
+
+update.meta(perc_women, 
+            subgroup = df_appl_v_orange_distinct_control$psy_or_med, 
+            tau.common = FALSE)
+
+
+
+# 2c. For age we are missing the sds --------------------------------------
+
+
+
+# 3. metaregression.
+
+df_for_metareg <- 
+  df_appl_v_orange %>%  
+  dplyr:: select(new_study_id, treatment_allocation, cohens_d_control, cohens_d_active, se_change_control_0.7, 
+                 se_change_active_0.7 ) %>% 
+  pivot_longer(c(cohens_d_control, cohens_d_active, se_change_control_0.7, 
+               se_change_active_0.7), names_to = c("control", "active") , names_sep = "_", values_to = c("cohens_d", "se_change") )
+
+
+df_for_metareg <- 
+  df_appl_v_orange %>%  
+  dplyr:: select(new_study_id, psy_or_med, cohens_d_control, cohens_d_active) %>% 
+  pivot_longer(cols = c(cohens_d_control, cohens_d_active), 
+               names_to = "arm", 
+               values_to = "cohens_d") 
+
+df_for_metareg_2 <- 
+  df_appl_v_orange %>%  
+  dplyr:: select(new_study_id,psy_or_med,  se_change_control_0.7, 
+                 se_change_active_0.7 ) %>% 
+  pivot_longer(cols = c(se_change_control_0.7, se_change_active_0.7), 
+               names_to = "arm", 
+               values_to = "se_change")
+
+df_for_metareg_long <- cbind(df_for_metareg, df_for_metareg_2)
+
+
+
+mod_1_meta_reg <- rma(yi = cohens_d, 
+                      sei = se_change, 
+                      data = df_for_metareg_long , 
+                      method = "ML", 
+                      mods = ~ psy_or_med+ arm, 
+                      test = "knha")
+
+mod_1_meta_reg
+
+
+mod_2_meta_reg <- rma(yi = cohens_d, 
+                  sei = se_change, 
+                  data = df_for_metareg_long , 
+                  method = "ML", 
+                  mods = ~ psy_or_med*arm, 
+                  test = "knha")
+
+mod_2_meta_reg
+
+anova(mod_1_meta_reg, mod_2_meta_reg)
+
+mod_2_meta_reg_output <- data.frame(broom::tidy(mod_2_meta_reg))
+mod_2_meta_reg_output[,1]
