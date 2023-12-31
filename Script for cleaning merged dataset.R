@@ -2808,34 +2808,41 @@ library(ggplot2)
 # Make sure to replace the column names accordingly
 
 # Calculate the size based on the difference between lower and upper
-statistics_indiv_metan$size <- statistics_indiv_metan$upper_random - statistics_indiv_metan$lower_random
-
-# Create ggplot
-ggplot(statistics_indiv_metan, aes(x = TE_random, y = c(1, 2, 3, 4))) +
-  geom_point(aes(size = size), shape = 18, position = position_stack(vjust = 0.5)) +
-  theme_minimal() +  # Adjust the theme as needed
-  scale_size_continuous(range = c(2, 8)) +  # Adjust the size range as needed
-  labs(x = "TE-random", y = NULL, title = "Stacked Diamond-shaped Objects for TE-random with Confidence Intervals")
 
 
-library(ggplot2)
-
+# Create ggplot with points and error bars
 # Assuming statistics_indiv_metan is your dataframe
 # Make sure to replace the column names accordingly
 
 # Example data (replace with your actual data)
-statistics_indiv_metan <- data.frame(
-  TE_random = c(0.2, 0.4, 0.6, 0.8),
-  lower_random = c(0.1, 0.3, 0.5, 0.7),
-  upper_random = c(0.3, 0.5, 0.7, 0.9)
+statistics_indiv_metan$text_label <-  c(
+  paste(statistics_indiv_metan$condition[1],"\n","k = ", statistics_indiv_metan$k_study[1],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[1],2) ), 
+   
+  paste(statistics_indiv_metan$condition[2],"\n","k = ", statistics_indiv_metan$k_study[2],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[2],2) ), 
+  
+  paste(statistics_indiv_metan$condition[3],"\n","k = ", statistics_indiv_metan$k_study[3],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[3],2) ), 
+   
+  paste(statistics_indiv_metan$condition[4],"\n","k = ", statistics_indiv_metan$k_study[4],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[4],2) ) 
 )
 
+
+
 # Create ggplot with points and error bars
-ggplot(statistics_indiv_metan, aes(x = TE_random, y = c(1:4) )) +
+ggplot(statistics_indiv_metan, aes(x = TE_random, y = c(1:4), colour = condition, label = text_label)) +
   geom_point(size = 3) +
-  geom_errorbar(aes(xmin = lower_random , xmax = upper_random), width = 0.2, position = position_dodge(0.5)) +
+  geom_errorbar(aes(xmin = lower_random, xmax = upper_random), width = 0.2, position = position_dodge(0.5)) +
+  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
+  scale_size_continuous(guide = "none") +
+  guides(colour = FALSE) + 
   theme_minimal() +
-  labs(x = "TE-random", c(1, 2, 3, 4), title = "Points with Confidence Intervals for TE-random")
+  labs(x = "TE-random", c(1, 2, 3, 4), title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm") +
+  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+  ylab("") +
+  ylim(0, 4.5) +
+  xlim(-2.5, 0.5)+
+  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey")
+
+  
 
 
 
