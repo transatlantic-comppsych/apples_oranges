@@ -1,0 +1,693 @@
+---
+title: Apples and Oranges in Adolescent Depression Treatments.
+subtitle: A conceptual and quantiative re-appraisal of control arms in clinical trials.
+author:
+  - name: Argyris Stringaris
+    email: a.stringaris@ucl.ac.uk
+    affiliations: 
+        - id: ucl_1
+          name: University College London
+          department: Divisions of Psychiatry and Psychology and Language Science
+          address: 1-19 Torrington Place
+          city: London, UK
+          state: 
+          postal-code: WC1E 7HB
+          country: United Kingdom
+    attributes:
+        corresponding: true
+    note: 
+  - name: Charlotte Burman
+    email: c.burman@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note:
+  - name: Dayna Bhudia
+    email: d.bhudia@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note:
+  - name: Carmen Moreno
+    email: cmoreno@hggm.es
+    affiliations:
+        - id: HGM
+          name: Hospital Gregorio Marañón
+          department: Department of Psychiatry
+          address: 46 C. del Dr. Esquerdo
+          city: Madrid
+          state:
+          postal-code: 28007
+          country: Spain
+  - name: Samuele Cortese
+    email: samuele.cortese@soton.ac.uk
+    affiliations:
+        - id: soton
+          name: University of Southampton
+          department: Centre for Innovation in Mental Health (CIMH), School of Psychology
+          address: Highfield Campus, Building 44
+          city: Southampton
+          state:
+          postal-code: SO17 1BJ
+          country: United Kingdom
+  - name: Georgina Krebs
+    email: g.krebs@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
+    note: 
+abstract: |
+  To follow
+keywords: 
+  - depression
+  - adolescents
+  - antidepressants
+  - psychotherapy
+date: last-modified
+bibliography: emotion_concepts_paper.bib
+format: 
+  elsevier-pdf:
+    keep-tex: true
+    journal:
+      name: Journal Name
+      formatting: preprint
+      model: 3p
+      cite-style: super
+      
+---
+
+# Introduction
+
+Depression is the leading cause of disability in adolescents and influential guidelines recommend that it be treated with either psychotherapy or anti-depressant medication or their combination. The evidence base for this recommendation typically derives from the appraisal of randomised controlled trials (RCTs) in which one modality (psychotherapy or anti-depressants) are compared against a control condition. In this paper we: a) test the hypothesis that medication control arms are more efficacious than psychotherapy control arms and that this undermines the validity of treatment comparisons and therefore of existing guidelines about depression treatment; b) explore how variation in treatment control arms can itself be exploited to advance our thinking concerning the mechanisms of depression and its treatment.
+
+Clinicians across medicine and other health professions are faced with choices betweent different treatment modalities for their patients, be it between surgical or medical (drug-based) treatments or, in the case of adolescent depression, between psychotherapy and antidepressant medication. To make informed choices, clinicians rely on the extant evidence, frequently summarised in the form of national guidelines or other treatment recommendations. Such a comparison is inherent in the internationally influential UK National Institute of Clinical Excellence (NICE) guidelines for adolescent depression which recommend that youth be first offered psychological therapy over medication for most presentations of depression. Such comparisons between the etwo treatment modalities are inherent in other recommendations, e.g. the practice parameter issued by the American Academy of Child and Adolescent Psychiatry or the Royal Australian and New Zealand College of Psychiatrists.
+
+These recommendations are not based on head to head trials between modalities; only one head-to-head trial exists in adolescent depression Instead, they rely on the comparison of the results of randomised controlled trials (RCTs) of each modality against RCTs of the other. In other words, it rests on a comparison of comparisons.
+
+In the case of antidepressant studies, the control is the placebo pill (standard also in the rest of medicine), whilst controls for psychotherapy studies can vary substantially from waiting list to treatment as usual to an attention control, such as psychoeducation. Stated in simple formal terms, the comparison relies on testing this equality,
+
+$$Effect_{Med} = Effect_{Psy}$$ {#eq-1}
+
+where *Effect* denotes the effect on depression that either medication (*Med* ) or psychotherapy (*Psy*) have. Yet for this indirect comparison to be valid, some basic assumptions need to hold. The most important of these is the *all-else-being-equal,* or more technically *ceteris paribus,* assumption with regards to trial design. By necessity, therefore, the control conditions for each antidepressant and psychotherapy trials must be equal for inferences to be valid. We call this the *equality of controls* assumption.
+
+The importance of this assumption can be easily intuited by expanding equation 1 to include the comparisons on which each side of that equation rests:
+
+$$Effect_{MedActive} - Effect_{MedControls} = Effect_{PsyActive} - Effect_{PsyControls}$$ {#eq-2}
+
+where MedActive and PsyActive are the active arms of antidepressant and psychotherapy trials, respectively, and MedControls and PsyControls the respective control arms. The assumption here has to be that the controls are equal, that is, $$ Effect_{MedControls} = Effect_{PsyControls}$$ A few simple examples help illustrate why this assumption is important Let the two modalities of treatment be medication and surgery, and let there be a trial for each modality. In the medication trial 80% of participants respond to the antihypertensive and only 40% to placebo; in the surgery trial, 40% of people respond to surgery and 0% to sham. If one relied on Equation 1 to compare the treatments they would arrive at the absurd conclusion that the two treatments are equal and recommend to a patient that it does not really matter which one they choose. Playing around with numbers in which no equality of the respective control arms is required, leads to other risible conclusions. Yet, a focus on the equality of controls is surprisingly absent.
+
+The importance of testing the equality of controls assumption for patients and the public can be vast because treatment guidelines, clinician's advice to patients, and patients' informed choices are all affected by the validity of treatment comparisons. Similarly, the rational allocation of public funds towards treatment modalities rests on valid comparisons between them.
+
+Beyond its immediate clinical importance, understanding the nature of controls in clinical trials of depression is key for reasons of causal inference and mechanistic understanding of treatment. Adolescent depression is notable for a relatively high placebo effect: the proportion of adolescents responding to placebo is higher in depression than in anxiety, and it is higher for adolescent vs adult depression. The reasons for these differences remain unclear and are typically treated as nuisance effects to be minimised by using trial designs such as a placebo lead in period. However, an alternative view is that placebo effects, or more generally, variability in the response to control arms may be informative about mechanisms of improvement. If, for example, the antidepressant effect of placebo is stronger than that of equivalent control arms in psychotherapy, then we ought to ask about the possible explanations of such differences and consider whether they can be exploited for improving treatment delivery, as previously suggested.
+
+In this paper, we have two aims: first, test whether the equality of controls assumption of adolescent depression treatment holds, and therefore scrutinise the validity of current recommendations concerning choice between treatment modalities; second,we explore variabiliity in trial control arms across and within the two treatment modalities and examine how they relate to anti-depressant effects.
+
+Our main hypothesis is that the within group effect of psychotherapy controls is substantially weaker than that of the placebo pill and we will test this in random effects meta-regression. We will also use series of sensitivity analyses concerning restricting to specific psychotherapy control groups ( e.g. exclude waitlist controls or include only controls to cognitive and behavioural therapy (CBT)) or medication control groups (e.g. trials for the FDA-approved fluoxetine and escitalopram). We also conduct sensitivity analyses in the form of simulations, to ensure that results are robust to estimations of the standard error of the change scores.
+
+We then go on to examine the control arms of psychological treatments in both a qualitative/descriptive way (e.g. the content of attention control) and by quantifying characteristics such as session frequency, duration of delivery. We then explore how these characteristics relate to the magnitude of within group change.
+
+@stringarisDevelopmentalPathwaysChildhood2014
+
+
+# Method
+## Studies included
+
+NOTE: **Charlotte** to please check code lines 986 to 1121
+NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. 
+
+## Statistical Analysis
+### Measures of Effect
+As the measure of effect of each individual study, we used the Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as: 
+
+$$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$  {#eq-3}
+
+where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the study respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. 
+
+For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to: 
+
+
+$$ \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$          {#eq-4}
+
+where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations. 
+
+In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: 
+
+$$SE_{change} \sim \mathcal{TN}(\mu, \sigma, a, b)
+$$ {#eq-5}
+
+for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+library(tidyverse)
+# Start here------------------------------------------------------
+# import master dataset 
+
+df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
+
+
+
+#Need to use SMDs, ie our Cohen's d and then use Standard error of SMD, to achieve this
+# I need reliabilities.
+
+# note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
+# Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
+# Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
+# for the CDRS-R total score in 53 clinic-referred6- to 12-year-olds.
+
+
+### A few more tidying things from Argyris before doing metanalyses
+# # discovered an error in the percentage women o fthe Fristad study. I have checked in the
+# # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
+# # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
+# # check again.
+df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
+
+
+
+# Create SEs proportions for percentage women --------------------------------------------
+
+# # We also need to calculate SE for proportion women for the baseline calculations
+# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
+
+product_perc_women <-  (df_appl_v_orange$percent_women/100)*
+  (1-(df_appl_v_orange$percent_women/100) ) 
+
+total_n <- df_appl_v_orange$baseline_n_active + 
+  df_appl_v_orange$baseline_n_control
+
+df_appl_v_orange$percent_women_std_error <- sqrt(product_perc_women/total_n )
+
+
+# Calculate SE for baseline severity --------------------------------------
+
+
+df_appl_v_orange$baseline_st_error_active <- 
+  df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
+
+df_appl_v_orange$baseline_st_error_control <-
+  df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
+
+
+
+# Turn into a long database with unique rows ------------------------------
+
+
+### Important: create a dataset that will have unique control studies (see problem that we identified with Charlotte, 
+#namely common control conditions)
+# create new id with Charlotte to help with better identification and work with duplicates (see below) 
+df_appl_v_orange  <- df_appl_v_orange  %>%
+  mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+                                  .default = study ))
+
+
+
+# Step 1: keep only the rows with the top instrument in our hierarchy
+df_with_distinct_instruments <-  df_appl_v_orange %>%          
+  group_by(new_study_id) %>% 
+  filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
+
+# Step 2: turn dataframes to long
+# A: turn long the rows with active
+turn_long_active_type <- df_with_distinct_instruments %>% 
+  dplyr:: select(new_study_id, active_type, psy_or_med, baseline_n_active, cohens_d_active) %>% 
+  pivot_longer(cols = c(cohens_d_active), 
+               names_to = "arm_effect_size", 
+               values_to = "cohens_d") 
+
+# also rename active_type to treatment for the merge below.
+turn_long_active_type <- rename(turn_long_active_type,treatment = active_type,
+                                baseline_n = baseline_n_active) 
+
+# # to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
+# turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
+# # but here another one where the same study reasonably contributes two actives, fluoxetine and duloxetine.
+# turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
+
+
+# we now need to go through each study id and remove duplicates
+turn_long_active_type <-
+  turn_long_active_type %>% 
+  group_by(new_study_id) %>% 
+  distinct(treatment, .keep_all = TRUE)
+
+# # Now checking if this worked with the studies that I used to illustrate the problem above. 
+# turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
+# turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# turn_long_active_type[turn_long_active_type$new_study_id == "Ackerson, 1998",]
+
+
+
+# B: turn long control rows
+turn_long_control_type <- df_with_distinct_instruments %>% 
+  dplyr:: select(new_study_id, control_type, psy_or_med, baseline_n_control, cohens_d_control) %>% 
+  pivot_longer(cols = c(cohens_d_control), 
+               names_to = "arm_effect_size", 
+               values_to = "cohens_d") 
+
+# also rename active_type to treatment for the merge below.
+turn_long_control_type <- rename(turn_long_control_type,treatment = control_type,
+                                 baseline_n = baseline_n_control) 
+
+# # to illustrate the issue, here we have one study with two controls that are reasonable. 
+# turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
+# # but here another one where the same study reasonably contributes two placebos
+# turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
+
+
+# we now need to go through each study id and remove duplicates
+turn_long_control_type <-
+  turn_long_control_type %>% 
+  group_by(new_study_id) %>% 
+  distinct(treatment, .keep_all = TRUE)
+
+# # Now checking if this worked with the studies that I used to illustrate the problem above. 
+# turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
+# turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# turn_long_control_type[turn_long_control_type$new_study_id == "Ackerson, 1998",]
+
+
+### Now merge the active and control datasets
+df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
+#dim(df_long_for_metan ) #check dimension
+#make sure no study lost
+#length(unique(df_long_for_metan$new_study_id ) ) == # #length(unique(df_appl_v_orange$new_study_id ) )
+
+# Now check again the studies with muliple arms
+# Now checking if this worked with the studies that I used to illustrate the problem above. 
+# df_long_for_metan[df_long_for_metan$new_study_id == "Stallard, 2012",]
+# df_long_for_metan[df_long_for_metan$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# df_long_for_metan[df_long_for_metan$new_study_id == "Ackerson, 1998",]
+
+
+# save this as the master dataframe  --------------------------------------
+# use this datafram to perform all operations below in quarto
+# ask Charlotte to check steps above (lines 986 to 1121)
+write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
+
+
+########### simulate so that each study has a value from a distribution of 
+######## of correlations. 
+
+# I will generate random numbers per study id from a distribution with these parameters. 
+# it is reasonable to generate one random correlation value per study as there is no reason why the correlation should
+# systematically vary within studies
+
+# I have created a function for this
+library(tidyverse)
+library(truncnorm)
+
+df_long_for_metan <- read.csv("~/apples_and_oranges/df_long_for_metan")
+
+simulate_dataframes_for_st_errors <- function(df, num_repetitions, seed, n, a, b, mean, sd) { # n refers to the number
+                                                                                              # of unique ids to which a correlation coef
+                                                                                              # is allocated.
+  set.seed(seed)
+  
+  # Empty list to store simulated dfs
+  list_df_simulated <- list()
+  
+  for (i in 1:num_repetitions) {
+    # Simulate the vector
+    simulated_correlations_vector <- truncnorm::rtruncnorm(n, a, b, mean, sd)  #using the truncnorm to create correlations
+    
+    # Create a copy of the original dataframe
+    df_simulated_copy <- df
+    
+    # Add/update the sims column
+    df_simulated_copy$correlation_sim_values <- simulated_correlations_vector[match(df_simulated_copy$new_study_id, unique(df_simulated_copy$new_study_id))]
+    
+    # Remove duplicated columns
+    df_simulated_copy <- df_simulated_copy[, !duplicated(colnames(df_simulated_copy))]
+    
+    # Calculate the ses
+    df_simulated_copy <- df_simulated_copy %>% 
+      group_by(new_study_id, baseline_n) %>% 
+      mutate(simulated_se = sqrt(((2*(1-correlation_sim_values))/baseline_n) + 
+                                   (cohens_d^2/(2*baseline_n))))
+    
+    # Add the simulated dataframe to the list
+    list_df_simulated[[i]] <- df_simulated_copy
+  }
+  
+  return(list_df_simulated)
+}
+
+list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan, 
+                                              num_repetitions = 1000, 
+                                              seed  = 1974,
+                                              n = length(unique(df_long_for_metan$new_study_id)), 
+                                              a = 0.45, 
+                                              b = .9, 
+                                              mean = 0.65, 
+                                              sd = 0.2)
+
+#check this worked
+
+#list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
+#summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
+
+
+```
+
+
+### Random Effects Metaregression
+We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$.
+Therefore, we can estimate a two stage model with: 
+
+$$Y_i \sim \mathcal{N}(\theta_i, \sigma_i^2)
+$$ {#eq-5}
+
+$$\theta_i \sim \mathcal{N}(x_i\beta, \tau_i^2)
+$$ {#eq-6}
+
+where $Y_i$ is the estimated effect size for study i, has a normal distribution with $\theta_i$ as its true mean effect and sampling error $\sigma^2$. Whereas $\theta_i$ is a study-specific instantiation of the distribution of effect sizes, with $\tau^2$ representing heterogeneity.
+
+This then gives rise to: 
+
+$$Y_i = x_i\beta_i + u_i + \epsilon_i$$ {#eq-7}
+
+where,
+
+$$u_i \sim N(0, \tau^2) $${#eq-8}
+
+which describes the deviation of each study from the mean of the distribution, and, 
+
+$$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-9}
+
+
+We can then specify the following model to obtain the means of each arm of the trials as follows:
+
+$$ \begin{aligned}
+    Υ_i &=
+    \begin{cases}
+        0 & MedControl: b_0 + u_i + \epsilon_i\\
+        1 & MedActive:  b_0 + b_{1_{i}} +  u_i + \epsilon_i \\
+        2 & PsyActive:  b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
+        3 & PsyControl: b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
+    \end{cases}
+\end{aligned}$$  {#eq-10}
+
+
+where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the 
+Similarly, each coefficient represents the contrast between the reference category and each level, for an exmaple and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows: 
+
+$$
+z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
+$$ {#eq-11}
+
+
+We used maximum likelihood (REML) to estimate model and applied  Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
+
+
+
+
+
+# Results
+
+The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\].
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+library(tidyverse)
+
+
+# describe studies
+n_unique_studies <- length(unique(df_long_for_metan$new_study_id))
+
+  
+
+df_count_studies <- df_long_for_metan %>% 
+  group_by(psy_or_med, arm_effect_size) %>% 
+  count(is.na(cohens_d))
+
+
+df_count_studies <-rename(df_count_studies, is_missing = `is.na(cohens_d)`)
+
+df_count_studies <-
+  df_count_studies %>% 
+  mutate(condition = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+                             psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+                             psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+                             psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+  )
+
+df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
+```
+
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies of which `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` belonged to active and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` to control arms of antidepressant trials; there were also `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` psychotherapy active and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` trials. Note that active and control arms do not exactly match because some studies used more than one control or active arm. There were also missing data on `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms where data were missing for medication active, mediaction contrl, psychotherapy active, and psychotherapy control respectively. 
+
+We then applied metaregression to obtain the means and confidence intervals of each of the four arms. 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# Run metaregression ------------------------------------------------------
+library(metafor)
+# add a new multilevel variable for the regression
+
+for(i in 1: length(list_df_simulated)){
+  list_df_simulated[[i]] <- list_df_simulated[[i]] %>% 
+    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+    )
+  
+  list_df_simulated[[i]]$four_level_var <- factor(list_df_simulated[[i]]$four_level_var) # turn to factor
+  
+  # relevel so that medication control becomes the reference category for the regression
+  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+}
+
+
+# check it worked
+# list_df_simulated[[2]] %>% 
+#   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
+
+
+
+# specify the model 
+model_1 <- as.formula(~ four_level_var)
+
+# run the metaregression
+list_model_1_meta_reg <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+  list_model_1_meta_reg[[i]] <- rma(yi = cohens_d, 
+                                    sei = simulated_se, 
+                                    data = list_df_simulated[[i]] , 
+                                    method = "ML", 
+                                    mods = model_1 , 
+                                    test = "knha")   
+  
+}
+
+# list_model_1_meta_reg[[2]]
+
+
+# Function to extract parameters (coefs, ses, CI) for each level of the dummy variable
+# it is an awkward one, because I couldnt' come up with a better way to add the intercept to each coefficient
+# given the named output of the built in coef function. 
+# here I exctract the coeffcients
+extract_coefficients_func <- function(df_with_coefs){
+  list_coefs <- list()
+  coefs <- 0
+  coefficient_output <- 0
+  
+  for(i in 1: length(coefficients(df_with_coefs))){
+    
+    temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
+                         length(coefficients(df_with_coefs)) - 1 ))
+    coefs[i] <- coef(df_with_coefs)[[i]]
+    
+    coefficient_output <- temp_vec + coefs
+    
+    st_error_output <- df_with_coefs$se
+    
+    df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
+    
+    df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
+    df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
+  }
+  return (df_coefficients )
+}
+
+
+# dummy_var_means <- extract_coefficients_func(list_model_1_meta_reg[[1]])
+
+list_dummy_var_means <-lapply(list_model_1_meta_reg, extract_coefficients_func)
+
+# this is the way to get the means and SEs from the simulation across all datasets. 
+
+df_mean_coefs_from_sim <- data.frame(
+  
+  condition = levels(list_df_simulated[[1]]$four_level_var),
+  
+  mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))),
+  
+  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[4,2])))
+  
+)
+
+# and add the CIs
+
+df_mean_coefs_from_sim$upper_ci <- df_mean_coefs_from_sim$mean_coefficient + 1.96 * df_mean_coefs_from_sim$mean_se
+
+df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.96 * df_mean_coefs_from_sim$mean_se
+# df_mean_coefs_from_sim # this is now the dataframe containing the means you need for plotting.
+
+#also, add the n of studies non missing from variable created above
+#important first create the same condition variable: 
+df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
+
+# I needed to join them because of the relevelling, the rows would not align otherwise.
+# df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+
+
+# need to merge this with the count studies variable to obtain the ks
+library(forcats)
+ordering_criterion <- unique(df_mean_coefs_from_sim$condition)
+
+# 
+df_count_studies_not_missing <- df_count_studies_not_missing %>% arrange(ordering_criterion) %>%
+  mutate(condition = fct_relevel(condition, levels = unique(condition)))
+# I will use this for plotting below.
+
+```
+We examined the variability that the simulations of the correlations of the pre-post outcomes produced. As shown in Supplemenatry Table 2, the standard deviation of the simulated mean varied in the third decimal point, indicating minimal influence of the correlations on the outcomes.
+
+
+
+
+NOTE: **Charlotte**, this should be moved to the supplement at Table 2
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+variability_in_sims <- data.frame (mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))), 
+            
+sd_coefficient = c(sd(sapply(list_dummy_var_means, function(df) df[1,1])),
+                      sd(sapply(list_dummy_var_means, function(df) df[2,1])),
+                      sd(sapply(list_dummy_var_means, function(df) df[3,1])),
+                      sd(sapply(list_dummy_var_means, function(df) df[4,1]))),
+
+  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[4,2]))),
+
+  sd_se = c(sd(sapply(list_dummy_var_means, function(df) df[1,2])),
+              sd(sapply(list_dummy_var_means, function(df) df[2,2])),
+              sd(sapply(list_dummy_var_means, function(df) df[3,2])),
+              sd(sapply(list_dummy_var_means, function(df) df[4,2])))
+)
+
+
+```
+
+
+Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metanalyses. 
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# for some reason doesn't work, but will make work.
+# tab_1_df <- df_mean_coefs_from_sim[, 1:length(df_mean_coefs_from_sim)-1]
+# knitr:: kable(tab_1_df, digits = 2, 
+#              col.names = c('Trial Arm', 'Beta', 'SE', 'Upper CI', 'Lower CI') )
+```
+
+Figure 1 graphs the results with the means of each level alongside their confidence intervals.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# plot results from simulated means ---------------------------------------
+
+# Create summary stats text
+df_mean_coefs_from_sim$text_label <- 0
+for(i in 1: nrow(df_mean_coefs_from_sim))
+df_mean_coefs_from_sim$text_label[i] <-  paste(
+   "k = ", df_count_studies_not_missing $n[i],"\n", 
+   round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
+   "[" ,
+ round(df_mean_coefs_from_sim$lower_ci[i],2), 
+ round(df_mean_coefs_from_sim$upper_ci[i], 2),
+"]") 
+                                                              
+
+# recode condition for ease of plotting
+df_mean_coefs_from_sim$condition <- str_replace_all(df_mean_coefs_from_sim$condition, "_", " ")
+
+# encode colours
+redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
+blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+
+
+
+
+ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
+                                   colour = condition, label = text_label)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
+  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
+  scale_size_continuous(guide = "none") +
+  guides(colour = FALSE) + 
+  scale_color_manual(values = c(redish_palette, blueish_palette)) +
+  theme_minimal() +
+  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
+       subtitle = "metanalytically derived estimates of within group changes") +
+  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+  ylab("") +
+  ylim(0, nrow(df_mean_coefs_from_sim) + 1) +
+  xlim(-2.5, 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
+  geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
+  geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
+  theme(axis.title.x = element_text(size = 14), 
+        axis.text.x  = element_text(size = 14),
+        axis.text.y = (element_blank()),
+        plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 14))+
+  geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
+  geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
+
+
+
+
+```
+
+As can be intuited from the confidence intervals displayed, there are statistically significant differences at p<0.05 between the two control arms. Table 2 illustrates this with the output of one of the simulated models. 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+coefs<- 0
+ses <- 0
+for(i in 1: length(list_model_1_meta_reg)){
+  
+  coefs[[i]] <- coef(list_model_1_meta_reg[[i]])[[4]]  ### CAREFUL this is poor coding practice on my part
+  ses[[i]] <- list_model_1_meta_reg[[i]]$se[4] ### but I can't find another way of grabbing this estimate from the
+  ### rma object. It could go badly wrong if the relevelling isn't done consistently...CHECK MANUALLY
+  coefficients_from_contrasts_medcontrol_psy_control <- data.frame(Beta = mean(coefs), SE = mean(ses))
+}
+
+
+coefficients_from_contrasts_medcontrol_psy_control$lower_ci <- coefficients_from_contrasts_medcontrol_psy_control$Beta - 1.96*coefficients_from_contrasts_medcontrol_psy_control$SE
+
+coefficients_from_contrasts_medcontrol_psy_control$upper_ci <- coefficients_from_contrasts_medcontrol_psy_control$Beta + 1.96*coefficients_from_contrasts_medcontrol_psy_control$SE
+
+
+
+
+
+```
+
+
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control, col.names = c("Beta", "SE", "Lower CI", "Upper CI"), digits = 2)
+```
+
+
+
