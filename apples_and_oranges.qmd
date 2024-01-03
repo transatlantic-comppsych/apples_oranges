@@ -1,6 +1,6 @@
 ---
-title: Apples and Oranges in Adolescent Depression Treatments.
-subtitle: A conceptual and quantiative re-appraisal of control arms in clinical trials.
+title: Fundamental Problems with the Evidence Base of Adolescent Depression Treatments.
+subtitle: Re-visiting the relative efficacy Control Conditions..
 author:
   - name: Argyris Stringaris
     email: a.stringaris@ucl.ac.uk
@@ -25,6 +25,16 @@ author:
     email: dayna.bhudia@ucl.ac.uk
     affiliations:
         - ref: ucl_1
+  - name: Lucy Foulkes
+    email: lucy.foulkes@psych.ox.ac.uk
+    affiliations:
+        - id: OU
+          name: University of Oxford
+          department: Experimental Psychology
+          address: Anna Watts Building, Radcliffe Observatory Quarter, Woodstock Road
+          city: Oxford
+          postal-code: OX2 6GG
+          country: United Kingdom
     note:
   - name: Carmen Moreno
     email: cmoreno@hggm.es
@@ -380,10 +390,10 @@ We can then specify the following model to obtain the means of each arm of the t
 $$ \begin{aligned}
     Υ_i &=
     \begin{cases}
-        0 & MedControl: b_0 + u_i + \epsilon_i\\
-        1 & MedActive:  b_0 + b_{1_{i}} +  u_i + \epsilon_i \\
-        2 & PsyActive:  b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
-        3 & PsyControl: b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
+        0 & MedControl:  b_0 + u_i + \epsilon_i\\
+        1 & MedActive:   b_0 + b_{1_{i}} +  u_i + \epsilon_i \\
+        2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
+        3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
     \end{cases}
 \end{aligned}$$  {#eq-10}
 
@@ -590,15 +600,11 @@ sd_coefficient = c(sd(sapply(list_dummy_var_means, function(df) df[1,1])),
 ```
 
 
-Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metanalyses. 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# for some reason doesn't work, but will make work.
-# tab_1_df <- df_mean_coefs_from_sim[, 1:length(df_mean_coefs_from_sim)-1]
-# knitr:: kable(tab_1_df, digits = 2, 
-#              col.names = c('Trial Arm', 'Beta', 'SE', 'Upper CI', 'Lower CI') )
-```
 
-Figure 1 graphs the results with the means of each level alongside their confidence intervals.
+
+Figure 1 graphs the results with the means of each level alongside their confidence intervals. Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metanalyses. 
+As can be intuited from the confidence intervals displayed, there are statistically significant differences at p<0.05 between the two control arms. Table 2 illustrates this with the output of one of the simulated models. 
+
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # plot results from simulated means ---------------------------------------
@@ -625,7 +631,7 @@ blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy contr
 
 
 
-ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
+plot_means <- ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
                                    colour = condition, label = text_label)) +
   geom_point(size = 3) +
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
@@ -634,7 +640,7 @@ ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coef
   guides(colour = FALSE) + 
   scale_color_manual(values = c(redish_palette, blueish_palette)) +
   theme_minimal() +
-  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
+  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Arm",
        subtitle = "metanalytically derived estimates of within group changes") +
   xlab("Standardized Mean Difference (SMD) with 95% CIs") +
   ylab("") +
@@ -655,10 +661,15 @@ ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coef
 
 
 
+png("plotted_means.png")
+plot_means
+dev.off()
 
 ```
 
-As can be intuited from the confidence intervals displayed, there are statistically significant differences at p<0.05 between the two control arms. Table 2 illustrates this with the output of one of the simulated models. 
+![Fig 1. Means of the Four Trial Arms](plotted_means.png){width=50%}
+
+
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 coefs<- 0
@@ -676,6 +687,11 @@ coefficients_from_contrasts_medcontrol_psy_control$lower_ci <- coefficients_from
 
 coefficients_from_contrasts_medcontrol_psy_control$upper_ci <- coefficients_from_contrasts_medcontrol_psy_control$Beta + 1.96*coefficients_from_contrasts_medcontrol_psy_control$SE
 
+coefficients_from_contrasts_medcontrol_psy_control$zed_value <- coefficients_from_contrasts_medcontrol_psy_control$Beta/
+coefficients_from_contrasts_medcontrol_psy_control$SE
+
+coefficients_from_contrasts_medcontrol_psy_control$p_value <- format(1 - pnorm(coefficients_from_contrasts_medcontrol_psy_control$zed_value), scientific = TRUE)
+
 
 
 
@@ -685,9 +701,30 @@ coefficients_from_contrasts_medcontrol_psy_control$upper_ci <- coefficients_from
 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#| label: Table 1
+#| tbl-cap: Means for the four Trial Arms alongside 95% Confidence Intervals
+tab_1_df <- df_mean_coefs_from_sim[, 1:length(df_mean_coefs_from_sim)-1]
 
-knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control, col.names = c("Beta", "SE", "Lower CI", "Upper CI"), digits = 2)
+knitr:: kable(tab_1_df, digits = 2)
 ```
+
+
+
+ 
+
+
+
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#| label: Table 2
+#| tbl-cap: Statistics of the Difference Between Medication and Psychotherapy Control Conditions
+knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control,col.names = c("Beta", "SE", "Lower CI", "Upper CI", "z-value", "p-value"), digits = 2)
+
+```
+
+
+
+
 
 
 
