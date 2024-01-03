@@ -17,12 +17,12 @@ author:
         corresponding: true
     note: 
   - name: Charlotte Burman
-    email: c.burman@ucl.ac.uk
+    email: charlotte.burman@ucl.ac.uk
     affiliations:
         - ref: ucl_1
     note:
   - name: Dayna Bhudia
-    email: d.bhudia@ucl.ac.uk
+    email: dayna.bhudia@ucl.ac.uk
     affiliations:
         - ref: ucl_1
     note:
@@ -77,9 +77,9 @@ format:
 
 Depression is the leading cause of disability in adolescents and influential guidelines recommend that it be treated with either psychotherapy or anti-depressant medication or their combination. The evidence base for this recommendation typically derives from the appraisal of randomised controlled trials (RCTs) in which one modality (psychotherapy or anti-depressants) are compared against a control condition. In this paper we: a) test the hypothesis that medication control arms are more efficacious than psychotherapy control arms and that this undermines the validity of treatment comparisons and therefore of existing guidelines about depression treatment; b) explore how variation in treatment control arms can itself be exploited to advance our thinking concerning the mechanisms of depression and its treatment.
 
-Clinicians across medicine and other health professions are faced with choices betweent different treatment modalities for their patients, be it between surgical or medical (drug-based) treatments or, in the case of adolescent depression, between psychotherapy and antidepressant medication. To make informed choices, clinicians rely on the extant evidence, frequently summarised in the form of national guidelines or other treatment recommendations. Such a comparison is inherent in the internationally influential UK National Institute of Clinical Excellence (NICE) guidelines for adolescent depression which recommend that youth be first offered psychological therapy over medication for most presentations of depression. Such comparisons between the etwo treatment modalities are inherent in other recommendations, e.g. the practice parameter issued by the American Academy of Child and Adolescent Psychiatry or the Royal Australian and New Zealand College of Psychiatrists.
+Clinicians across medicine and other health professions are faced with choices between different treatment modalities for their patients, be it between surgical or medical (drug-based) treatments or, in the case of adolescent depression, between psychotherapy and antidepressant medication. To make informed choices, clinicians rely on the extant evidence, frequently summarised in the form of national guidelines or other treatment recommendations. Such a comparison is inherent in the internationally influential UK National Institute of Clinical Excellence (NICE) guidelines for adolescent depression which recommend that youth be first offered psychological therapy over medication for most presentations of depression. Such comparisons between the two treatment modalities are inherent in other recommendations, e.g. the practice parameter issued by the American Academy of Child and Adolescent Psychiatry or the Royal Australian and New Zealand College of Psychiatrists.
 
-These recommendations are not based on head to head trials between modalities; only one head-to-head trial exists in adolescent depression Instead, they rely on the comparison of the results of randomised controlled trials (RCTs) of each modality against RCTs of the other. In other words, it rests on a comparison of comparisons.
+These recommendations are not based on head to head trials between modalities; only one head-to-head trial exists in adolescent depression. Instead, they rely on the comparison of the results of randomised controlled trials (RCTs) of each modality against RCTs of the other. In other words, it rests on a comparison of comparisons.
 
 In the case of antidepressant studies, the control is the placebo pill (standard also in the rest of medicine), whilst controls for psychotherapy studies can vary substantially from waiting list to treatment as usual to an attention control, such as psychoeducation. Stated in simple formal terms, the comparison relies on testing this equality,
 
@@ -109,8 +109,8 @@ We then go on to examine the control arms of psychological treatments in both a 
 # Method
 ## Studies included
 
-NOTE: **Charlotte** to please check code lines 986 to 1121
-NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. 
+NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: In progress.
+NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. Also, for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. The numbers look right for med studies.
 
 ## Statistical Analysis
 ### Measures of Effect
@@ -118,7 +118,7 @@ As the measure of effect of each individual study, we used the Standardised Mean
 
 $$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$  {#eq-3}
 
-where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the study respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. 
+where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the study respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods recommended by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, an average SD was calculated by taking the mean of the SDs of all trials of the same type (i.e. psy or med) using the same instrument. These average SDs were calculated for each time point and for each arm (control and active). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to: 
 
