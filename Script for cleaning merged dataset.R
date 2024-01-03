@@ -15,7 +15,7 @@ df_full_med <- read.csv("Full Medication Dataset.csv")
 merged_dataset <- bind_rows(df_full_med, df_full_psych)
 
 # fix column ordering
-merged_dataset <- select(merged_dataset, -c(primary, hierarchy, time))
+merged_dataset <- dplyr:: select(merged_dataset, -c(primary, hierarchy, time))
 merged_dataset <- merged_dataset %>% relocate(descr_active, .after = control_type)
 merged_dataset <- merged_dataset %>% relocate(descr_control, .after = descr_active)
 merged_dataset <- merged_dataset %>% relocate(mean_age, .after = age_group)
@@ -239,7 +239,7 @@ sum(is.na(filter_test$cohens_d_active))
 sum(is.na(filter_test$cohens_d_control))
 
 # start looking at demographics, baseline and post means, and cohens d per arm
-df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
+df_demographics <- df_first_row %>% dplyr:: select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
                                            post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
@@ -249,7 +249,7 @@ df_demographics <- df_first_row %>% select(study, year, psy_or_med, active_type,
 df_demographics$descr_active <- ifelse(is.na(df_demographics$descr_active), df_demographics$active_type, df_demographics$descr_active)
 df_demographics$descr_control <- ifelse(is.na(df_demographics$descr_control), df_demographics$control_type, df_demographics$descr_control)
 
-df_demographics <- df_demographics %>%  select(-c(active_type, control_type))
+df_demographics <- df_demographics %>%  dplyr::select(-c(active_type, control_type))
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
 # check how many studies we have baseline means for primary instrument
@@ -348,7 +348,7 @@ columns_to_check <- c(
 # Identify which columns have missing values for each study
 columns_with_missing_values <- df_appl_v_orange %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
-  select(psy_or_med, study, year, where(function(x) any(is.na(x))))
+  dplyr::select(psy_or_med, study, year, where(function(x) any(is.na(x))))
 
 # Print columns with missing values for each study THROWS UP ERROR TOLD CHARLOTTE
 # tapply(print(columns_with_missing_values[,1:2]
@@ -376,7 +376,7 @@ openxlsx:: write.xlsx(columns_with_missing_values, file = "columns_with_missing_
 df_first_row_missing_sds <- df_first_row %>% 
   filter(psy_or_med == 0) %>% 
   summarise(
-    rows_with_na_sds = sum(rowSums(is.na(select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
+    rows_with_na_sds = sum(rowSums(is.na(dplyr::select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
   )
 df_first_row_missing_sds
 
@@ -384,7 +384,7 @@ df_first_row_missing_sds
 df_first_row_missing_means <- df_first_row %>% 
   filter(psy_or_med == 0) %>% 
   summarise(
-    rows_with_na_means = sum(rowSums(is.na(select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
+    rows_with_na_means = sum(rowSums(is.na(dplyr::select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
   )
 df_first_row_missing_means
 
@@ -412,7 +412,7 @@ df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE)
 df_first_row_missing_sds <- df_first_row %>% 
   filter(psy_or_med == 0) %>% 
   summarise(
-    rows_with_na_sds = sum(rowSums(is.na(select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
+    rows_with_na_sds = sum(rowSums(is.na(dplyr::select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
   )
 df_first_row_missing_sds
 
@@ -423,7 +423,7 @@ df_first_row_missing_sds
 df_first_row_missing_means <- df_first_row %>% 
   filter(psy_or_med == 0) %>% 
   summarise(
-    rows_with_na_means = sum(rowSums(is.na(select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
+    rows_with_na_means = sum(rowSums(is.na(dplyr::select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
   )
 df_first_row_missing_means
 
@@ -458,7 +458,7 @@ unique_med
 new_columns_with_missing_values <- df_first_row %>%
   filter(rowSums(is.na(.[columns_to_check])) > 0) %>%
   filter(psy_or_med == 0) %>% 
-  select(study, year, active_type, instrument_name, where(function(x) any(is.na(x))))
+  dplyr:: select(study, year, active_type, instrument_name, where(function(x) any(is.na(x))))
 ###tapply(print(new_columns_with_missing_values[,1:2]), new_columns_with_missing_values$psy_or_med) THROWS UP ERROR TOO
 openxlsx:: write.xlsx(new_columns_with_missing_values, file = "new_columns_with_missing_values.xlsx", colNames = T, borders = "columns", asTable = F)
 
@@ -555,7 +555,7 @@ df_first_row <- full_join(df_first_row, df_cipriani_form, by = c("study", "year"
 
 # Now we want to join this back into master dataset
 df_first_row_prepare <- df_first_row %>% 
-  select(c(study_ID, instrument_name, study, year, active_type, control_type, cip_change_actv: suicide_n_actv, cip_change_ctrl: suicide_n_ctrl))
+  dplyr::select(c(study_ID, instrument_name, study, year, active_type, control_type, cip_change_actv: suicide_n_actv, cip_change_ctrl: suicide_n_ctrl))
 df_appl_v_orange <- full_join(df_appl_v_orange, df_first_row_prepare, by = c("study_ID", "instrument_name"))
 
 # There are a few studies present in second dataset but not present in first (as we were not able to locate these studies). 
@@ -567,7 +567,7 @@ df_appl_v_orange <- df_appl_v_orange %>%
     year = coalesce(year.x, year.y),
     active_type = coalesce(active_type.x, active_type.y),
     control_type = coalesce(control_type.x, control_type.y)) %>%
-  select(-study.x, -study.y, -year.x, -year.y, -active_type.x, -active_type.y, -control_type.x, -control_type.y) %>% 
+  dplyr::select(-study.x, -study.y, -year.x, -year.y, -active_type.x, -active_type.y, -control_type.x, -control_type.y) %>% 
   relocate(study, year, active_type, control_type, .after = "Column1")
 
 # Checked dataframe, looks mostly good with a couple of problems. Some haven't joined correctly because there are errors in how the drug name is spelled. 
@@ -604,7 +604,7 @@ unique(filter_test$study_ID)
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 0) %>% 
-  select(study_ID)
+  dplyr::select(study_ID)
 
 # We have cohens ds for 28/33 med studies. For Bristol Myers Squibb 2002a, Emslie 2002b, Hughes 1990 and Paxil GlaxoSmithKline 2009
 # we will not be able to calculate ds due to very poor reporting in the original studies. No possible way to impute missing data.
@@ -627,7 +627,7 @@ sum(!is.na(filter_test$cohens_d_control))
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 1) %>% 
-  select(study_ID)
+  dplyr::select(study_ID)
 
 # None of these 8 studies are included in Cuijpers' MA because their primary outcome measure is not continuous.
 # For a few of them I may be able to extract some relevant data and impute other data using methods above. I can do this for Shomaker 2016 and Yu 2002. 
@@ -659,7 +659,7 @@ unique(filter_test$study_ID)
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 1) %>% 
-  select(study_ID)
+  dplyr::select(study_ID)
 
 # Great, now we have Cohens ds for Shomaker 2016 and Yu 2002. Hence we now have cohens d for 60 / 66 psy studies. 
 
@@ -679,6 +679,8 @@ studies_w_complete_sds <- df_appl_v_orange %>%
   
 # We only have this for one study. Hence we decided to stick with cohens d for now and perform the imputations above.
 
+# save dataframe 
+openxlsx:: write.xlsx(df_appl_v_orange, "df_appl_v_orange.xlsx") # you can use this now for the quarto document
 
 ############IGNORE from HERE to line 976
 
@@ -1320,7 +1322,17 @@ df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.9
 df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
 
 # I needed to join them because of the relevelling, the rows would not align otherwise.
-df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+#df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+
+
+# need to merge this with the count studies variable to obtain the ks
+library(forcats)
+ordering_criterion <- unique(df_mean_coefs_from_sim$condition)
+
+# 
+df_count_studies_not_missing <- df_count_studies_not_missing %>% arrange(ordering_criterion) %>%
+  mutate(condition = fct_relevel(condition, levels = unique(condition)))
+# I will use this for plotting below.
 
 
 
@@ -1330,7 +1342,7 @@ df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_no
 df_mean_coefs_from_sim$text_label <- 0
 for(i in 1: nrow(df_mean_coefs_from_sim))
 df_mean_coefs_from_sim$text_label[i] <-  paste(
-   "k = ", df_mean_coefs_from_sim$n[i],"\n", 
+   "k = ", df_count_studies_not_missing $n[i],"\n", 
    round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
    "[" ,
  round(df_mean_coefs_from_sim$lower_ci[i],2), 
@@ -1383,11 +1395,8 @@ ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coef
 
 
 
-# tomorrow run the regression for the direct comparison.
 
-
-
-######PAUSE
+######BELOW IS MAINLY OLD CODE, stop here for the moment.
 
 mod_1 <- as.formula(~ arm_effect_size)
 mod_2 <- as.formula(~ psy_or_med + arm_effect_size)
