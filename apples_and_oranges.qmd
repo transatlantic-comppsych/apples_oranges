@@ -206,13 +206,13 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
 # Step 2: turn dataframes to long
 # A: turn long the rows with active
 turn_long_active_type <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, active_type, psy_or_med, baseline_n_active, cohens_d_active) %>% 
+  dplyr:: select(new_study_id, descr_active, psy_or_med, baseline_n_active, cohens_d_active) %>% 
   pivot_longer(cols = c(cohens_d_active), 
                names_to = "arm_effect_size", 
                values_to = "cohens_d") 
 
 # also rename active_type to treatment for the merge below.
-turn_long_active_type <- rename(turn_long_active_type,treatment = active_type,
+turn_long_active_type <- rename(turn_long_active_type,treatment = descr_active,
                                 baseline_n = baseline_n_active) 
 
 # # to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
