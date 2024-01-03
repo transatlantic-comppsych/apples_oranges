@@ -1145,7 +1145,7 @@ df_count_studies <-
 
 df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n
 
-
+df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
 
 
 # Generate simulations of standard errors ---------------------------------
@@ -1212,8 +1212,182 @@ list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_
 summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
 
 
-### Now run the metaregressions.
 
+# Run metaregression ------------------------------------------------------
+library(metafor)
+# add a new multilevel variable for the regression
+
+for(i in 1: length(list_df_simulated)){
+  list_df_simulated[[i]] <- list_df_simulated[[i]] %>% 
+    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+    )
+  
+  list_df_simulated[[i]]$four_level_var <- factor(list_df_simulated[[i]]$four_level_var) # turn to factor
+  
+  # relevel so that medication control becomes the reference category for the regression
+  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+}
+
+
+# check it worked
+# list_df_simulated[[2]] %>% 
+#   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
+
+
+
+# specify the model 
+model_1 <- as.formula(~ four_level_var)
+
+# run the metaregression
+list_model_1_meta_reg <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+  list_model_1_meta_reg[[i]] <- rma(yi = cohens_d, 
+                                    sei = simulated_se, 
+                                    data = list_df_simulated[[i]] , 
+                                    method = "ML", 
+                                    mods = model_1 , 
+                                    test = "knha")   
+  
+}
+
+# list_model_1_meta_reg[[2]]
+
+
+# Function to extract parameters (coefs, ses, CI) for each level of the dummy variable
+# it is an awkward one, because I couldnt' come up with a better way to add the intercept to each coefficient
+# given the named output of the built in coef function. 
+# here I exctract the coeffcients
+extract_coefficients_func <- function(df_with_coefs){
+  list_coefs <- list()
+  coefs <- 0
+  coefficient_output <- 0
+  
+  for(i in 1: length(coefficients(df_with_coefs))){
+    
+    temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
+                         length(coefficients(df_with_coefs)) - 1 ))
+    coefs[i] <- coef(df_with_coefs)[[i]]
+    
+    coefficient_output <- temp_vec + coefs
+    
+    st_error_output <- df_with_coefs$se
+    
+    df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
+    
+    df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
+    df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
+  }
+  return (df_coefficients )
+}
+
+
+# dummy_var_means <- extract_coefficients_func(list_model_1_meta_reg[[1]])
+
+list_dummy_var_means <-lapply(list_model_1_meta_reg, extract_coefficients_func)
+
+# this is the way to get the means and SEs from the simulation across all datasets. 
+
+df_mean_coefs_from_sim <- data.frame(
+  
+  condition = levels(list_df_simulated[[1]]$four_level_var),
+  
+  mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
+                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))),
+  
+  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
+              mean(sapply(list_dummy_var_means, function(df) df[4,2])))
+  
+)
+
+# and add the CIs
+
+df_mean_coefs_from_sim$upper_ci <- df_mean_coefs_from_sim$mean_coefficient + 1.96 * df_mean_coefs_from_sim$mean_se
+
+df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.96 * df_mean_coefs_from_sim$mean_se
+# df_mean_coefs_from_sim # this is now the dataframe containing the means you need for plotting.
+
+#also, add the n of studies non missing from variable created above
+#important first create the same condition variable: 
+df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
+
+# I needed to join them because of the relevelling, the rows would not align otherwise.
+df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+
+
+
+# plot results from simulated means ---------------------------------------
+
+# Create summary stats text
+df_mean_coefs_from_sim$text_label <- 0
+for(i in 1: nrow(df_mean_coefs_from_sim))
+df_mean_coefs_from_sim$text_label[i] <-  paste(
+   "k = ", df_mean_coefs_from_sim$n[i],"\n", 
+   round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
+   "[" ,
+ round(df_mean_coefs_from_sim$lower_ci[i],2), 
+ round(df_mean_coefs_from_sim$upper_ci[i], 2),
+"]") 
+                                                              
+
+# recode condition for ease of plotting
+df_mean_coefs_from_sim$condition <- str_replace_all(df_mean_coefs_from_sim$condition, "_", " ")
+
+# encode colours
+redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
+blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+
+
+
+
+ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
+                                   colour = condition, label = text_label)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
+  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
+  scale_size_continuous(guide = "none") +
+  guides(colour = FALSE) + 
+  scale_color_manual(values = c(redish_palette, blueish_palette)) +
+  theme_minimal() +
+  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
+       subtitle = "metanalytically derived estimates of within group changes") +
+  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+  ylab("") +
+  ylim(0, nrow(df_mean_coefs_from_sim) + 1) +
+  xlim(-2.5, 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
+  geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
+  geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
+  theme(axis.title.x = element_text(size = 14), 
+        axis.text.x  = element_text(size = 14),
+        axis.text.y = (element_blank()),
+        plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 14))+
+  geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
+  geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
+
+
+
+
+
+
+
+
+# tomorrow run the regression for the direct comparison.
+
+
+
+######PAUSE
 
 mod_1 <- as.formula(~ arm_effect_size)
 mod_2 <- as.formula(~ psy_or_med + arm_effect_size)
