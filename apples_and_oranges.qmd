@@ -144,6 +144,128 @@ $$ {#eq-5}
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+###########Libraries needed
+library(tidyverse)
+library(truncnorm)
+library(metafor)
+```
+
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#############Some custom made functions#############
+
+###### 1. Simulation Function for SEs
+simulate_dataframes_for_st_errors <- function(df, num_repetitions, seed, n, a, b, mean, sd) { # n refers to the number
+                                                                                              # of unique ids to which a correlation coef
+                                                                                              # is allocated.
+  set.seed(seed)
+  
+  # Empty list to store simulated dfs
+  list_df_simulated <- list()
+  
+  for (i in 1:num_repetitions) {
+    # Simulate the vector
+    simulated_correlations_vector <- truncnorm::rtruncnorm(n, a, b, mean, sd)  #using the truncnorm to create correlations
+    
+    # Create a copy of the original dataframe
+    df_simulated_copy <- df
+    
+    # Add/update the sims column
+    df_simulated_copy$correlation_sim_values <- simulated_correlations_vector[match(df_simulated_copy$new_study_id, unique(df_simulated_copy$new_study_id))]
+    
+    # Remove duplicated columns
+    df_simulated_copy <- df_simulated_copy[, !duplicated(colnames(df_simulated_copy))]
+    
+    # Calculate the ses
+    df_simulated_copy <- df_simulated_copy %>% 
+      group_by(new_study_id, baseline_n) %>% 
+      mutate(simulated_se = sqrt(((2*(1-correlation_sim_values))/baseline_n) + 
+                                   (cohens_d^2/(2*baseline_n))))
+    
+    # Add the simulated dataframe to the list
+    list_df_simulated[[i]] <- df_simulated_copy
+  }
+  
+  return(list_df_simulated)
+}
+
+###############2. Simulation function for metaregression
+run_metaregression <- function(list_of_datasets, model_formula) {
+  list_model_meta_reg <- list()
+  
+  for (i in seq_along(list_of_datasets)) {
+    list_model_meta_reg[[i]] <- metafor::rma(yi = cohens_d,
+                                             sei = simulated_se,
+                                             data = list_of_datasets[[i]],
+                                             method = "ML",
+                                             mods = model_formula,
+                                             test = "knha")
+  }
+  
+  return(list_model_meta_reg)
+}
+
+###########3. Function to extract parameters (coefs, ses, CI) for each level of the dummy #variable
+# it is a slightly awkward one, because I couldnt' come up with a better way to add the intercept to #each coefficient
+# given the named output of the built in coef function. 
+# here I exctract the coeffcients
+extract_coefficients_func <- function(df_with_coefs){
+  list_coefs <- list()
+  coefs <- 0
+  coefficient_output <- 0
+  
+  for(i in 1: length(coefficients(df_with_coefs))){
+    
+    temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
+                         length(coefficients(df_with_coefs)) - 1 ))
+    coefs[i] <- coef(df_with_coefs)[[i]]
+    
+    coefficient_output <- temp_vec + coefs
+    
+    st_error_output <- df_with_coefs$se
+    
+    df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
+    
+    df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
+    df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
+  }
+  return (df_coefficients )
+}
+
+
+############4. Function to get the means out of the extracted parameters
+# here the argument list_of_dfs is the list of extracted coefficients that you get out of the #extract_coefficients_func
+# which itself you get from the run_metaregression function. The argument conditions refers to #the levels of the variable that describes each study arm
+
+calculate_mean_coefs_ses <- function(list_of_dfs, conditions) {
+  df_coefs <- matrix(NA, nrow = length(list_of_dfs), ncol = length(conditions))
+  df_se <- matrix(NA, nrow = length(list_of_dfs), ncol = length(conditions))
+  
+  for (i in 1:length(list_of_dfs)) {
+    for (j in 1:length(conditions)) {
+      df_coefs[i, j] <- list_of_dfs[[i]]$coefficients[j]
+      df_se[i, j] <- list_of_dfs[[i]]$se[j]
+    }
+  }
+  
+  df_mean_coefs_ses <- data.frame(
+    coef_means = colMeans(df_coefs),
+    se_means = colMeans(df_se)
+  )
+  
+  df_mean_coefs_ses$lower_ci <- df_mean_coefs_ses$coef_means - 1.96 * df_mean_coefs_ses$se_means
+  df_mean_coefs_ses$upper_ci <- df_mean_coefs_ses$coef_means + 1.96 * df_mean_coefs_ses$se_means
+  
+  return(df_mean_coefs_ses)
+}
+
+```
+
+
+
+
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 library(tidyverse)
 # Start here------------------------------------------------------
@@ -303,45 +425,10 @@ write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
 # it is reasonable to generate one random correlation value per study as there is no reason why the correlation should
 # systematically vary within studies
 
-# I have created a function for this
-library(tidyverse)
-library(truncnorm)
+# Use the function I have created for this
 
 df_long_for_metan <- read.csv("df_long_for_metan") 
 
-simulate_dataframes_for_st_errors <- function(df, num_repetitions, seed, n, a, b, mean, sd) { # n refers to the number
-                                                                                              # of unique ids to which a correlation coef
-                                                                                              # is allocated.
-  set.seed(seed)
-  
-  # Empty list to store simulated dfs
-  list_df_simulated <- list()
-  
-  for (i in 1:num_repetitions) {
-    # Simulate the vector
-    simulated_correlations_vector <- truncnorm::rtruncnorm(n, a, b, mean, sd)  #using the truncnorm to create correlations
-    
-    # Create a copy of the original dataframe
-    df_simulated_copy <- df
-    
-    # Add/update the sims column
-    df_simulated_copy$correlation_sim_values <- simulated_correlations_vector[match(df_simulated_copy$new_study_id, unique(df_simulated_copy$new_study_id))]
-    
-    # Remove duplicated columns
-    df_simulated_copy <- df_simulated_copy[, !duplicated(colnames(df_simulated_copy))]
-    
-    # Calculate the ses
-    df_simulated_copy <- df_simulated_copy %>% 
-      group_by(new_study_id, baseline_n) %>% 
-      mutate(simulated_se = sqrt(((2*(1-correlation_sim_values))/baseline_n) + 
-                                   (cohens_d^2/(2*baseline_n))))
-    
-    # Add the simulated dataframe to the list
-    list_df_simulated[[i]] <- df_simulated_copy
-  }
-  
-  return(list_df_simulated)
-}
 
 list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan, 
                                               num_repetitions = 1000, 
@@ -411,8 +498,6 @@ We used maximum likelihood (REML) to estimate model and applied  Hartung-Knapp a
 
 
 
-
-
 # Results
 
 The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\].
@@ -440,6 +525,11 @@ df_count_studies <-
                              psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
                              psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
   )
+
+  df_count_studies$condition <- factor(df_count_studies$condition) # turn to factor
+  
+  # relevel so that medication control becomes the reference category for the regression
+  df_count_studies$condition <- relevel(df_count_studies$condition, ref = "medication_control")
 
 df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
 ```
@@ -472,135 +562,103 @@ for(i in 1: length(list_df_simulated)){
 # list_df_simulated[[2]] %>% 
 #   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
 
-# create a function for metaregression 
+######## NOW RUN METAREGRESSIONS AND GET Coefficients for 
+# A) the overall sample
+# B) the CBT vs Fluox and Escitalopram sample
+# C) the no WL sample
 
-run_metaregression <- function(list_of_datasets, model_formula) {
-  list_model_meta_reg <- list()
-  
-  for (i in seq_along(list_of_datasets)) {
-    list_model_meta_reg[[i]] <- metafor::rma(yi = cohens_d,
-                                             sei = simulated_se,
-                                             data = list_of_datasets[[i]],
-                                             method = "ML",
-                                             mods = model_formula,
-                                             test = "knha")
-  }
-  
-  return(list_model_meta_reg)
-}
 
+
+# A. Estimate Means and CIs for the overall ----------------------------------
+# specify model
 model_1 <- as.formula(~ four_level_var)
+
+# run metareg function 
+# here you can use the simulated results directly
 list_model_1_meta_reg <- run_metaregression(list_df_simulated, model_1)
 
-# list_model_1_meta_reg[[2]]
+# extract coefs from the  list
+list_dummy_var_means <-  lapply(list_model_1_meta_reg, extract_coefficients_func)
+
+# calculate mean coefs and ses
+df_mean_coefs_from_sim <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, conditions)
+
+ df_mean_coefs_from_sim <- data.frame(cbind(condition,df_mean_coefs_from_sim))
 
 
-# Function to extract parameters (coefs, ses, CI) for each level of the dummy variable
-# it is an awkward one, because I couldnt' come up with a better way to add the intercept to each coefficient
-# given the named output of the built in coef function. 
-# here I exctract the coeffcients
-extract_coefficients_func <- function(df_with_coefs){
-  list_coefs <- list()
-  coefs <- 0
-  coefficient_output <- 0
+
+# B. Estimate Means and CIs for CBT Fluox Esc --------------------------------
+# first grab ids for those studies
+cbt_fluox_esc_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
+
+# use those ids to subset all dataframes in the list
+list_cbt_fluox_esc_study <- list()
+
+for(i in 1: length(list_df_simulated)){
   
-  for(i in 1: length(coefficients(df_with_coefs))){
-    
-    temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
-                         length(coefficients(df_with_coefs)) - 1 ))
-    coefs[i] <- coef(df_with_coefs)[[i]]
-    
-    coefficient_output <- temp_vec + coefs
-    
-    st_error_output <- df_with_coefs$se
-    
-    df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
-    
-    df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
-    df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
-  }
-  return (df_coefficients )
+  list_cbt_fluox_esc_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                          %in% cbt_fluox_esc_study_ids,]
+  
 }
 
 
-# dummy_var_means <- extract_coefficients_func(list_model_1_meta_reg[[1]])
+model_1 <- as.formula(~ four_level_var)
 
-list_dummy_var_means <-lapply(list_model_1_meta_reg, extract_coefficients_func)
+# apply the metareg function to the list of cbt, fluox, esc
+list_model_1_cbt_fluox_esc_study <- run_metaregression(list_cbt_fluox_esc_study , model_1)
 
-# this is the way to get the means and SEs from the simulation across all datasets. 
+# extract coefs from the list for cbt fluox escit
+means_cbt_fluox_esc_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
 
-df_mean_coefs_from_sim <- data.frame(
+# calculate mean coefs and ses
+conditions <- unique(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, conditions)
+ coef_and_se_means_cbt_fluox_esc_study <- data.frame(cbind(condition, coef_and_se_means_cbt_fluox_esc_study))
+
+
+# C. Estimate Means and CIs without WL ---------------------------------------
+# grab the ids for no waitlist
+no_wl_ids <-
+  df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
+
+# use them to loop over the simulated list to subset all the dataframes.
+list_no_wl <- list()
+
+for(i in 1: length(list_df_simulated)){
   
-  condition = levels(list_df_simulated[[1]]$four_level_var),
+  list_no_wl[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                            %in% no_wl_ids,]
   
-  mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))),
-  
-  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[4,2])))
-  
-)
+}
 
-# and add the CIs
+# use this model as above
+model_1 <- as.formula(~ four_level_var)
 
-df_mean_coefs_from_sim$upper_ci <- df_mean_coefs_from_sim$mean_coefficient + 1.96 * df_mean_coefs_from_sim$mean_se
+# apply the function to the list of cbt, fluox, esc
+list_model_1_no_wl <- run_metaregression(list_no_wl , model_1)
 
-df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.96 * df_mean_coefs_from_sim$mean_se
-# df_mean_coefs_from_sim # this is now the dataframe containing the means you need for plotting.
 
-#also, add the n of studies non missing from variable created above
-#important first create the same condition variable: 
-df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
+# now use the function to extract the coefficients
+means_no_wl <-  lapply(list_model_1_no_wl, extract_coefficients_func)
 
-# I needed to join them because of the relevelling, the rows would not align otherwise.
-# df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+# run the mean function for no wl
+conditions <- unique(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_no_wl <- calculate_mean_coefs_ses(means_no_wl, conditions)
+coef_and_se_means_no_wl <- data.frame(cbind(condition,coef_and_se_means_no_wl))
 
-# need to merge this with the count studies variable to obtain the ks
-library(forcats)
-ordering_criterion <- unique(df_mean_coefs_from_sim$condition)
 
-# 
-df_count_studies_not_missing <- df_count_studies_not_missing %>% arrange(ordering_criterion) %>%
-  mutate(condition = fct_relevel(condition, levels = unique(condition)))
-# I will use this for plotting below.
+ #add the ns of studies FIX THIS
+
+
+ df_mean_coefs_from_sim <- data.frame(cbind(df_mean_coefs_from_sim, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
+
+# here are all three of them OVERALL, CBT and WL together. We may want to display them together. 
+# df_all_coefficients <- cbind(df_mean_coefs_from_sim, coef_and_se_means_cbt_fluox_esc_study,coef_and_se_means_no_wl)
+
 
 ```
 We examined the variability that the simulations of the correlations of the pre-post outcomes produced. As shown in Supplemenatry Table 2, the standard deviation of the simulated mean varied in the third decimal point, indicating minimal influence of the correlations on the outcomes.
-
-
-
-
-NOTE: **Charlotte**, this should be moved to the supplement at Table 2
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-variability_in_sims <- data.frame (mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))), 
-            
-sd_coefficient = c(sd(sapply(list_dummy_var_means, function(df) df[1,1])),
-                      sd(sapply(list_dummy_var_means, function(df) df[2,1])),
-                      sd(sapply(list_dummy_var_means, function(df) df[3,1])),
-                      sd(sapply(list_dummy_var_means, function(df) df[4,1]))),
-
-  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[4,2]))),
-
-  sd_se = c(sd(sapply(list_dummy_var_means, function(df) df[1,2])),
-              sd(sapply(list_dummy_var_means, function(df) df[2,2])),
-              sd(sapply(list_dummy_var_means, function(df) df[3,2])),
-              sd(sapply(list_dummy_var_means, function(df) df[4,2])))
-)
-
-
-```
-
-
 
 
 Figure 1 graphs the results with the means of each level alongside their confidence intervals. Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metanalyses. 
@@ -614,8 +672,8 @@ As can be intuited from the confidence intervals displayed, there are statistica
 df_mean_coefs_from_sim$text_label <- 0
 for(i in 1: nrow(df_mean_coefs_from_sim))
 df_mean_coefs_from_sim$text_label[i] <-  paste(
-   "k = ", df_count_studies_not_missing $n[i],"\n", 
-   round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
+   "k = ", df_mean_coefs_from_sim$n[i],"\n", 
+   round(df_mean_coefs_from_sim$coef_means[i], 2),
    "[" ,
  round(df_mean_coefs_from_sim$lower_ci[i],2), 
  round(df_mean_coefs_from_sim$upper_ci[i], 2),
@@ -632,7 +690,7 @@ blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy contr
 
 
 
-plot_means <- ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
+plot_means <- ggplot(df_mean_coefs_from_sim, aes(x = coef_means, y = 1:nrow(df_mean_coefs_from_sim),
                                    colour = condition, label = text_label)) +
   geom_point(size = 3) +
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
