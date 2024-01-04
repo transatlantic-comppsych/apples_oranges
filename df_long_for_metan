@@ -2,11 +2,12 @@
 "Ackerson, 1998","cbt",1,12,"cohens_d_active",-2.05555555555555
 "Arnarson, 2009","cbt",1,NA,"cohens_d_active",NA
 "Asarnow, 2002","cbt + family education",1,NA,"cohens_d_active",NA
-"Atkinson, 2014",NA,0,117,"cohens_d_active",-2.30476190476191
-"Berard, 2006",NA,0,182,"cohens_d_active",-2.01481481481481
+"Atkinson, 2014","Duloxetine",0,117,"cohens_d_active",-2.30476190476191
+"Atkinson, 2014","Fluoxetine",0,117,"cohens_d_active",-2.18867924528302
+"Berard, 2006","Paroxetine",0,182,"cohens_d_active",-2.01481481481481
 "Bolton, 2007","ipt",1,105,"cohens_d_active",-1.15018315018315
-"Bristol-Myers Squibb, 2002a",NA,0,NA,"cohens_d_active",NA
-"Bristol-Myers Squibb, 2002b",NA,0,90,"cohens_d_active",-2.25500285877644
+"Bristol-Myers Squibb, 2002a","Nefazodone",0,NA,"cohens_d_active",NA
+"Bristol-Myers Squibb, 2002b","Nefazodone",0,90,"cohens_d_active",-2.25500285877644
 "Charkhandeh, 2016","cbt",1,65,"cohens_d_active",-1.72151898734177
 "Clarke, 1995","cbt+cau",1,55,"cohens_d_active",-0.589473684210526
 "Clarke, 1999","cbt + parenting group",1,32,"cohens_d_active",-1.2824427480916
@@ -17,29 +18,31 @@
 "De Jonge-Heesen, 2020","cbt",1,66,"cohens_d_active",-0.477064220183486
 "Diamond, 2002","abft (attachment based family therapy)",1,16,"cohens_d_active",-1.48148148148148
 "Diamond, 2010","Attachment-Based Family Therapy",1,35,"cohens_d_active",-1.73322005097706
-"Emslie, 1997",NA,0,48,"cohens_d_active",-1.58893280632411
-"Emslie, 2002a",NA,0,109,"cohens_d_active",-1.88034188034188
-"Emslie, 2002b",NA,0,99,"cohens_d_active",NA
-"Emslie, 2006",NA,0,101,"cohens_d_active",-2.40981856990395
-"Emslie, 2007a",NA,0,80,"cohens_d_active",-1.37225170583776
-"Emslie, 2007b",NA,0,102,"cohens_d_active",-1.88361408882083
-"Emslie, 2009",NA,0,154,"cohens_d_active",-2.6984126984127
-"Emslie, 2014",NA,0,108,"cohens_d_active",-2.22935779816514
+"Emslie, 1997","Fluoxetine",0,48,"cohens_d_active",-1.58893280632411
+"Emslie, 2002a","Fluoxetine",0,109,"cohens_d_active",-1.88034188034188
+"Emslie, 2002b","Nefazodone",0,99,"cohens_d_active",NA
+"Emslie, 2006","Paroxetine",0,101,"cohens_d_active",-2.40981856990395
+"Emslie, 2007a","Venlafaxine",0,80,"cohens_d_active",-1.37225170583776
+"Emslie, 2007b","Venlafaxine",0,102,"cohens_d_active",-1.88361408882083
+"Emslie, 2009","Escitalopram",0,154,"cohens_d_active",-2.6984126984127
+"Emslie, 2014","Duloxetine",0,108,"cohens_d_active",-2.22935779816514
+"Emslie, 2014","Fluoxetine",0,117,"cohens_d_active",-2.12871287128713
 "Esposito-Smythers, 2019","cbt",1,74,"cohens_d_active",-1.53333333333333
-"Findling, 2009",NA,0,18,"cohens_d_active",-1.56595744680851
+"Findling, 2009","Fluoxetine",0,18,"cohens_d_active",-1.56595744680851
 "Fristad, 2019","cbt + placebo",1,19,"cohens_d_active",-1.33333333333333
-"Geller, 1990",NA,0,12,"cohens_d_active",-2.72131147540984
-"Geller, 1992",NA,0,26,"cohens_d_active",-2.17948717948718
+"Geller, 1990","Nortriptyline",0,12,"cohens_d_active",-2.72131147540984
+"Geller, 1992","Nortriptyline",0,26,"cohens_d_active",-2.17948717948718
 "Gillham, 2006","cbt",1,147,"cohens_d_active",-0.204744069912609
-"Hughes, 1990",NA,0,NA,"cohens_d_active",NA
+"Hughes, 1990","Imipramine",0,NA,"cohens_d_active",NA
 "Idsoe, 2019","cbt",1,133,"cohens_d_active",-0.571821936668196
 "Israel, 2013","abft (attachment based family therapy)",1,11,"cohens_d_active",-1.3728813559322
 "Kahn, 1990","cbt",1,17,"cohens_d_active",-0.630075386853591
 "Kahn, 1990","self-modeling",1,17,"cohens_d_active",-1.78712220762155
-"Keller, 2001",NA,0,95,"cohens_d_active",-1.48006644518272
-"Klein, 1998",NA,0,23,"cohens_d_active",-3.86551724137931
-"Kutcher, 1994",NA,0,30,"cohens_d_active",-1.43682310469314
-"Kye, 1996",NA,0,18,"cohens_d_active",-0.851063829787234
+"Keller, 2001","Imipramine",0,95,"cohens_d_active",-1.48006644518272
+"Keller, 2001","Paroxetine",0,93,"cohens_d_active",-1.81572273879966
+"Klein, 1998","Desipramine",0,23,"cohens_d_active",-3.86551724137931
+"Kutcher, 1994","Desipramine",0,30,"cohens_d_active",-1.43682310469314
+"Kye, 1996","Amitriptyline",0,18,"cohens_d_active",-0.851063829787234
 "Lewinsohn, 1990","cwb adolescents + parents",1,19,"cohens_d_active",-1.48792756539235
 "Lewinsohn, 1990","cwb adolescents only",1,21,"cohens_d_active",-1.00387096774194
 "Liddle, 1990","cbt (social competence training)",1,11,"cohens_d_active",-1.17068811438785
@@ -48,15 +51,15 @@
 "Luby, 2012","PCIT-ED intervention (Parent-Child Interaction Therapy Emotion Development)",1,25,"cohens_d_active",-1.48538011695906
 "Makover, 2019","The High School Transition Program (HSTP)",1,NA,"cohens_d_active",NA
 "March, 2004","cbt",1,111,"cohens_d_active",-2.56642335766423
-"March, 2004",NA,0,109,"cohens_d_active",-3.7175697865353
+"March, 2004","Fluoxetine",0,109,"cohens_d_active",-3.7175697865353
 "Martinovic, 2006","cbt",1,16,"cohens_d_active",-2.48803827751196
 "Moeini, 2019","DAD (Dorehye Amozeshie Dokhtaran)",1,64,"cohens_d_active",-0.474708171206226
 "Mufson, 1999","ipt",1,24,"cohens_d_active",-1.69736842105263
 "Mufson, 2004","ipt",1,34,"cohens_d_active",-1.46762589928058
-"Organon, 2002a",NA,0,82,"cohens_d_active",-1.54059462550029
-"Organon, 2002b",NA,0,85,"cohens_d_active",-1.31023441966838
-"Paxil (GlaxoSmithKline), 2009",NA,0,29,"cohens_d_active",NA
-"Puig-Antich, 1987",NA,0,20,"cohens_d_active",-2.16216216216216
+"Organon, 2002a","Mirtazapine",0,82,"cohens_d_active",-1.54059462550029
+"Organon, 2002b","Mirtazapine",0,85,"cohens_d_active",-1.31023441966838
+"Paxil (GlaxoSmithKline), 2009","Paroxetine",0,29,"cohens_d_active",NA
+"Puig-Antich, 1987","Imipramine",0,20,"cohens_d_active",-2.16216216216216
 "Reynolds, 1986","cbt",1,9,"cohens_d_active",-2.70642201834862
 "Rohde, 2004","cbt",1,45,"cohens_d_active",-1.42608695652174
 "Rohde, 2014a","cognitive behavioral intervention (CB)",1,126,"cohens_d_active",0.0895522388059696
@@ -77,11 +80,11 @@
 "Tang, 2009","Intensive Interpersonal Psychotherapy for depressed adolescents with suicidal risk (IPT-A-IN)",1,35,"cohens_d_active",-1.02586903799515
 "Topooco, 2018","cbt",1,33,"cohens_d_active",-1.59036144578313
 "Topooco, 2019","icbt",1,35,"cohens_d_active",-1.46478873239437
-"Von Knorring, 2006",NA,0,124,"cohens_d_active",-2.19818181818182
+"Von Knorring, 2006","Citalopram",0,124,"cohens_d_active",-2.19818181818182
 "Vostanis, 1996","cbt",1,29,"cohens_d_active",-1.81609195402299
-"Wagner, 2003",NA,0,189,"cohens_d_active",-2.07636363636364
-"Wagner, 2004",NA,0,89,"cohens_d_active",-1.99082568807339
-"Wagner, 2006",NA,0,131,"cohens_d_active",-2.12864493996569
+"Wagner, 2003","Sertraline",0,189,"cohens_d_active",-2.07636363636364
+"Wagner, 2004","Citalopram",0,89,"cohens_d_active",-1.99082568807339
+"Wagner, 2006","Escitalopram",0,131,"cohens_d_active",-2.12864493996569
 "Weisz, 1997","cbt",1,16,"cohens_d_active",-0.897655377744697
 "Weisz, 2009","cbt",1,32,"cohens_d_active",-0.404778636683064
 "Wood, 1996","cbt",1,24,"cohens_d_active",-1.07920792079208

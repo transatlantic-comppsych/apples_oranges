@@ -119,8 +119,8 @@ We then go on to examine the control arms of psychological treatments in both a 
 # Method
 ## Studies included
 
-NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: In progress.
-NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. Also, for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. The numbers look right for med studies.
+NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done.
+NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. 
 
 ## Statistical Analysis
 ### Measures of Effect
@@ -206,8 +206,9 @@ df_appl_v_orange  <- df_appl_v_orange  %>%
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
                                   .default = study ))
 
-
-
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(descr_active = if_else(is.na(descr_active ), active_type , descr_active ))
+        
 # Step 1: keep only the rows with the top instrument in our hierarchy
 df_with_distinct_instruments <-  df_appl_v_orange %>%          
   group_by(new_study_id) %>% 
@@ -222,7 +223,7 @@ turn_long_active_type <- df_with_distinct_instruments %>%
                values_to = "cohens_d") 
 
 # also rename active_type to treatment for the merge below.
-turn_long_active_type <- rename(turn_long_active_type,treatment = descr_active,
+turn_long_active_type <- rename(turn_long_active_type, treatment = descr_active,
                                 baseline_n = baseline_n_active) 
 
 # # to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
@@ -293,7 +294,6 @@ df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
 # use this datafram to perform all operations below in quarto
 # ask Charlotte to check steps above (lines 986 to 1121)
 write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
-
 
 ########### simulate so that each study has a value from a distribution of 
 ######## of correlations. 
