@@ -196,8 +196,9 @@ df_appl_v_orange  <- df_appl_v_orange  %>%
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
                                   .default = study ))
 
-
-
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(descr_active = if_else(is.na(descr_active ), active_type , descr_active ))
+        
 # Step 1: keep only the rows with the top instrument in our hierarchy
 df_with_distinct_instruments <-  df_appl_v_orange %>%          
   group_by(new_study_id) %>% 
@@ -212,7 +213,7 @@ turn_long_active_type <- df_with_distinct_instruments %>%
                values_to = "cohens_d") 
 
 # also rename active_type to treatment for the merge below.
-turn_long_active_type <- rename(turn_long_active_type,treatment = descr_active,
+turn_long_active_type <- rename(turn_long_active_type, treatment = descr_active,
                                 baseline_n = baseline_n_active) 
 
 # # to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
