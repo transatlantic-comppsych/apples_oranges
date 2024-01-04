@@ -471,24 +471,25 @@ for(i in 1: length(list_df_simulated)){
 # list_df_simulated[[2]] %>% 
 #   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
 
+# create a function for metaregression 
 
-
-# specify the model 
-model_1 <- as.formula(~ four_level_var)
-
-# run the metaregression
-list_model_1_meta_reg <- list()
-
-for(i in 1: length(list_df_simulated)){
+run_metaregression <- function(list_of_datasets, model_formula) {
+  list_model_meta_reg <- list()
   
-  list_model_1_meta_reg[[i]] <- rma(yi = cohens_d, 
-                                    sei = simulated_se, 
-                                    data = list_df_simulated[[i]] , 
-                                    method = "ML", 
-                                    mods = model_1 , 
-                                    test = "knha")   
+  for (i in seq_along(list_of_datasets)) {
+    list_model_meta_reg[[i]] <- metafor::rma(yi = cohens_d,
+                                             sei = simulated_se,
+                                             data = list_of_datasets[[i]],
+                                             method = "ML",
+                                             mods = model_formula,
+                                             test = "knha")
+  }
   
+  return(list_model_meta_reg)
 }
+
+model_1 <- as.formula(~ four_level_var)
+list_model_1_meta_reg <- run_metaregression(list_df_simulated, model_1)
 
 # list_model_1_meta_reg[[2]]
 
@@ -723,6 +724,37 @@ knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control,col.names = c("
 ```
 
 
+We then examined whether restricting studies to the trials (US-) licensed medication fluoxetine and escitalopram and the most widely used and evidence-based psychological treatment, namely CBT would change results. As can be seen, the coefficient of the difference between placebo and psychotherapy control condition is very strong as judged by the z-value of the difference (8.8), and comaprable to the overall results.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# filter dataset to include only those ids with cbt fluox or escitalopram
+
+# grab those ids
+cbt_fluox_esc_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
+
+# subset all dataframes in the list
+list_cbt_fluox_esc_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+list_cbt_fluox_esc_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                        %in% cbt_fluox_esc_study_ids,]
+
+}
+
+
+# use this model as above
+model_1 <- as.formula(~ four_level_var)
+
+# apply the function to the list of cbt, fluox, esc
+list_model_1_meta_reg_cbt_fluox_esc <- run_metaregression(list_cbt_fluox_esc_study, model_1)
+
+
+# now use the function to extract the coefficients
+
+list_model_1_meta_reg_cbt_fluox_esc[[1]]
+```
 
 
 
