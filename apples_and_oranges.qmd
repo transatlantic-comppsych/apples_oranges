@@ -128,7 +128,7 @@ As the measure of effect of each individual study, we used the Standardised Mean
 
 $$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$  {#eq-3}
 
-where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the study respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
+where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to: 
 
@@ -159,14 +159,14 @@ df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
 # note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
 # Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
 # Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
-# for the CDRS-R total score in 53 clinic-referred6- to 12-year-olds.
+# for the CDRS-R total score in 53 clinic-referred 6- to 12-year-olds.
 
 
 ### A few more tidying things from Argyris before doing metanalyses
-# # discovered an error in the percentage women o fthe Fristad study. I have checked in the
+# # discovered an error in the percentage women of the Fristad study. I have checked in the
 # # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
 # # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
-# # check again.
+# # check again. # CB checked and all good.
 df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
 
 
@@ -294,6 +294,7 @@ df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
 # use this datafram to perform all operations below in quarto
 # ask Charlotte to check steps above (lines 986 to 1121)
 write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
+
 
 ########### simulate so that each study has a value from a distribution of 
 ######## of correlations. 
