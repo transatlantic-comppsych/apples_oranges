@@ -119,8 +119,8 @@ We then go on to examine the control arms of psychological treatments in both a 
 # Method
 ## Studies included
 
-NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: In progress.
-NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. Also, for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. The numbers look right for med studies.
+NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done.
+NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. 
 
 ## Statistical Analysis
 ### Measures of Effect
@@ -294,7 +294,6 @@ df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
 # use this datafram to perform all operations below in quarto
 # ask Charlotte to check steps above (lines 986 to 1121)
 write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
-
 
 ########### simulate so that each study has a value from a distribution of 
 ######## of correlations. 
