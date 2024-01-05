@@ -207,7 +207,79 @@ run_metaregression <- function(list_of_datasets, model_formula) {
   return(list_model_meta_reg)
 }
 
-###########3. Function to extract parameters (coefs, ses, CI) for each level of the dummy #variable
+
+#########2. Function to count studies with missingness etc. 
+
+count_studies <- function(df) {
+  df_count_studies <- df %>%
+    group_by(psy_or_med, arm_effect_size) %>%
+    count(is.na(cohens_d)) %>%
+    rename(is_missing = `is.na(cohens_d)`) %>%
+    mutate(
+      condition = case_when(
+        psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+        psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+        psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+        psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control"
+      )
+    )
+  
+  df_count_studies$condition <- factor(df_count_studies$condition)  # turn to factor
+  
+  # relevel so that medication control becomes the reference category for the regression
+  df_count_studies$condition <- relevel(df_count_studies$condition, ref = "medication_control")
+  
+  return(df_count_studies)
+}
+
+
+
+##########3. Function to extract mean coefficients and to extract model characteristics
+
+
+aggregate_model_results <- function(list_model_1_meta_reg, condition) {
+  df_coefs <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
+  df_se <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
+  df_z_value <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
+  df_lower_ci <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
+  df_upper_ci <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
+  tau_sq <- rep(0, length(list_model_1_meta_reg))
+  i_sq <- rep(0, length(list_model_1_meta_reg))
+  k <- rep(0, length(list_model_1_meta_reg))
+  r_sq <- rep(0, length(list_model_1_meta_reg))
+  
+  for (i in 1:length(list_model_1_meta_reg)) {
+    for (j in 1:length(condition)) {
+      df_coefs[i, j] <- list_model_1_meta_reg[[i]]$beta[[j]]
+      df_se[i, j] <- list_model_1_meta_reg[[i]]$se[[j]]
+      df_z_value[i, j] <- list_model_1_meta_reg[[i]]$zval[[j]]
+      df_lower_ci[i, j] <- list_model_1_meta_reg[[i]]$ci.lb[[j]]
+      df_upper_ci[i, j] <- list_model_1_meta_reg[[i]]$ci.ub[[j]]
+      tau_sq[i] <- list_model_1_meta_reg[[i]]$tau2
+      i_sq[i] <- list_model_1_meta_reg[[i]]$I2
+      k[i] <- list_model_1_meta_reg[[i]]$k
+      r_sq[i] <- list_model_1_meta_reg[[i]]$R2
+    }
+  }
+  
+  df_coefficients_model <- data.frame(
+    coefficients = colMeans(df_coefs),
+    se = colMeans(df_se),
+    z_value = colMeans(df_z_value),
+    lower_ci = colMeans(df_lower_ci),
+    upper_ci = colMeans(df_upper_ci),
+    tau_sq = mean(tau_sq),
+    i_sq = mean(i_sq),
+    k = mean(k),
+    r_sq = mean(r_sq)
+  )
+  
+  return(df_coefficients_model)
+}
+
+
+
+###########4. Function to extract the SMDs  (SMD, ses, CI) for each level of the dummy #variable. The output is used below in 5.
 # it is a slightly awkward one, because I couldnt' come up with a better way to add the intercept to #each coefficient
 # given the named output of the built in coef function. 
 # here I exctract the coeffcients
@@ -235,7 +307,7 @@ extract_coefficients_func <- function(df_with_coefs){
 }
 
 
-############4. Function to get the means out of the extracted parameters
+############5. Function to get the means out of the SMDs (this is similar to Func 3 and I should at some point create one more general one)
 # here the argument list_of_dfs is the list of extracted coefficients that you get out of the #extract_coefficients_func
 # which itself you get from the run_metaregression function. The argument conditions refers to #the levels of the variable that describes each study arm
 
@@ -260,6 +332,66 @@ calculate_mean_coefs_ses <- function(list_of_dfs, conditions) {
   
   return(df_mean_coefs_ses)
 }
+
+
+###############6. Function for plotting the SMDs
+library(ggplot2)
+library(stringr)
+
+plot_means_function <- function(dataframe, subtitle) {
+  dataframe$text_label <- 0
+  
+  for (i in 1:nrow(dataframe)) {
+    dataframe$text_label[i] <- paste(
+      "k = ", dataframe$n[i], "\n",
+      round(dataframe$coef_means[i], 2),
+      "[" ,
+      round(dataframe$lower_ci[i], 2), 
+      round(dataframe$upper_ci[i], 2),
+      "]"
+    ) 
+  }
+  
+  # Recode condition for ease of plotting
+  dataframe$condition <- str_replace_all(dataframe$condition, "_", " ")
+  
+  # Encode colours
+  redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
+  blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+  
+  # Plotting
+  plot_means <- ggplot(dataframe, aes(x = coef_means, y = 1:nrow(dataframe),
+                                      colour = condition, label = text_label)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
+    geom_text(vjust = +1.5, size = 4) +
+    scale_size_continuous(guide = "none") +
+    guides(colour = FALSE) + 
+    scale_color_manual(values = c(redish_palette, blueish_palette)) +
+    theme_minimal() +
+    labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Arm",
+         subtitle = subtitle) +
+    xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+    ylab("") +
+    ylim(0, nrow(dataframe) + 1) +
+    xlim(-3.0, 0.5) +
+    geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
+    geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+    geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
+    geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+    geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
+    theme(axis.title.x = element_text(size = 14), 
+          axis.text.x  = element_text(size = 14),
+          axis.text.y = (element_blank()),
+          plot.title = element_text(size = 16),
+          plot.subtitle = element_text(size = 14)) +
+    geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
+    geom_text(x = 0.2, y = 4.75, label = "No Effect", color = "grey", vjust = 0.5, hjust = 0)
+  
+  return(plot_means)
+}
+
+
 
 ```
 
@@ -503,44 +635,44 @@ We used maximum likelihood (REML) to estimate model and applied  Hartung-Knapp a
 The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\].
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-library(tidyverse)
-
-
-# describe studies
-n_unique_studies <- length(unique(df_long_for_metan$new_study_id))
-
-  
-
-df_count_studies <- df_long_for_metan %>% 
-  group_by(psy_or_med, arm_effect_size) %>% 
-  count(is.na(cohens_d))
-
-
-df_count_studies <-rename(df_count_studies, is_missing = `is.na(cohens_d)`)
-
-df_count_studies <-
-  df_count_studies %>% 
-  mutate(condition = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
-                             psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
-                             psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
-                             psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
-  )
-
-  df_count_studies$condition <- factor(df_count_studies$condition) # turn to factor
-  
-  # relevel so that medication control becomes the reference category for the regression
-  df_count_studies$condition <- relevel(df_count_studies$condition, ref = "medication_control")
-
-df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
+# library(tidyverse)
+# 
+# 
+# # describe studies
+# n_unique_studies <- length(unique(df_long_for_metan$new_study_id))
+# 
+#   
+# 
+# df_count_studies <- df_long_for_metan %>% 
+#   group_by(psy_or_med, arm_effect_size) %>% 
+#   count(is.na(cohens_d))
+# 
+# 
+# df_count_studies <-rename(df_count_studies, is_missing = `is.na(cohens_d)`)
+# 
+# df_count_studies <-
+#   df_count_studies %>% 
+#   mutate(condition = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+#                              psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+#                              psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+#                              psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+#   )
+# 
+#   df_count_studies$condition <- factor(df_count_studies$condition) # turn to factor
+#   
+#   # relevel so that medication control becomes the reference category for the regression
+#   df_count_studies$condition <- relevel(df_count_studies$condition, ref = "medication_control")
+# 
+# df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
 ```
 
-In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above. 
-
-We then applied metaregression to obtain the means and confidence intervals of each of the four arms. 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# Run metaregression ------------------------------------------------------
+# Get Ns, run metareg, prepare graphing ------------------------------------------------------
+library(tidyverse)
 library(metafor)
+
+
 # add a new multilevel variable for the regression
 
 for(i in 1: length(list_df_simulated)){
@@ -570,6 +702,13 @@ for(i in 1: length(list_df_simulated)){
 
 
 # A. Estimate Means and CIs for the overall ----------------------------------
+
+# count studies
+# count the number of studies
+n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) # CHARLOTTE please check
+df_count_studies <- count_studies(df_long_for_metan) # CHARLOTTE please check
+
+
 # specify model
 model_1 <- as.formula(~ four_level_var)
 
@@ -577,18 +716,25 @@ model_1 <- as.formula(~ four_level_var)
 # here you can use the simulated results directly
 list_model_1_meta_reg <- run_metaregression(list_df_simulated, model_1)
 
-# extract coefs from the  list
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_overall <-  aggregate_model_results(list_model_1_meta_reg, condition)
+
+# extract SMDs from the  list
 list_dummy_var_means <-  lapply(list_model_1_meta_reg, extract_coefficients_func)
 
-# calculate mean coefs and ses
-df_mean_coefs_from_sim <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, conditions)
+# calculate mean SMDs and ses
+df_mean_coefs_from_sim <- calculate_mean_coefs_ses(list_dummy_var_means, condition)
 
- df_mean_coefs_from_sim <- data.frame(cbind(condition,df_mean_coefs_from_sim))
+df_mean_coefs_from_sim <- data.frame(cbind(condition,df_mean_coefs_from_sim))
+
+# add the ns
+df_mean_coefs_from_sim <- data.frame(cbind(df_mean_coefs_from_sim, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
 
 
 
 # B. Estimate Means and CIs for CBT Fluox Esc --------------------------------
-# first grab ids for those studies
+#  grab ids for those studies
 cbt_fluox_esc_study_ids <-
   df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
 
@@ -602,20 +748,34 @@ for(i in 1: length(list_df_simulated)){
   
 }
 
+# count the number of studies
+study_count_cbt_fluox_esc_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cbt_fluox_esc_study_ids,])
+# CHARLOTTE please check
 
-model_1 <- as.formula(~ four_level_var)
+
 
 # apply the metareg function to the list of cbt, fluox, esc
+model_1 <- as.formula(~ four_level_var)
 list_model_1_cbt_fluox_esc_study <- run_metaregression(list_cbt_fluox_esc_study , model_1)
 
-# extract coefs from the list for cbt fluox escit
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_cbt_fluox_esc_study <-  aggregate_model_results(list_model_1_cbt_fluox_esc_study, condition)
+
+
+# extract SMDs from the list for cbt fluox escit
 means_cbt_fluox_esc_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
 
-# calculate mean coefs and ses
-conditions <- unique(list_df_simulated[[1]]$four_level_var) # for the conditino argument
-coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, conditions)
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, condition)
  coef_and_se_means_cbt_fluox_esc_study <- data.frame(cbind(condition, coef_and_se_means_cbt_fluox_esc_study))
 
+# add the ns to the dataframe
+ coef_and_se_means_cbt_fluox_esc_study$n  <- study_count_cbt_fluox_esc_study[study_count_cbt_fluox_esc_study$is_missing ==F,]$n
+
+ 
 
 # C. Estimate Means and CIs without WL ---------------------------------------
 # grab the ids for no waitlist
@@ -632,32 +792,58 @@ for(i in 1: length(list_df_simulated)){
   
 }
 
+# count studies 
+study_count_no_wl_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_ids,])
+# CHARLOTTE please check
+
+
 # use this model as above
 model_1 <- as.formula(~ four_level_var)
 
-# apply the function to the list of cbt, fluox, esc
+# apply the metareg function to the list of cbt, fluox, esc
 list_model_1_no_wl <- run_metaregression(list_no_wl , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_no_wl <-  aggregate_model_results(list_model_1_no_wl, condition)
+
+
 
 
 # now use the function to extract the coefficients
 means_no_wl <-  lapply(list_model_1_no_wl, extract_coefficients_func)
 
 # run the mean function for no wl
-conditions <- unique(list_df_simulated[[1]]$four_level_var) # for the conditino argument
-coef_and_se_means_no_wl <- calculate_mean_coefs_ses(means_no_wl, conditions)
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_no_wl <- calculate_mean_coefs_ses(means_no_wl, condition)
 coef_and_se_means_no_wl <- data.frame(cbind(condition,coef_and_se_means_no_wl))
 
 
- #add the ns of studies FIX THIS
+coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_missing 
+                                                     ==FALSE,]$n
 
 
- df_mean_coefs_from_sim <- data.frame(cbind(df_mean_coefs_from_sim, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
 
 # here are all three of them OVERALL, CBT and WL together. We may want to display them together. 
 # df_all_coefficients <- cbind(df_mean_coefs_from_sim, coef_and_se_means_cbt_fluox_esc_study,coef_and_se_means_no_wl)
 
 
 ```
+
+NOTE: CHARLOTTE Please create a table here with the results from the count studies or study count variables that you checked in the code chunk above for each A,B and C. 
+The table for A should be added here and accompany the description below. 
+THe other two should go below as supplementary.
+As indicated in the methods we should have one overall table with all studies and all their characteristics ala Cipriani.
+
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above. 
+
+We then applied metaregression to obtain the means and confidence intervals of each of the four arms. 
+
+
+
+
+
+
 We examined the variability that the simulations of the correlations of the pre-post outcomes produced. As shown in Supplemenatry Table 2, the standard deviation of the simulated mean varied in the third decimal point, indicating minimal influence of the correlations on the outcomes.
 
 
@@ -667,95 +853,27 @@ As can be intuited from the confidence intervals displayed, there are statistica
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # plot results from simulated means ---------------------------------------
+# 
+subtitle_text_all <- "Metanalytic estimates of within-group changes: all studies"
+plot_means_all <- plot_means_function(df_mean_coefs_from_sim, subtitle_text_all)
+print(plot_means_all)
 
-# Create summary stats text
-df_mean_coefs_from_sim$text_label <- 0
-for(i in 1: nrow(df_mean_coefs_from_sim))
-df_mean_coefs_from_sim$text_label[i] <-  paste(
-   "k = ", df_mean_coefs_from_sim$n[i],"\n", 
-   round(df_mean_coefs_from_sim$coef_means[i], 2),
-   "[" ,
- round(df_mean_coefs_from_sim$lower_ci[i],2), 
- round(df_mean_coefs_from_sim$upper_ci[i], 2),
-"]") 
-                                                              
-
-# recode condition for ease of plotting
-df_mean_coefs_from_sim$condition <- str_replace_all(df_mean_coefs_from_sim$condition, "_", " ")
-
-# encode colours
-redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
-blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+subtitle_text_cbt <- "Metanalytic estimates of within-group changes: cbt, fluox, escit"
+plot_means_cbt <- plot_means_function(coef_and_se_means_cbt_fluox_esc_study , subtitle_text_cbt)
+print(plot_means_cbt)
 
 
-
-
-plot_means <- ggplot(df_mean_coefs_from_sim, aes(x = coef_means, y = 1:nrow(df_mean_coefs_from_sim),
-                                   colour = condition, label = text_label)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
-  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
-  scale_size_continuous(guide = "none") +
-  guides(colour = FALSE) + 
-  scale_color_manual(values = c(redish_palette, blueish_palette)) +
-  theme_minimal() +
-  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Arm",
-       subtitle = "metanalytically derived estimates of within group changes") +
-  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
-  ylab("") +
-  ylim(0, nrow(df_mean_coefs_from_sim) + 1) +
-  xlim(-2.5, 0.5) +
-  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
-  geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
-  geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
-  theme(axis.title.x = element_text(size = 14), 
-        axis.text.x  = element_text(size = 14),
-        axis.text.y = (element_blank()),
-        plot.title = element_text(size = 16),
-        plot.subtitle = element_text(size = 14))+
-  geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
-  geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
-
-
-
-png("plotted_means.png")
-plot_means
-dev.off()
-
-```
-
-![Fig 1. Means of the Four Trial Arms](plotted_means.png){width=50%}
-
-
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-coefs<- 0
-ses <- 0
-for(i in 1: length(list_model_1_meta_reg)){
-  
-  coefs[[i]] <- coef(list_model_1_meta_reg[[i]])[[4]]  ### CAREFUL this is poor coding practice on my part
-  ses[[i]] <- list_model_1_meta_reg[[i]]$se[4] ### but I can't find another way of grabbing this estimate from the
-  ### rma object. It could go badly wrong if the relevelling isn't done consistently...CHECK MANUALLY
-  coefficients_from_contrasts_medcontrol_psy_control <- data.frame(Beta = mean(coefs), SE = mean(ses))
-}
-
-
-coefficients_from_contrasts_medcontrol_psy_control$lower_ci <- coefficients_from_contrasts_medcontrol_psy_control$Beta - 1.96*coefficients_from_contrasts_medcontrol_psy_control$SE
-
-coefficients_from_contrasts_medcontrol_psy_control$upper_ci <- coefficients_from_contrasts_medcontrol_psy_control$Beta + 1.96*coefficients_from_contrasts_medcontrol_psy_control$SE
-
-coefficients_from_contrasts_medcontrol_psy_control$zed_value <- coefficients_from_contrasts_medcontrol_psy_control$Beta/
-coefficients_from_contrasts_medcontrol_psy_control$SE
-
-coefficients_from_contrasts_medcontrol_psy_control$p_value <- format(1 - pnorm(coefficients_from_contrasts_medcontrol_psy_control$zed_value), scientific = TRUE)
-
-
-
+subtitle_text_no_wl <- "Metanalytic estimates of within-group changes: wl excluded"
+plot_means_wl <- plot_means_function(coef_and_se_means_no_wl, subtitle_text_no_wl)
+print(plot_means_wl)
 
 
 ```
+
+
+
+
+
 
 
 
@@ -775,46 +893,40 @@ knitr:: kable(tab_1_df, digits = 2)
 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-#| label: Table 2
-#| tbl-cap: Statistics of the Difference Between Medication and Psychotherapy Control Conditions
-knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control,col.names = c("Beta", "SE", "Lower CI", "Upper CI", "z-value", "p-value"), digits = 2)
+# #| label: Table 2
+# #| tbl-cap: Statistics of the Difference Between Medication and Psychotherapy Control Conditions
+# knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control,col.names = c("Beta", "SE", "Lower CI", "Upper CI", "z-value", "p-value"), digits = 2)
 
 ```
 
 
 We then examined whether restricting studies to the trials (US-) licensed medication fluoxetine and escitalopram and the most widely used and evidence-based psychological treatment, namely CBT would change results. As can be seen, the coefficient of the difference between placebo and psychotherapy control condition is very strong as judged by the z-value of the difference (8.8), and comaprable to the overall results.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# filter dataset to include only those ids with cbt fluox or escitalopram
-
-# grab those ids
-cbt_fluox_esc_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
-
-# subset all dataframes in the list
-list_cbt_fluox_esc_study <- list()
-
-for(i in 1: length(list_df_simulated)){
-  
-list_cbt_fluox_esc_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-                                                        %in% cbt_fluox_esc_study_ids,]
-
-}
 
 
-# use this model as above
-model_1 <- as.formula(~ four_level_var)
+```{r}
+# examine the stability of the simulations
+stability_sims %>%
+  ggplot(aes(x = n_sims, y = z_value)) +
+  geom_point() +
+  geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
+  geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "black") +
+  annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line are statistically significant)", hjust = -0.1, vjust = 0) +
+  geom_segment(aes(x = 300, xend = 300, y = 7.5, yend = min(stability_sims$z_value-0.3)),
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "black") +
+  annotate("text", x = 300, y = 7.5, label = "simulated z-values",
+           hjust = -0.1, vjust = 0) +
+  theme_minimal() +
+  labs(
+    x = "Number of Simulations",
+    y = "z-value",
+    title = "Stability of the Statistic of the Difference between \nMedication and Psychotherapy Control Arms",
+    subtitle = "Results from 1000 simulations with within-group standard errors"
+  )
 
-# apply the function to the list of cbt, fluox, esc
-list_model_1_meta_reg_cbt_fluox_esc <- run_metaregression(list_cbt_fluox_esc_study, model_1)
 
-
-# now use the function to extract the coefficients
-
-list_model_1_meta_reg_cbt_fluox_esc[[1]]
 ```
-
-
-
-
 
