@@ -847,7 +847,7 @@ We then applied metaregression to obtain the means and confidence intervals of e
 We examined the variability that the simulations of the correlations of the pre-post outcomes produced. As shown in Supplemenatry Table 2, the standard deviation of the simulated mean varied in the third decimal point, indicating minimal influence of the correlations on the outcomes.
 
 
-Figure 1 graphs the results with the means of each level alongside their confidence intervals. Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metanalyses. 
+Figure 1 graphs the results with the means of each level alongside their confidence intervals. Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metaregressions. 
 As can be intuited from the confidence intervals displayed, there are statistically significant differences at p<0.05 between the two control arms. Table 2 illustrates this with the output of one of the simulated models. 
 
 
@@ -869,13 +869,6 @@ print(plot_means_wl)
 
 
 ```
-
-
-
-
-
-
-
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #| label: Table 1
@@ -904,7 +897,7 @@ We then examined whether restricting studies to the trials (US-) licensed medica
 
 
 
-```{r}
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # examine the stability of the simulations
 
 z_psy_con_vs_med_con <- 0
