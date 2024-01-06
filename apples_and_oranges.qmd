@@ -1,6 +1,6 @@
 ---
 title: Fundamental Problems with the Evidence Base of Adolescent Depression Treatments.
-subtitle: Re-visiting the relative efficacy Control Conditions..
+subtitle: Insights from the relative efficacy of Control Conditions.
 author:
   - name: Argyris Stringaris
     email: a.stringaris@ucl.ac.uk
