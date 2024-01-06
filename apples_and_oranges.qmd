@@ -80,7 +80,6 @@ format:
       formatting: preprint
       model: 3p
       cite-style: super
-      
 ---
 
 # Introduction
@@ -115,35 +114,36 @@ We then go on to examine the control arms of psychological treatments in both a 
 
 @stringarisDevelopmentalPathwaysChildhood2014
 
-
 # Method
+
 ## Studies included
 
-NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done.
-NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. 
+NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. <!--# Charlotte, that's all great. What we now need here is an account of exactly how  we searched and how we used the other datasets. Follow previous examples, though in our case, it will be a lot about how we used the accounts of others. Please make sure to say where that we asked about missing information.  -->
 
 ## Statistical Analysis
-### Measures of Effect
-As the measure of effect of each individual study, we used the Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as: 
 
-$$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$  {#eq-3}
+### Measures of Effect
+
+As the measure of effect of each individual study, we used the Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as:
+
+$$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-3}
 
 where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
-For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to: 
+For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to:
 
+$$ \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-4}
 
-$$ \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$          {#eq-4}
+where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
-where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations. 
-
-In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: 
+In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: <!--# Georgina, I have used the Truncated Normal, we can obviously do sensitivity analyses with other ones -->
 
 $$SE_{change} \sim \mathcal{TN}(\mu, \sigma, a, b)
 $$ {#eq-5}
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
+<!--# Charlotte, I am particularly keen for you to code independently the SE calculation, maybe use all the other parts as they are, but check the SEs. Once you have re-assured yourself about it, could you please read the code for the other steps below, but break it down by taking it out of the function and probably out of the loop and verifying that you would get the same results for one dataset, e.g. the first one in the list of 1000. It would be amazing to verify the results this way. Finally, as discussed, we can vary the parammeters of the distribution if we have better a prioris-->
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 ###########Libraries needed
@@ -151,7 +151,6 @@ library(tidyverse)
 library(truncnorm)
 library(metafor)
 ```
-
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #############Some custom made functions#############
@@ -393,10 +392,8 @@ plot_means_function <- function(dataframe, subtitle) {
 
 
 
+
 ```
-
-
-
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 library(tidyverse)
@@ -579,31 +576,29 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 
 ```
 
-
 ### Random Effects Metaregression
-We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$.
-Therefore, we can estimate a two stage model with: 
+
+We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$. Therefore, we can estimate a two stage model with:
 
 $$Y_i \sim \mathcal{N}(\theta_i, \sigma_i^2)
-$$ {#eq-5}
+$$
 
 $$\theta_i \sim \mathcal{N}(x_i\beta, \tau_i^2)
 $$ {#eq-6}
 
 where $Y_i$ is the estimated effect size for study i, has a normal distribution with $\theta_i$ as its true mean effect and sampling error $\sigma^2$. Whereas $\theta_i$ is a study-specific instantiation of the distribution of effect sizes, with $\tau^2$ representing heterogeneity.
 
-This then gives rise to: 
+This then gives rise to:
 
 $$Y_i = x_i\beta_i + u_i + \epsilon_i$$ {#eq-7}
 
 where,
 
-$$u_i \sim N(0, \tau^2) $${#eq-8}
+$$u_i \sim N(0, \tau^2) $$ {#eq-8}
 
-which describes the deviation of each study from the mean of the distribution, and, 
+which describes the deviation of each study from the mean of the distribution, and,
 
 $$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-9}
-
 
 We can then specify the following model to obtain the means of each arm of the trials as follows:
 
@@ -615,24 +610,23 @@ $$ \begin{aligned}
         2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
         3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
     \end{cases}
-\end{aligned}$$  {#eq-10}
+\end{aligned}$$ {#eq-10}
 
-
-where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the 
-Similarly, each coefficient represents the contrast between the reference category and each level, for an exmaple and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows: 
+where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the Similarly, each coefficient represents the contrast between the reference category and each level, for an exmaple and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
 
 $$
 z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
 $$ {#eq-11}
 
+We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
 
-We used maximum likelihood (REML) to estimate model and applied  Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
-
-
+We present our main results as means of the estimates across simulated datasets, for example, the SMDs of each level of the dummy variable above are means across the simulations.
 
 # Results
 
-The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\].
+Studies included in the metaregression.
+
+The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it-->
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # library(tidyverse)
@@ -666,14 +660,13 @@ The data for the studies included in this metanalysis are summarised in Suppleme
 # df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
 ```
 
-
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Get Ns, run metareg, prepare graphing ------------------------------------------------------
 library(tidyverse)
 library(metafor)
 
 
-# add a new multilevel variable for the regression
+# add a new multilevel variable to the simulated data for the regression
 
 for(i in 1: length(list_df_simulated)){
   list_df_simulated[[i]] <- list_df_simulated[[i]] %>% 
@@ -719,6 +712,7 @@ list_model_1_meta_reg <- run_metaregression(list_df_simulated, model_1)
 # extract coefficients and model characteristics.
 condition <- levels(list_df_simulated[[1]]$four_level_var)
 aggregate_results_overall <-  aggregate_model_results(list_model_1_meta_reg, condition)
+aggregate_results_overall <- cbind(aggregate_results_overall, condition)
 
 # extract SMDs from the  list
 list_dummy_var_means <-  lapply(list_model_1_meta_reg, extract_coefficients_func)
@@ -830,72 +824,48 @@ coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_
 
 ```
 
-NOTE: CHARLOTTE Please create a table here with the results from the count studies or study count variables that you checked in the code chunk above for each A,B and C. 
-The table for A should be added here and accompany the description below. 
-THe other two should go below as supplementary.
-As indicated in the methods we should have one overall table with all studies and all their characteristics ala Cipriani.
+### Analysis of all studies
 
-In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above. 
+#### Number of studies included
 
-We then applied metaregression to obtain the means and confidence intervals of each of the four arms. 
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above.
 
+#### Metaregression analysis.
 
+We applied metaregression to obtain the SMDs and confidence intervals of each of the four arms.
 
-
-
-
-We examined the variability that the simulations of the correlations of the pre-post outcomes produced. As shown in Supplemenatry Table 2, the standard deviation of the simulated mean varied in the third decimal point, indicating minimal influence of the correlations on the outcomes.
-
-
-Figure 1 graphs the results with the means of each level alongside their confidence intervals. Table 1 shows the results containing the means and standard errors for each level, derived as the average of 1000 metaregressions. 
-As can be intuited from the confidence intervals displayed, there are statistically significant differences at p<0.05 between the two control arms. Table 2 illustrates this with the output of one of the simulated models. 
-
+As can be seen in Figure 1, there were substantial differences between the four arms of the metanalysis with striking difference being the medication and the psychotherapy control arms. In particular, placebo had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$coef_means, 2)`, 95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$upper_ci, 2)`, whereas psychotherapy controls had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$coef_means, 2)` , 95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$upper_ci, 2)`.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# plot results from simulated means ---------------------------------------
-# 
 subtitle_text_all <- "Metanalytic estimates of within-group changes: all studies"
 plot_means_all <- plot_means_function(df_mean_coefs_from_sim, subtitle_text_all)
-print(plot_means_all)
-
-subtitle_text_cbt <- "Metanalytic estimates of within-group changes: cbt, fluox, escit"
-plot_means_cbt <- plot_means_function(coef_and_se_means_cbt_fluox_esc_study , subtitle_text_cbt)
-print(plot_means_cbt)
-
-
-subtitle_text_no_wl <- "Metanalytic estimates of within-group changes: wl excluded"
-plot_means_wl <- plot_means_function(coef_and_se_means_no_wl, subtitle_text_no_wl)
-print(plot_means_wl)
-
-
+#print(plot_means_all)
+pdf(file = "plot_means_all.pdf")
+plot_means_all
 ```
+
+![Figure 1.](plot_means_all.pdf)
+
+Table 1 summarises the statistics of the estimated SMDs. <!--# Charlotte, we need to turn these into nice tables with proper columns, rounding etc. -->
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-#| label: Table 1
-#| tbl-cap: Means for the four Trial Arms alongside 95% Confidence Intervals
-tab_1_df <- df_mean_coefs_from_sim[, 1:length(df_mean_coefs_from_sim)-1]
 
-knitr:: kable(tab_1_df, digits = 2)
+knitr:: kable(df_mean_coefs_from_sim, caption = "Table 1")
 ```
 
-
-
- 
-
-
-
+In Table 2, we present the regression that tests our hypothesis about differences between medication and psychotherapy control. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable, including psychotherapy control, are compared. The strongest difference betwen arms, as judged by the z-value, is between the psychotherapy and medication control with a z-value `r round(aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value, 2)` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# #| label: Table 2
-# #| tbl-cap: Statistics of the Difference Between Medication and Psychotherapy Control Conditions
-# knitr:: kable(coefficients_from_contrasts_medcontrol_psy_control,col.names = c("Beta", "SE", "Lower CI", "Upper CI", "z-value", "p-value"), digits = 2)
-
+knitr:: kable(aggregate_results_overall, caption = "Table 2")
 ```
 
+### Sensitivity Analyses
 
-We then examined whether restricting studies to the trials (US-) licensed medication fluoxetine and escitalopram and the most widely used and evidence-based psychological treatment, namely CBT would change results. As can be seen, the coefficient of the difference between placebo and psychotherapy control condition is very strong as judged by the z-value of the difference (8.8), and comaprable to the overall results.
+We then conducted a series of sensitivity analyses of our results.
 
+#### Effect of standard errors of the SMDs .
 
+It could be argued that the choice of standard errors of the changes for the calculation of the confidence intervals could have affect the results in one or the other direction. To address such concerns we have simulated 1000 different datasets with SMDs coming from a broad distribution. If standard error distributions were influential, this should show up as substantial variability across simulations. We test this idea in the Figure 1 which displays across the 1000 simulations the z-value of the contrast between medication and psychotherapy control arms (the mean of which we presented in Table 2). As can be seen, the variability in the z-score is minimal and consistently far away from the threshold for significance, i.e. the value of z = 1.645.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # examine the stability of the simulations
@@ -930,7 +900,45 @@ stab_sims <- stability_sims %>%
     title = "Stability of the Statistic of the Difference between \nMedication and Psychotherapy Control Arms",
     subtitle = "Results from 1000 simulations with within-group standard errors"
   )
-stab_sims
 
+pdf(file = "stab_sims.pdf")
+stab_sims
+dev.off()
 ```
 
+![](stab_sims.pdf)
+
+#### Comparison of CBT with fluoxetine and escitalopram
+
+CBT is the most widely studied treatment and, similar to fluoxetine, it has metanalytic evidence supporting its use. Both fluoxetine and escitalopram are approved by the FDA as treatments for adolescent depression. As can be seen in Figure 3, the pattern of results is very similar to that of the overall analyses.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+subtitle_text_cbt <- "Metanalytic estimates of within-group changes: cbt, fluox, escit"
+plot_means_cbt <- plot_means_function(coef_and_se_means_cbt_fluox_esc_study , subtitle_text_cbt)
+pdf(file = "plot_means_cbt.pdf")
+plot_means_cbt
+dev.off()
+```
+
+![](plot_means_cbt.pdf)
+
+#### Excluding studies with waitlist control arms.
+
+It could be argued that waitlist control arms represent outliers amongst psychotherapy control studies that reduce the estimate of the overall efficacy. We therefore analysed the data excluding waitlist control studies. As can be seen, the pattern of results is very similar to that of the overall analyses.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+
+subtitle_text_no_wl <- "Metanalytic estimates of within-group changes: wl excluded"
+plot_means_wl <- plot_means_function(coef_and_se_means_no_wl, subtitle_text_no_wl)
+#print(plot_means_wl)
+
+pdf(file = "plot_means_wl.pdf")
+plot_means_wl
+dev.off()
+```
+
+![](plot_means_wl.pdf)
+
+```         
+```
