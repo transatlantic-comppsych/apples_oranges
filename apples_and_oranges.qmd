@@ -100,15 +100,15 @@ The importance of this assumption can be easily intuited by expanding equation 1
 
 $$Effect_{MedActive} - Effect_{MedControls} = Effect_{PsyActive} - Effect_{PsyControls}$$ {#eq-2}
 
-where MedActive and PsyActive are the active arms of antidepressant and psychotherapy trials, respectively, and MedControls and PsyControls the respective control arms. The assumption here has to be that the controls are equal, that is, $$ Effect_{MedControls} = Effect_{PsyControls}$$ A few simple examples help illustrate why this assumption is important Let the two modalities of treatment be medication and surgery, and let there be a trial for each modality. In the medication trial 80% of participants respond to the antihypertensive and only 40% to placebo; in the surgery trial, 40% of people respond to surgery and 0% to sham. If one relied on Equation 1 to compare the treatments they would arrive at the absurd conclusion that the two treatments are equal and recommend to a patient that it does not really matter which one they choose. Playing around with numbers in which no equality of the respective control arms is required, leads to other risible conclusions. Yet, a focus on the equality of controls is surprisingly absent.
+where MedActive and PsyActive are the active arms of antidepressant and psychotherapy trials, respectively, and MedControls and PsyControls the respective control arms. The assumption here has to be that the controls are equal, that is, $$ Effect_{MedControls} = Effect_{PsyControls}$$ A simple example from medicine helps illustrate why this assumption is important Let the two modalities of treatment for appendicitis be antibiotic medication and surgery, and let there be a set of trials for each modality. In the medication trials, on average 40% of participants respond to the antibiotics and only 0% to placebo; in the surgery trial, 80% of people respond to surgery and 40% to sham. If one relied on Equation 1 to compare the treatments they would arrive at the absurd conclusion that the two treatments are equal and recommend to a patient that it does not really matter which one they choose. Playing around with numbers in which no equality of the respective control arms is required, leads to other risible conclusions. Yet, in the dicussion about depression treatments, a focus on the equality of controls is surprisingly absent.
 
-The importance of testing the equality of controls assumption for patients and the public can be vast because treatment guidelines, clinician's advice to patients, and patients' informed choices are all affected by the validity of treatment comparisons. Similarly, the rational allocation of public funds towards treatment modalities rests on valid comparisons between them.
+The importance of testing the equality of controls assumption for patients and the public can be vast because treatment guidelines, clinicians' advice to patients, and patients' informed choices are all affected by the validity of treatment comparisons. Similarly, the rational allocation of public funds towards treatment modalities rests on valid comparisons between them.
 
-Beyond its immediate clinical importance, understanding the nature of controls in clinical trials of depression is key for reasons of causal inference and mechanistic understanding of treatment. Adolescent depression is notable for a relatively high placebo effect: the proportion of adolescents responding to placebo is higher in depression than in anxiety, and it is higher for adolescent vs adult depression. The reasons for these differences remain unclear and are typically treated as nuisance effects to be minimised by using trial designs such as a placebo lead in period. However, an alternative view is that placebo effects, or more generally, variability in the response to control arms may be informative about mechanisms of improvement. If, for example, the antidepressant effect of placebo is stronger than that of equivalent control arms in psychotherapy, then we ought to ask about the possible explanations of such differences and consider whether they can be exploited for improving treatment delivery, as previously suggested.
+Beyond its immediate clinical importance, understanding the nature of controls in clinical trials of depression is key for reasons of causal inference and mechanistic understanding of treatment. Adolescent depression is notable for a relatively high placebo effect: the proportion of adolescents responding to placebo is higher in depression than in anxiety, and it is higher for adolescent vs adult depression. The reasons for these differences remain unclear and are typically treated as nuisance effects to be minimised by using trial designs such as a placebo lead in period. However, an alternative view is that placebo effects, or more generally, variability in the response to control conditions, may be informative about mechanisms of improvement. If, for example, the antidepressant effect of placebo is stronger than that of equivalent control arms in psychotherapy, then we ought to ask about the possible explanations of such differences and consider whether they can be exploited for improving treatment delivery, as previously suggested.
 
-In this paper, we have two aims: first, test whether the equality of controls assumption of adolescent depression treatment holds, and therefore scrutinise the validity of current recommendations concerning choice between treatment modalities; second,we explore variabiliity in trial control arms across and within the two treatment modalities and examine how they relate to anti-depressant effects.
+In this paper, we have two aims: first, test whether the equality of controls assumption of adolescent depression treatment holds, and therefore scrutinise the validity of current recommendations concerning choice between treatment modalities; second,we explore the variabiliity in trial control arms across and within the two treatment modalities and examine how they relate to anti-depressant effects.
 
-Our main hypothesis is that the within group effect of psychotherapy controls is substantially weaker than that of the placebo pill and we will test this in random effects meta-regression. We will also use series of sensitivity analyses concerning restricting to specific psychotherapy control groups ( e.g. exclude waitlist controls or include only controls to cognitive and behavioural therapy (CBT)) or medication control groups (e.g. trials for the FDA-approved fluoxetine and escitalopram). We also conduct sensitivity analyses in the form of simulations, to ensure that results are robust to estimations of the standard error of the change scores.
+Our main hypothesis is that the within group effect of psychotherapy controls is substantially weaker than that of the placebo pill and we will test this using random effects meta-regression. We will also use series of sensitivity analyses. First we compared CBT trial arms with those of trials involving fluoxetine and escitalopram. CBT is the most widely studied treatment and, similar to fluoxetine, it has metanalytic evidence supporting its use. Both fluoxetine and escitalopram are approved by the FDA as treatments for adolescent depression. We also conduct analyses excluding waitlist control arms as it could be argued that waitlist control arms represent outliers amongst psychotherapy control studies that reduce the estimate of the overall efficacy. Finally, we also conduct sensitivity analyses in the form of simulations, to ensure that results are robust to estimations of the standard error of the change scores.
 
 We then go on to examine the control arms of psychological treatments in both a qualitative/descriptive way (e.g. the content of attention control) and by quantifying characteristics such as session frequency, duration of delivery. We then explore how these characteristics relate to the magnitude of within group change.
 
@@ -594,9 +594,11 @@ where,
 
 $$u_i \sim N(0, \tau^2) $$ {#eq-8}
 
-which describes the deviation of each study from the mean of the distribution, and,
+describes the deviation of each study from the mean of the distribution, and,
 
 $$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-9}
+
+describes the sampling error.
 
 We can then specify the following model to obtain the means of each arm of the trials as follows:
 
@@ -610,7 +612,7 @@ $$ \begin{aligned}
     \end{cases}
 \end{aligned}$$ {#eq-10}
 
-where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the Similarly, each coefficient represents the contrast between the reference category and each level, for an exmaple and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
+where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the mean. Similarly, each coefficient represents the contrast between the reference category and each level, for an example and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
 
 $$
 z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
@@ -767,12 +769,14 @@ coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluo
 # add the ns to the dataframe
  coef_and_se_means_cbt_fluox_esc_study$n  <- study_count_cbt_fluox_esc_study[study_count_cbt_fluox_esc_study$is_missing ==F,]$n
 
+
  
 
 # C. Estimate Means and CIs without WL ---------------------------------------
 # grab the ids for no waitlist
-no_wl_ids <-
-  df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
+no_wl_ids <-df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
+ 
+  
 
 # use them to loop over the simulated list to subset all the dataframes.
 list_no_wl <- list()
@@ -824,9 +828,13 @@ coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_
 
 ### Analysis of all studies
 
-#### Number of studies included
+#### Number and type of of studies included
 
 In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above.
+
+<!--# Charlotte, for the paragraph below, please provide the numbers for each of the numbers wherever I have put an X -->
+
+Placebo was the control condition for all medication trials; the active arm ranged from serotonin reuptake inhibitors, such as <!--# X -->fluoxetine and <!--# X -->escitalopram, to tricylics, such as <!--# X -->notriptylin. In psychological trials, the control arm included <!--# X -->WL controls, care as usual <!--# X --> and several other conditions such as attention control <!--# X -->; the active arm included CBT <!--# X -->, IPT <!--# X --> and psychodynamic therapy <!--# X --> amongst others. All included trials and the types of treatment controls can be found in Suppelmenateray Table 1.
 
 #### Metaregression analysis.
 
@@ -908,7 +916,7 @@ dev.off()
 
 #### Comparison of CBT with fluoxetine and escitalopram
 
-CBT is the most widely studied treatment and, similar to fluoxetine, it has metanalytic evidence supporting its use. Both fluoxetine and escitalopram are approved by the FDA as treatments for adolescent depression. As can be seen in Figure 3, the pattern of results is very similar to that of the overall analyses.
+We next compared the control and active arms of CBT studies to those of fluoxetine and escitalopram studies. As can be seen, the pattern of results is very similar to that of the ovarall analyses.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 subtitle_text_cbt <- "Metanalytic estimates of within-group changes: cbt, fluox, escit"
@@ -922,7 +930,7 @@ dev.off()
 
 #### Excluding studies with waitlist control arms.
 
-It could be argued that waitlist control arms represent outliers amongst psychotherapy control studies that reduce the estimate of the overall efficacy. We therefore analysed the data excluding waitlist control studies. As can be seen, the pattern of results is very similar to that of the overall analyses.
+We next analysed the data after excluding waitlist control studies. As can be seen, the pattern of results is very similar to that of the overall analyses.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
