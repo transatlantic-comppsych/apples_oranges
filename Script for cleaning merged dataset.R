@@ -232,6 +232,7 @@ df_appl_v_orange <- df_appl_v_orange %>% arrange(study_ID, instrument_value)
 
 # retain only first row to look at demographics as this will keep one row per study_ID, taking the primary instrument
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
+write.csv(df_first_row, "df_first_row.csv")
 
 #check how many med comparisons we cannot calc cohens d for (for primary instrument)
 filter_test <- df_first_row %>% filter(psy_or_med == 0)
