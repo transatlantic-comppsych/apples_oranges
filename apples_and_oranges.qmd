@@ -118,28 +118,31 @@ We then go on to examine the control arms of psychological treatments in both a 
 
 ## Studies included
 
-NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. <!--# Charlotte, that's all great. What we now need here is an account of exactly how  we searched and how we used the other datasets. Follow previous examples, though in our case, it will be a lot about how we used the accounts of others. Please make sure to say where that we asked about missing information.  -->
+For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from Cuijpers' (2023) systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions. Cuijpers made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to Cuijpers' (2023) meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers' (2023) literature search. 
+
+Medication studies were drawn from Cipriani's (2016) network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive replies from any authors. **Yet to do** We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers' (2023) review to ensure we analysed an equivalently up-to-date database of medication trials. We used the same search terms outlined in Cipriani (2016).
+
+NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. <!--# Charlotte, that's all great. What we now need here is an account of exactly how  we searched and how we used the other datasets. Follow previous examples, though in our case, it will be a lot about how we used the accounts of others. Please make sure to say where that we asked about missing information. **CB** Completed above. -->
 
 ## Statistical Analysis
 
 ### Measures of Effect
 
-As the measure of effect of each individual study, we used the Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as:
+As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
 
-$$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-3}
+$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$
 
 where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to:
 
-$$ \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-4}
+$$ SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$
 
 where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
 In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: <!--# Georgina, I have used the Truncated Normal, we can obviously do sensitivity analyses with other ones -->
 
-$$SE_{change} \sim \mathcal{TN}(\mu, \sigma, a, b)
-$$ {#eq-5}
+$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
@@ -542,7 +545,7 @@ df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
 # save this as the master dataframe  --------------------------------------
 # use this datafram to perform all operations below in quarto
 # ask Charlotte to check steps above (lines 986 to 1121)
-write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
+write.csv(df_long_for_metan, "df_long_for_metan.csv", row.names = F)
 
 
 ########### simulate so that each study has a value from a distribution of 
@@ -554,7 +557,7 @@ write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
 
 # Use the function I have created for this
 
-df_long_for_metan <- read.csv("df_long_for_metan") 
+df_long_for_metan <- read.csv("df_long_for_metan.csv") 
 
 
 list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan, 
@@ -626,7 +629,7 @@ We present our main results as means of the estimates across simulated datasets,
 
 Studies included in the metaregression.
 
-The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it-->
+The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it. CB - I'm not sure I entirely understand. df_long_for_metan is already quite succinct (6 columns). I wonder if you are thinking of df_appl_v_orange which is more complete and includes means and sds etc. I'd say that's probably more appropriate to make available. I agree we should simplify it down a bit. Happy to do that once you confirm I'm on the right track here. If we decide to format it to be consistent with Cuijpers' data, we would have one row per comparison, rather than the long format we have in df_long_for_metan. -->
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # library(tidyverse)
@@ -700,6 +703,7 @@ for(i in 1: length(list_df_simulated)){
 # count the number of studies
 n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) # CHARLOTTE please check
 df_count_studies <- count_studies(df_long_for_metan) # CHARLOTTE please check
+# CB checked both, both correct.
 
 
 # specify model
@@ -744,7 +748,7 @@ for(i in 1: length(list_df_simulated)){
 
 # count the number of studies
 study_count_cbt_fluox_esc_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cbt_fluox_esc_study_ids,])
-# CHARLOTTE please check
+# CHARLOTTE please check. CB - checked and correct.
 
 
 
@@ -791,6 +795,7 @@ for(i in 1: length(list_df_simulated)){
 # count studies 
 study_count_no_wl_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_ids,])
 # CHARLOTTE please check
+# CB checked and correct
 
 
 # use this model as above
@@ -823,18 +828,55 @@ coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_
 # here are all three of them OVERALL, CBT and WL together. We may want to display them together. 
 # df_all_coefficients <- cbind(df_mean_coefs_from_sim, coef_and_se_means_cbt_fluox_esc_study,coef_and_se_means_no_wl)
 
+# D. CDRS Sensitivity Analysis ---------------------------------------
+
+cdrs_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$instrument_name == "cdrs",]$new_study_id
+
+# use those ids to subset all dataframes in the list
+list_cdrs_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+
+  list_cdrs_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                          %in% cdrs_study_ids,]
+
+}
+
+# count the number of studies
+study_count_cdrs_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cdrs_study_ids,])
+
+#CHARLOTTE please check. CB checked, all good. 
+
+# apply the metareg function to the list of cbt, fluox, esc
+model_1 <- as.formula(~ four_level_var)
+list_model_1_cdrs_study <- run_metaregression(list_cdrs_study , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_cdrs_study <-  aggregate_model_results(list_model_1_cdrs_study, condition)
+
+# extract SMDs from the list for cbt fluox escit
+means_cdrs_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_cdrs_study <- calculate_mean_coefs_ses(means_cdrs_study, condition)
+coef_and_se_means_cdrs_study <- data.frame(cbind(condition, coef_and_se_means_cdrs_study))
+
+# add the ns to the dataframe
+coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study$is_missing ==F,]$n
 
 ```
-
 ### Analysis of all studies
 
 #### Number and type of of studies included
 
-In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to compute the SMD was missing and could not be imputed by any of the methods outlined above.
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD was missing and could not be imputed by any of the methods outlined above.
 
-<!--# Charlotte, for the paragraph below, please provide the numbers for each of the numbers wherever I have put an X -->
+<!--# Charlotte, for the paragraph below, please provide the numbers for each of the numbers wherever I have put an X. CB - done. I removed psychodynamic because there weren't any active conditions of this type. -->
 
-Placebo was the control condition for all medication trials; the active arm ranged from serotonin reuptake inhibitors, such as <!--# X -->fluoxetine and <!--# X -->escitalopram, to tricylics, such as <!--# X -->notriptylin. In psychological trials, the control arm included <!--# X -->WL controls, care as usual <!--# X --> and several other conditions such as attention control <!--# X -->; the active arm included CBT <!--# X -->, IPT <!--# X --> and psychodynamic therapy <!--# X --> amongst others. All included trials and the types of treatment controls can be found in Suppelmenateray Table 1.
+Placebo was the control condition for all medication trials; the active arm ranged from serotonin reuptake inhibitors, such as 6 fluoxetine and 2 escitalopram, to tricylics, such as 2 nortriptyline. In psychological trials, the control arm included 14 WL controls, 25 care as usual and several other conditions such as 4 attention control conditions; the active arm included 43 CBT and 8 IPT amongst others. All included trials and the types of treatment controls can be found in Suppelmenateray Table 1.
 
 #### Metaregression analysis.
 
@@ -946,5 +988,93 @@ dev.off()
 
 ![](plot_means_wl.pdf)
 
-```         
+#### Meta-analysis of baseline values
+
+We next conducted a meta-analysis to test for differences in means at baseline.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+# Metanalysis of CDRS at baseline #
+
+df_with_cdrs <-  df_appl_v_orange %>%          
+  filter(instrument_name == "cdrs") 
+
+library(meta)
+means_cdrs_baseline_control <- metamean(n = baseline_n_control,
+                   mean = baseline_mean_control,
+                   sd = baseline_sd_control,
+                   studlab = new_study_id,
+                   data = df_with_cdrs,
+                   sm = "MRAW",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.tau = "REML",
+                   hakn = TRUE,
+                   title = "CDRS Scores at Baseline")
+summary(means_cdrs_baseline_control)
+
+update.meta(means_cdrs_baseline_control, 
+            subgroup = psy_or_med, 
+            tau.common = FALSE)
+
+means_cdrs_baseline_active <- metamean(n = baseline_n_active,
+                                        mean = baseline_mean_active,
+                                        sd = baseline_sd_active,
+                                        studlab = new_study_id,
+                                        data = df_with_cdrs,
+                                        sm = "MRAW",
+                                        fixed = FALSE,
+                                        random = TRUE,
+                                        method.tau = "REML",
+                                        hakn = TRUE,
+                                        title = "CDRS Scores at Baseline")
+summary(means_cdrs_active)
+
+update.meta(means_cdrs_baseline_active, 
+            subgroup = psy_or_med, 
+            tau.common = FALSE)
+
+# Metanalysis of HAMD at baseline #
+df_with_hamd <-  df_appl_v_orange %>%          
+  filter(instrument_name == "hamd") 
+
+library(meta)
+means_hamd_baseline_control <- metamean(n = baseline_n_control,
+                                        mean = baseline_mean_control,
+                                        sd = baseline_sd_control,
+                                        studlab = new_study_id,
+                                        data = df_with_hamd,
+                                        sm = "MRAW",
+                                        fixed = FALSE,
+                                        random = TRUE,
+                                        method.tau = "REML",
+                                        hakn = TRUE,
+                                        title = "HAMD Scores at Baseline")
+summary(means_hamd_baseline_control)
+
+
+update.meta(means_hamd_baseline_control, 
+            subgroup = psy_or_med, 
+            tau.common = FALSE)
+
+
+means_hamd_baseline_active <- metamean(n = baseline_n_active,
+                                       mean = baseline_mean_active,
+                                       sd = baseline_sd_active,
+                                       studlab = new_study_id,
+                                       data = df_with_hamd,
+                                       sm = "MRAW",
+                                       fixed = FALSE,
+                                       random = TRUE,
+                                       method.tau = "REML",
+                                       hakn = TRUE,
+                                       title = "HAMD Scores at Baseline")
+summary(means_hamd_baseline_active)
+
+
+update.meta(means_hamd_baseline_active, 
+            subgroup = psy_or_med, 
+            tau.common = FALSE)
+
+
 ```
