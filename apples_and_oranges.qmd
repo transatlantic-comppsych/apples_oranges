@@ -748,7 +748,7 @@ for(i in 1: length(list_df_simulated)){
 
 # count the number of studies
 study_count_cbt_fluox_esc_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cbt_fluox_esc_study_ids,])
-# CHARLOTTE please check. CB - checked and correct.
+# CHARLOTTE please check. CB - come back to this, possible problem.
 
 
 
@@ -795,7 +795,7 @@ for(i in 1: length(list_df_simulated)){
 # count studies 
 study_count_no_wl_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_ids,])
 # CHARLOTTE please check
-# CB checked and correct
+# CB come back to this, possible problem.
 
 
 # use this model as above
@@ -807,8 +807,6 @@ list_model_1_no_wl <- run_metaregression(list_no_wl , model_1)
 # extract coefficients and model characteristics.
 condition <- levels(list_df_simulated[[1]]$four_level_var)
 aggregate_results_no_wl <-  aggregate_model_results(list_model_1_no_wl, condition)
-
-
 
 
 # now use the function to extract the coefficients
@@ -823,12 +821,51 @@ coef_and_se_means_no_wl <- data.frame(cbind(condition,coef_and_se_means_no_wl))
 coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_missing 
                                                      ==FALSE,]$n
 
+# D. Estimate Means and CIs without WL and CAU --------------------------------------- 
+# grab the ids for no waitlist and cau
+no_wl_or_cau_ids <- df_appl_v_orange[df_appl_v_orange$control_type != "wl" & df_appl_v_orange$control_type != "cau",]$new_study_id
+  
+# use them to loop over the simulated list to subset all the dataframes.
+list_no_wl_or_cau <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+  list_no_wl_or_cau[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                            %in% no_wl_or_cau_ids,]
+  
+}
+
+# count studies 
+study_count_no_wl_or_cau_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_or_cau_ids,])
+# CHARLOTTE please check
+
+# use this model as above
+model_1 <- as.formula(~ four_level_var)
+
+# apply the metareg function to the list of cbt, fluox, esc
+list_model_1_no_wl <- run_metaregression(list_no_wl_or_cau , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_no_wl_or_cau <-  aggregate_model_results(list_model_1_no_wl_or_cau, condition)
+
+# now use the function to extract the coefficients
+means_no_wl_or_cau <-  lapply(list_model_1_no_wl_or_cau, extract_coefficients_func)
+
+# run the mean function for no wl
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the condition argument
+coef_and_se_means_no_wl_or_cau <- calculate_mean_coefs_ses(means_no_wl_or_cau, condition)
+coef_and_se_means_no_wl_or_cau <- data.frame(cbind(condition,coef_and_se_means_no_wl_or_cau))
+
+
+coef_and_se_means_no_wl_or_cau$n <- study_count_no_wl_or_cau_study[study_count_no_wl_or_cau_study$is_missing 
+                                                     ==FALSE,]$n
 
 
 # here are all three of them OVERALL, CBT and WL together. We may want to display them together. 
 # df_all_coefficients <- cbind(df_mean_coefs_from_sim, coef_and_se_means_cbt_fluox_esc_study,coef_and_se_means_no_wl)
 
-# D. CDRS Sensitivity Analysis ---------------------------------------
+# E. CDRS Sensitivity Analysis ---------------------------------------
 
 cdrs_study_ids <-
   df_appl_v_orange[df_appl_v_orange$instrument_name == "cdrs",]$new_study_id
@@ -846,7 +883,7 @@ for(i in 1: length(list_df_simulated)){
 # count the number of studies
 study_count_cdrs_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cdrs_study_ids,])
 
-#CHARLOTTE please check. CB checked, all good. 
+#CHARLOTTE please check. CB - come back to this, possible problem. 
 
 # apply the metareg function to the list of cbt, fluox, esc
 model_1 <- as.formula(~ four_level_var)
