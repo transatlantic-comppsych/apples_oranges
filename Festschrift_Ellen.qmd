@@ -1,0 +1,262 @@
+---
+title: "Fundamental Flaws in the Appraisal of Adolescent Depression Treatment"
+subtitle: "In honour of Dr Ellen Leibenluft"
+author: "Professor Argyris Stringaris, MD, PhD, FRCPsych"
+format: revealjs
+logo: ucl_brain_sciences.png
+fontsize: "22pt"
+include-in-header:
+  - text: |
+      <style>
+      .reveal .slide-logo {
+        max-height: unset;
+        height: 150px;
+      }
+      </style>
+---
+
+## Overview
+
+-   Importance of Adolescent Depression
+
+-   How Do We Treat Adolescent Depression?
+
+-   The Problem With Comparing Treatments
+
+-   Vast Differences in the Control Conditions between Treatment Types.
+
+-   Dubious Control Groups for Psychotherapy
+
+-   Understanding Human Expectations and Psychiatric Treatments
+
+## What I learnt from Ellen
+
+![](ArgyrisandEllen.png)
+
+## What I learnt from Ellen
+
+Ellen,
+
+-   gave meaning to the concept of irritability and more generally that of negative and aggressive **mood**, something with vast public health implications.
+
+-   injected rationality into an extraordinary debate that of the US "Pediatric Bipolar", and curbing excesses that came from very powerful places.
+
+-   is consistently a **Clinical Researcher** with an instinct for what matters to patients and public.
+
+-   worked together with an extraordinary team of people and bringing out the most of each.
+
+-   is an extraordinary writer.
+
+-   has a keen sense and knowledge of history and therefore human fallibility.
+
+## Importance of Adolescent Depression
+
+![](adolescent_mental_health.jpeg){fig-align="left"}
+
+## How Do We Treat Adolescent Depression?
+
+![National Institute of Clinical Excellence Guidelines](NICE_1.png){fig-align="left"}
+
+## How Do We Treat Adolescent Depression
+
+![National Institute of Clinical Excellence Guidelines](NICE_2.png){fig-align="left"}
+
+## How Do We Treat Adolescent Depression
+
+![American Academy of C&A Psychiatry Practice Parameter](AACAP_1.png){fig-align="left"}
+
+## How do We Treat Adolescent Depression
+
+![](AACAP_2.png){fig-align="left"}
+
+## Comparing Treatments
+
+These recommendations are not based on head to head trials between modalities.
+
+-   only one head-to-head trial exists in adolescent depression.
+-   comparisons rely on the comparison of the results of randomised controlled trials (RCTs) of each modality against RCTs of the other.
+-   In other words, they rest on comparison of comparisons.
+
+## Comparing Treatments: Clinical Importance
+
+This has potentially vast implications for the health of the public:
+
+-   As a patient/carer: which treatment should I/my child take?
+
+-   As a health professional: you can take A or/over B
+
+-   As a public health official: doctors should ...
+
+## The Problem With Comparing Treatments
+
+-   In antidepressant studies, the control is the placebo pill
+
+-   In psychotherapy studies controls vary substantially
+
+    What is tested is:
+
+$$Effect_{Med} = Effect_{Psy}$$
+
+where *Effect* denotes the effect on depression that either medication (*Med* ) or psychotherapy (*Psy*) have.
+
+## The Problem With Comparing Treatments
+
+In particular, it relies on the equality of controls:
+
+$$Effect_{MedActive} - Effect_{MedControls} = Effect_{PsyActive} - Effect_{PsyControls}$$
+
+or:
+
+$$ Effect_{MedControls} = Effect_{PsyControls}$$
+
+## The Problem with Comparing Treatments
+
+![](appendicitis.png){fig-align="left" width="340"}
+
+Compare: antibiotics vs surgery:
+
+-   Antibiotics improvement rate: 40% on active; 2% on control
+
+-   Surgery improvement rate: 80% on active, 42% on control
+
+## The Problem with Comparing Treatments
+
+Compare: antibiotics vs surgery:
+
+-   Antibiotics improvement rate: 40% on active; 0% on control
+
+-   Surgery improvement rate: 80% on active, 40% on control
+
+Would you tell your patient that these are equally good treatments?
+
+## Comparing Treatments: Mechanistic Implications
+
+If there is variability in control arms, then:
+
+-   is it random?
+
+-   does it tell us something about how treatments work? e.g. :
+
+    -   what are the psychological mechanisms of placebo?
+
+    -   why would people find other control groups unfavourable?
+
+-   more generally, what is an appropriate counterfactual to treatment?
+
+## Assessing Treatment Comparisons: Methods
+
+-   Extracted baseline and follow up means and sds for each study (where available) from all randomised controlled trials (RCTs) in adolescent depression using medication or psychotherapy.
+
+-   Estimated Standardised Mean Differences (SMD) for each study.
+
+    $$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\  $$
+
+## Assessing Treatment Comparisons: Methods
+
+We also needed the estimation of the standard errors. For this we require the test-retest correlation coefficient of the instrument, which is not reported in studies:
+
+$$SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$
+
+We therefore simulated 1000 datasets with correlations coefficients from a broad distribution and used these for our calculations–the magnitude of $r_{t_{1}t_{2}}$ made very little difference to results.
+
+## Assessing Treatment Comparisons: Methods
+
+Random Effects Meta-Regression
+
+$$Y_i = x_i\beta_i + u_i + \epsilon_i$$
+
+where
+
+$$ \begin{aligned}
+    Υ_i &=
+    \begin{cases}
+        0 & MedControl:  b_0 + u_i + \epsilon_i\\
+        1 & MedActive:   b_0 + b_{1_{i}} +  u_i + \epsilon_i \\
+        2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
+        3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
+    \end{cases}
+\end{aligned}$$
+
+## Assessing Treatment Comparisons: Results					
+
+There were 81 studies in total
+
+-   antidepressants: 28 active arms and 25 control arms of antidepressant trials;
+
+-   psychotherapy: 55 active arms and 52 control arms from psychotherapy trials.
+
+-   Placebo was the control condition for all medication trials
+
+-   WL controls, care as usual and several other conditions such as attention control for psychotherapy
+
+## Assessing Treatment Comparisons: SMDs overall
+
+![](plot_means_all.png){fig-align="left"}
+
+## Assessing Treatment Comparisons: SMDs CBT and SRI only
+
+![](plot_means_cbt.png){fig-align="left"}
+
+## Assessing Treatment Comparisons: SMDs no waitlist
+
+![](plot_means_wl.png){fig-align="left"}
+
+## Assessing Treatment Comparisons: differences
+
+![](coef_pic.png){fig-align="left" width="361"}
+
+## What were the controls? 
+
+-   Mostly waitlist (WL) and care-as-usual (CAU).
+
+-   Others were attention controls, which were typically poorly matched to active groups.
+
+-   Often information was missing on key variables.
+
+## What is a good control? 
+
+Controls should serve as counterfactuals: what would an individual look like if they did not receive treatment?
+
+There should be a **latent true value** of what an individual would look like had they not received the treatment.
+
+## What is a good control? 
+
+A good control is crucially **ΝΟΤ** being told that you were allocated to:
+
+-   simply waiting (WL control)
+
+-   getting what they would have gotten anyway (CAU control), which is heterogeneous (and in our field sometimes not much at all).
+
+-   receiving a sub-par treatment that the experimenter themselves do not believe in (some ill-designed control).
+
+    All this also whilst **knowing** that someone else (other people in the trial) got the "real thing". This creates negative counterfactual compared to treatment.
+
+## Are there alternative explanations for the finding? 
+
+-   could it be due to different instruments used?
+
+    -   No, even when using common instruments, such as CDRS and HAM-D, the results were the same.
+
+-   could there be more regression to the mean in the medication group.
+
+    -   There could be, the values are higher at baseline in most studies (with common instruments)
+
+    -   But the difference is very large, even when matching studies with the same baseline values.
+
+    -   We are thinking of ways of dealing with this statistically at present.
+
+## Where to next?
+
+At a practical level:
+
+-   change guidelines, at the very least they should be toned down.
+
+-   impose more rigorous controls on psychotherapy studies.
+
+-   actively research the social and neurobiological underpinnings of control conditions. This has to include:
+
+    -   expectancy effects
+
+    -   opportunity cost
+
+-   think about the ethical implications of control groups.
