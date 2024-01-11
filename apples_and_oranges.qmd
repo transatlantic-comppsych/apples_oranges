@@ -124,21 +124,21 @@ NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: 
 
 ### Measures of Effect
 
-As the measure of effect of each individual study, we used the Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as:
+As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following NOTE: **Charlotte** cite Lakens 2013 and in there Cummings 2012, as:
 
-$$\frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-3}
+$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-3}
 
 where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to:
 
-$$ \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-4}
+$$ SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-4}
 
 where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
 In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: <!--# Georgina, I have used the Truncated Normal, we can obviously do sensitivity analyses with other ones -->
 
-$$SE_{change} \sim \mathcal{TN}(\mu, \sigma, a, b)
+$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)
 $$ {#eq-5}
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
@@ -862,7 +862,7 @@ knitr:: kable(df_mean_coefs_from_sim, caption = "Table 1")
 In Table 2, we present the regression that tests our hypothesis about differences between medication and psychotherapy control. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable, including psychotherapy control, are compared. The strongest difference betwen arms, as judged by the z-value, is between the psychotherapy and medication control with a z-value `r round(aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value, 2)` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-knitr:: kable(aggregate_results_overall, caption = "Table 2")
+knitr:: kable(aggregate_results_overall, caption = "Table 2", digits = 2)
 ```
 
 ### Sensitivity Analyses
