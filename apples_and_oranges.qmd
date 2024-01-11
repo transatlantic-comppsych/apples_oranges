@@ -694,7 +694,8 @@ for(i in 1: length(list_df_simulated)){
 # A) the overall sample
 # B) the CBT vs Fluox and Escitalopram sample
 # C) the no WL sample
-
+# D) the no WL or CAU sample
+# E) the CDRS only sample
 
 
 # A. Estimate Means and CIs for the overall ----------------------------------
