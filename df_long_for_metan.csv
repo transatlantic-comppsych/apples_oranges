@@ -1,0 +1,182 @@
+"new_study_id","treatment","psy_or_med","baseline_n","arm_effect_size","cohens_d"
+"Ackerson, 1998","cbt",1,12,"cohens_d_active",-2.05555555555555
+"Arnarson, 2009","cbt",1,NA,"cohens_d_active",NA
+"Asarnow, 2002","cbt + family education",1,NA,"cohens_d_active",NA
+"Atkinson, 2014","Duloxetine",0,117,"cohens_d_active",-2.30476190476191
+"Atkinson, 2014","Fluoxetine",0,117,"cohens_d_active",-2.18867924528302
+"Berard, 2006","Paroxetine",0,182,"cohens_d_active",-2.01481481481481
+"Bolton, 2007","ipt",1,105,"cohens_d_active",-1.15018315018315
+"Bristol-Myers Squibb, 2002a","Nefazodone",0,NA,"cohens_d_active",NA
+"Bristol-Myers Squibb, 2002b","Nefazodone",0,90,"cohens_d_active",-2.25500285877644
+"Charkhandeh, 2016","cbt",1,65,"cohens_d_active",-1.72151898734177
+"Clarke, 1995","cbt+cau",1,55,"cohens_d_active",-0.589473684210526
+"Clarke, 1999","cbt + parenting group",1,32,"cohens_d_active",-1.2824427480916
+"Clarke, 1999","cbt",1,37,"cohens_d_active",-1.66336633663366
+"Clarke, 2001","cbt + cau",1,45,"cohens_d_active",-0.509090909090909
+"Clarke, 2002","cbt + cau",1,41,"cohens_d_active",-1.23809523809524
+"De Cuyper, 2004","cbt",1,9,"cohens_d_active",-0.425602660016625
+"De Jonge-Heesen, 2020","cbt",1,66,"cohens_d_active",-0.477064220183486
+"Diamond, 2002","abft (attachment based family therapy)",1,16,"cohens_d_active",-1.48148148148148
+"Diamond, 2010","Attachment-Based Family Therapy",1,35,"cohens_d_active",-1.73322005097706
+"Emslie, 1997","Fluoxetine",0,48,"cohens_d_active",-1.58893280632411
+"Emslie, 2002a","Fluoxetine",0,109,"cohens_d_active",-1.88034188034188
+"Emslie, 2002b","Nefazodone",0,99,"cohens_d_active",NA
+"Emslie, 2006","Paroxetine",0,101,"cohens_d_active",-2.40981856990395
+"Emslie, 2007a","Venlafaxine",0,80,"cohens_d_active",-1.37225170583776
+"Emslie, 2007b","Venlafaxine",0,102,"cohens_d_active",-1.88361408882083
+"Emslie, 2009","Escitalopram",0,154,"cohens_d_active",-2.6984126984127
+"Emslie, 2014","Duloxetine",0,108,"cohens_d_active",-2.22935779816514
+"Emslie, 2014","Fluoxetine",0,117,"cohens_d_active",-2.12871287128713
+"Esposito-Smythers, 2019","cbt",1,74,"cohens_d_active",-1.53333333333333
+"Findling, 2009","Fluoxetine",0,18,"cohens_d_active",-1.56595744680851
+"Fristad, 2019","cbt + placebo",1,19,"cohens_d_active",-1.33333333333333
+"Geller, 1990","Nortriptyline",0,12,"cohens_d_active",-2.72131147540984
+"Geller, 1992","Nortriptyline",0,26,"cohens_d_active",-2.17948717948718
+"Gillham, 2006","cbt",1,147,"cohens_d_active",-0.204744069912609
+"Hughes, 1990","Imipramine",0,NA,"cohens_d_active",NA
+"Idsoe, 2019","cbt",1,133,"cohens_d_active",-0.571821936668196
+"Israel, 2013","abft (attachment based family therapy)",1,11,"cohens_d_active",-1.3728813559322
+"Kahn, 1990","cbt",1,17,"cohens_d_active",-0.630075386853591
+"Kahn, 1990","self-modeling",1,17,"cohens_d_active",-1.78712220762155
+"Keller, 2001","Imipramine",0,95,"cohens_d_active",-1.48006644518272
+"Keller, 2001","Paroxetine",0,93,"cohens_d_active",-1.81572273879966
+"Klein, 1998","Desipramine",0,23,"cohens_d_active",-3.86551724137931
+"Kutcher, 1994","Desipramine",0,30,"cohens_d_active",-1.43682310469314
+"Kye, 1996","Amitriptyline",0,18,"cohens_d_active",-0.851063829787234
+"Lewinsohn, 1990","cwb adolescents + parents",1,19,"cohens_d_active",-1.48792756539235
+"Lewinsohn, 1990","cwb adolescents only",1,21,"cohens_d_active",-1.00387096774194
+"Liddle, 1990","cbt (social competence training)",1,11,"cohens_d_active",-1.17068811438785
+"Liddle, 1990","cbt",1,11,"cohens_d_active",-1.17068811438785
+"Listug-Lunde, 2013","cwd",1,8,"cohens_d_active",-0.869908015768725
+"Luby, 2012","PCIT-ED intervention (Parent-Child Interaction Therapy Emotion Development)",1,25,"cohens_d_active",-1.48538011695906
+"Makover, 2019","The High School Transition Program (HSTP)",1,NA,"cohens_d_active",NA
+"March, 2004","cbt",1,111,"cohens_d_active",-2.56642335766423
+"March, 2004","Fluoxetine",0,109,"cohens_d_active",-3.7175697865353
+"Martinovic, 2006","cbt",1,16,"cohens_d_active",-2.48803827751196
+"Moeini, 2019","DAD (Dorehye Amozeshie Dokhtaran)",1,64,"cohens_d_active",-0.474708171206226
+"Mufson, 1999","ipt",1,24,"cohens_d_active",-1.69736842105263
+"Mufson, 2004","ipt",1,34,"cohens_d_active",-1.46762589928058
+"Organon, 2002a","Mirtazapine",0,82,"cohens_d_active",-1.54059462550029
+"Organon, 2002b","Mirtazapine",0,85,"cohens_d_active",-1.31023441966838
+"Paxil (GlaxoSmithKline), 2009","Paroxetine",0,29,"cohens_d_active",NA
+"Puig-Antich, 1987","Imipramine",0,20,"cohens_d_active",-2.16216216216216
+"Reynolds, 1986","cbt",1,9,"cohens_d_active",-2.70642201834862
+"Rohde, 2004","cbt",1,45,"cohens_d_active",-1.42608695652174
+"Rohde, 2014a","cognitive behavioral intervention (CB)",1,126,"cohens_d_active",0.0895522388059696
+"Rossello, 1999","cbt",1,25,"cohens_d_active",-0.93956043956044
+"Rossello, 1999","ipt",1,23,"cohens_d_active",-1.48433048433048
+"Sanford, 2006","Family Psychoeducation (FPE) + cau",1,16,"cohens_d_active",NA
+"Santomauro, 2016","cbt",1,11,"cohens_d_active",-0.78125
+"Shomaker, 2016","cbt",1,61,"cohens_d_active",-1.63013698630137
+"Srivastava, 2020","cCBT",1,11,"cohens_d_active",-4.76923076923077
+"Stallard, 2012","cbt",1,392,"cohens_d_active",-0.426056338028169
+"Stark, 1987","pst",1,10,"cohens_d_active",-1.14742014742015
+"Stark, 1987","self control",1,9,"cohens_d_active",-2.25
+"Stice, 2008","cbt based bibliotherapy",1,80,"cohens_d_active",-0.478497880072683
+"Stice, 2008","cbt",1,89,"cohens_d_active",-0.95513151108819
+"Stice, 2008","sup",1,88,"cohens_d_active",-0.547677261613692
+"Stikkelbroek, 2020","cbt",1,NA,"cohens_d_active",NA
+"Szigethy, 2007","cbt",1,22,"cohens_d_active",-1.59574468085106
+"Tang, 2009","Intensive Interpersonal Psychotherapy for depressed adolescents with suicidal risk (IPT-A-IN)",1,35,"cohens_d_active",-1.02586903799515
+"Topooco, 2018","cbt",1,33,"cohens_d_active",-1.59036144578313
+"Topooco, 2019","icbt",1,35,"cohens_d_active",-1.46478873239437
+"Von Knorring, 2006","Citalopram",0,124,"cohens_d_active",-2.19818181818182
+"Vostanis, 1996","cbt",1,29,"cohens_d_active",-1.81609195402299
+"Wagner, 2003","Sertraline",0,189,"cohens_d_active",-2.07636363636364
+"Wagner, 2004","Citalopram",0,89,"cohens_d_active",-1.99082568807339
+"Wagner, 2006","Escitalopram",0,131,"cohens_d_active",-2.12864493996569
+"Weisz, 1997","cbt",1,16,"cohens_d_active",-0.897655377744697
+"Weisz, 2009","cbt",1,32,"cohens_d_active",-0.404778636683064
+"Wood, 1996","cbt",1,24,"cohens_d_active",-1.07920792079208
+"Young, 2006","ipt",1,27,"cohens_d_active",-3.02564102564103
+"Young, 2010","Interpersonal Psychotherapy-Adolescent Skills Training (IPT-AST)",1,NA,"cohens_d_active",NA
+"Young, 2016","Interpersonal Psychotherapy-Adolescent Skills Training (IPT-AST)",1,95,"cohens_d_active",-0.513750731421884
+"Yu, 2002","cbt",1,104,"cohens_d_active",-0.411255411255411
+"Ackerson, 1998","wl",1,10,"cohens_d_control",-0.119047619047619
+"Arnarson, 2009","cau",1,NA,"cohens_d_control",NA
+"Asarnow, 2002","wl",1,NA,"cohens_d_control",NA
+"Atkinson, 2014","Placebo",0,103,"cohens_d_control",-2.15384615384615
+"Berard, 2006","Placebo",0,93,"cohens_d_control",-2.21070811744387
+"Bolton, 2007","other ctr",1,105,"cohens_d_control",-0.267657992565056
+"Bolton, 2007","wl",1,104,"cohens_d_control",-0.51685393258427
+"Bristol-Myers Squibb, 2002a","Placebo",0,NA,"cohens_d_control",NA
+"Bristol-Myers Squibb, 2002b","Placebo",0,93,"cohens_d_control",-2.09804593760713
+"Charkhandeh, 2016","other ctr",1,63,"cohens_d_control",-0.652444444444445
+"Charkhandeh, 2016","wl",1,60,"cohens_d_control",0.00593471810088973
+"Clarke, 1995","cau",1,70,"cohens_d_control",-0.256756756756757
+"Clarke, 1999","wl",1,27,"cohens_d_control",-1.05426356589147
+"Clarke, 2001","cau",1,49,"cohens_d_control",-0.0512820512820513
+"Clarke, 2002","cau",1,47,"cohens_d_control",-1.06930693069307
+"De Cuyper, 2004","wl",1,11,"cohens_d_control",-0.694117647058823
+"De Jonge-Heesen, 2020","other ctr",1,64,"cohens_d_control",-0.120198265179678
+"Diamond, 2002","wl",1,16,"cohens_d_control",-1.04395604395604
+"Diamond, 2010","cau",1,31,"cohens_d_control",-1.14715189873418
+"Emslie, 1997","Placebo",0,48,"cohens_d_control",-0.766423357664234
+"Emslie, 2002a","Placebo",0,110,"cohens_d_control",-1.17786561264822
+"Emslie, 2002b","Placebo",0,96,"cohens_d_control",NA
+"Emslie, 2006","Placebo",0,102,"cohens_d_control",-2.609375
+"Emslie, 2007a","Placebo",0,85,"cohens_d_control",-1.25585023400936
+"Emslie, 2007b","Placebo",0,94,"cohens_d_control",-1.69769173492182
+"Emslie, 2009","Placebo",0,157,"cohens_d_control",-2.273276904474
+"Emslie, 2014","Placebo",0,122,"cohens_d_control",-2.21276595744681
+"Esposito-Smythers, 2019","cau",1,73,"cohens_d_control",-1.31578947368421
+"Findling, 2009","Placebo",0,16,"cohens_d_control",-1.92431972789116
+"Fristad, 2019","other ctr",1,18,"cohens_d_control",-1.08333333333333
+"Geller, 1990","Placebo",0,19,"cohens_d_control",-2.28125
+"Geller, 1992","Placebo",0,24,"cohens_d_control",-2.44444444444444
+"Gillham, 2006","cau",1,124,"cohens_d_control",-0.159256801592568
+"Hughes, 1990","Placebo",0,NA,"cohens_d_control",NA
+"Idsoe, 2019","cau",1,95,"cohens_d_control",-0.239766081871345
+"Israel, 2013","cau",1,9,"cohens_d_control",-0.0560747663551403
+"Kahn, 1990","other ctr",1,17,"cohens_d_control",-1.30547818012999
+"Kahn, 1990","wl",1,17,"cohens_d_control",-0.0890302066772653
+"Keller, 2001","Placebo",0,87,"cohens_d_control",-1.53547297297297
+"Klein, 1998","Placebo",0,22,"cohens_d_control",-1.84109589041096
+"Kutcher, 1994","Placebo",0,30,"cohens_d_control",-1.50655021834061
+"Kye, 1996","Placebo",0,13,"cohens_d_control",-1.02325581395349
+"Lewinsohn, 1990","wl",1,19,"cohens_d_control",-0.310456011054814
+"Liddle, 1990","other ctr",1,10,"cohens_d_control",-0.53715308863026
+"Liddle, 1990","wl",1,10,"cohens_d_control",-0.750246791707799
+"Listug-Lunde, 2013","cau",1,8,"cohens_d_control",-1.01932712956335
+"Luby, 2012","other ctr",1,18,"cohens_d_control",-0.583732057416267
+"Makover, 2019","cau",1,NA,"cohens_d_control",NA
+"March, 2004",NA,1,NA,"cohens_d_control",NA
+"March, 2004","Placebo",0,112,"cohens_d_control",-3.16639477977161
+"Martinovic, 2006","cau",1,16,"cohens_d_control",0.0746268656716415
+"Moeini, 2019","cau",1,64,"cohens_d_control",-0.0656934306569345
+"Mufson, 1999","other ctr",1,24,"cohens_d_control",-0.788571428571428
+"Mufson, 2004","cau",1,29,"cohens_d_control",-0.82089552238806
+"Organon, 2002a","Placebo",0,44,"cohens_d_control",-1.42686550108559
+"Organon, 2002b","Placebo",0,45,"cohens_d_control",-0.855730773625871
+"Paxil (GlaxoSmithKline), 2009","Placebo",0,27,"cohens_d_control",NA
+"Puig-Antich, 1987","Placebo",0,22,"cohens_d_control",-1.44736842105263
+"Reynolds, 1986","other ctr",1,11,"cohens_d_control",-2.18532818532819
+"Reynolds, 1986","wl",1,10,"cohens_d_control",0.184313725490196
+"Rohde, 2004","other ctr",1,48,"cohens_d_control",0.393162393162393
+"Rohde, 2014a","other ctr",1,124,"cohens_d_control",0.311688311688312
+"Rossello, 1999","wl",1,23,"cohens_d_control",-0.670826833073323
+"Sanford, 2006","cau",1,15,"cohens_d_control",NA
+"Santomauro, 2016","wl",1,12,"cohens_d_control",0.20610349402919
+"Shomaker, 2016","other ctr",1,58,"cohens_d_control",-1.42666666666667
+"Srivastava, 2020","cau",1,10,"cohens_d_control",-3.29770992366412
+"Stallard, 2012","other ctr",1,374,"cohens_d_control",-0.398104265402843
+"Stallard, 2012","cau",1,298,"cohens_d_control",-0.705550329256821
+"Stark, 1987","wl",1,9,"cohens_d_control",-0.349079263410729
+"Stice, 2008","cau",1,84,"cohens_d_control",-0.304691618344755
+"Stikkelbroek, 2020","cau",1,NA,"cohens_d_control",NA
+"Szigethy, 2007","cau",1,19,"cohens_d_control",-0.53125
+"Tang, 2009","cau",1,38,"cohens_d_control",-0.0714630613230325
+"Topooco, 2018","other ctr",1,37,"cohens_d_control",-0.788888888888889
+"Topooco, 2019","other ctr",1,35,"cohens_d_control",-0.437158469945355
+"Von Knorring, 2006","Placebo",0,120,"cohens_d_control",-2.16545454545455
+"Vostanis, 1996","other ctr",1,28,"cohens_d_control",-0.675496688741722
+"Wagner, 2003","Placebo",0,187,"cohens_d_control",-1.83545454545455
+"Wagner, 2004","Placebo",0,85,"cohens_d_control",-1.48648648648649
+"Wagner, 2006","Placebo",0,133,"cohens_d_control",-1.96206147868815
+"Weisz, 1997","cau",1,32,"cohens_d_control",-0.311594202898551
+"Weisz, 2009","cau",1,25,"cohens_d_control",-0.344532681734881
+"Wood, 1996","other ctr",1,24,"cohens_d_control",-0.714859437751004
+"Young, 2006","other ctr",1,14,"cohens_d_control",-1.16959064327485
+"Young, 2010","cau",1,NA,"cohens_d_control",NA
+"Young, 2016","other ctr",1,91,"cohens_d_control",-0.273284997211378
+"Yu, 2002","cau",1,116,"cohens_d_control",-0.0719794344473007
