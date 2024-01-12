@@ -470,20 +470,38 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
   group_by(new_study_id) %>% 
   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
 
+# Here I am creating a new column for df_long_for_metan, to be able to identify which studies featured a condition of interest. 
+# for CBT, fluox, esc
+cbt_fluox_esc_study_ids <- df_with_distinct_instruments %>%
+  filter(active_type %in% c("cbt", "Fluoxetine", "Escitalopram")) %>%
+  pull(new_study_id)
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key1 = ifelse(new_study_id %in% cbt_fluox_esc_study_ids, 1, NA))
+
+# for wl 
+wl_study_ids <- df_with_distinct_instruments %>%
+  filter(control_type == "wl") %>%
+  pull(new_study_id)
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key2 = ifelse(new_study_id %in% wl_study_ids, 2, NA))
+
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key = paste(key1, key2, sep = "_"))
+
+
 # Step 2: turn dataframes to long
 # A: turn long the rows with active
 active_df <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
+  dplyr:: select(new_study_id, key, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
                  baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active) %>% 
   rename(treatment = descr_active) %>% 
   rename_with(~ str_remove(., "_active")) %>% 
   mutate(arm_effect_size = "cohens_d_active") %>% # chose this clunky name because I had used this variable name in previous code and don't want to bread the rest
   group_by(new_study_id) %>% #go through each study id and remove duplicates
   distinct(treatment, .keep_all = TRUE)
-         
 
 control_df <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
+  dplyr:: select(new_study_id, key, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
                  baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control) %>% 
   rename(treatment = descr_control) %>% 
   rename_with(~ str_remove(., "_control")) %>% 
