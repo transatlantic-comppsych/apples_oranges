@@ -458,8 +458,12 @@ df_appl_v_orange  <- df_appl_v_orange  %>%
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
                                   .default = study ))
 
+# We are going to use the descr_active and descr_control columns rather than active_type and control_type columns, as these have unique values for each study. However the descr columns are empty for med studies, so I'm going to paste values across to fix this error.
 df_appl_v_orange <- df_appl_v_orange %>% 
   mutate(descr_active = if_else(is.na(descr_active ), active_type , descr_active ))
+
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(descr_control = if_else(is.na(descr_control), control_type, descr_control ))
 
 # Step 1: keep only the rows with the top instrument in our hierarchy
 df_with_distinct_instruments <-  df_appl_v_orange %>%          
@@ -488,6 +492,11 @@ control_df <- df_with_distinct_instruments %>%
   distinct(treatment, .keep_all = TRUE) 
 
 df_long_for_metan <- rbind(active_df, control_df)
+
+# I'm going to remove the March / TADS psy control row. It is currently filled with NAs which implies missing data, however it is actually the case that this condition doesn't exist. 
+
+df_long_for_metan <- df_long_for_metan %>%
+  filter(!(new_study_id == "March, 2004" & is.na(treatment)))
 
 #dim(df_long_for_metan ) #check dimension
 #make sure no study lost
@@ -637,7 +646,7 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 # count studies
 # count the number of studies
 n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) # CHARLOTTE please check
-df_count_studies <- count_studies(df_long_for_metan) # CHARLOTTE please check
+df_count_studies <- count_studies(df_long_for_metan ) # CHARLOTTE please check
 # CB checked both, both correct.
 
 
