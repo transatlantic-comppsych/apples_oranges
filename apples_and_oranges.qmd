@@ -118,7 +118,7 @@ We then go on to examine the control arms of psychological treatments in both a 
 
 ## Studies included
 
-For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from Cuijpers' (2023) systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions. Cuijpers made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to Cuijpers' (2023) meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers' (2023) literature search. 
+For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from Cuijpers' (2023) systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions. Cuijpers made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to Cuijpers' (2023) meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers' (2023) literature search.
 
 Medication studies were drawn from Cipriani's (2016) network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive any responses. **Yet to do** We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers' (2023) review to ensure we analysed an equivalently up-to-date database of medication trials. We used the same search terms outlined in Cipriani (2016).
 
@@ -393,6 +393,43 @@ plot_means_function <- function(dataframe, subtitle) {
   return(plot_means)
 }
 
+###########7. Function for baseline SMD results
+library(broom)
+run_metareg_and_extract <- function(dataframe, model_1, condition) {
+  # Run metareg
+  inst_baseline_metareg <- rma(yi = baseline_mean,
+                               sei = baseline_stand_error,
+                               data = dataframe,
+                               method = "ML",
+                               mods = model_1,
+                               test = "knha")
+  
+  # Extract coefficients from the list
+  baseline_metareg_results <- tidy(inst_baseline_metareg)
+  baseline_metareg_results$condition <- condition
+  coefs_for_inst_baseline <- tidy(inst_baseline_metareg)$estimate
+  
+  # Calculate SMDs
+  smds_for_inst_baseline <- c(coefs_for_inst_baseline[1], coefs_for_inst_baseline[-1] + coefs_for_inst_baseline[1])
+  
+  # Calculate upper and lower CIs
+  upper_cis_for_inst_baseline <- smds_for_inst_baseline + 1.96 * tidy(inst_baseline_metareg)$std.error
+  lower_cis_for_inst_baseline <- smds_for_inst_baseline - 1.96 * tidy(inst_baseline_metareg)$std.error
+  
+  # Create dataframe with results
+  df_baseline_means_with_cis <- data.frame(
+    baseline_smds = smds_for_inst_baseline,
+    upper_cis_smds = upper_cis_for_inst_baseline,
+    lower_cis_smds = lower_cis_for_inst_baseline,
+    condition = condition
+  )
+  
+  # Return the two dataframes
+  return(list(baseline_metareg_results = baseline_metareg_results, df_baseline_means_with_cis = df_baseline_means_with_cis))
+}
+
+
+
 
 ```
 
@@ -611,12 +648,54 @@ We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adju
 
 We present our main results as means of the estimates across simulated datasets, for example, the SMDs of each level of the dummy variable above are means across the simulations.
 
+### Sensitivity Analyses
+
+We conducted a number of additional analyses to test for the robustness of our results.
+
+First, we tested whether the simulated values for the standard error had a substantial influence on the estimation of the differences between the medication vs psychotherapy control condition. To inspect whether this is the case, we plotted the z-value of the difference between the two coefficients against the number of simulations. We make inference on the stability of the difference, by counting the proportion of times that the z-value is above the
+
+```{r, warning=FALSE, message = FALSE, echo = FALSE}
+# my alpha for the z 
+target_probability <- 1 - 0.05
+
+#start here 
+x <- 1
+
+# two decimals should be fine
+tolerance <- 1e-3
+
+#find the z value using the pnorm function
+while (abs(pnorm(x)) < target_probability ) {
+  x <- x + tolerance  
+}
+
+# Adjust the step size based on your problem  
+cat("critical value of z =", x, "corresponding to an alpha = 0.05." , "\n")
+
+```
+
+
+Second, we restricted the metaregression to studies using CBT and the FDA-approved antidepressants fluoxetine and escitalopram.
+
+Third, we restricted the metaregression to studies that *did not* use waitlist as their control.
+
+Fourth, we tested whether our results could be accounted for by differential regression to the mean. In an initial step, we tested in metaregression as above for differences in baseline means for those medication and psychotherapy studies that shared the same instruments. We then accounted for the effect that possible differing baseline values across all studies studies' outcomes by regressing the SMDs of studies on their respective baseline values of the instrument with which the SMD was calculated. For example, in a study that used the CDRS, this was used to calculate the SMD. This SMD was then used as the outcome and the baseline value of the CDRS, termed *BaselineScore* below, in that study was used as the independent variable as follows: $$
+SMD = \beta_0 + \beta_1 BaselineScore + \epsilon
+$$ {#eq-12}
+
+This allows us to estimate the effect of the baseline score on the SMD by evaluating $\beta_1$. We can then re-arrange Equation 12 to extract the residuals, that is, the variability in the SMD that is not accounted for by the baseline score.
+
+$$
+\epsilon = SMD - (\beta_0 + \beta_1 BaselineScore) ) \
+$$
+
+where, $\epsilon$ is the adjusted SMD, for which we simulated standard errors and then used it the outcome in metaregression, as described above for the unadjusted SMDs.
+
 # Results
 
 Studies included in the metaregression.
 
 The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it. CB - I'm not sure I entirely understand. df_long_for_metan is already quite succinct (6 columns). I wonder if you are thinking of df_appl_v_orange which is more complete and includes means and sds etc. I'd say that's probably more appropriate to make available. I agree we should simplify it down a bit. Happy to do that once you confirm I'm on the right track here. If we decide to format it to be consistent with Cuijpers' data, we would have one row per comparison, rather than the long format we have in df_long_for_metan. -->
-
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Get Ns, run metareg, prepare graphing ------------------------------------------------------
@@ -868,6 +947,7 @@ coef_and_se_means_cdrs_study <- data.frame(cbind(condition, coef_and_se_means_cd
 coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study$is_missing ==F,]$n
 
 ```
+
 ### Analysis of all studies
 
 #### Number and type of of studies included
@@ -920,8 +1000,8 @@ It could be argued that the choice of standard errors of the changes for the cal
 # examine the stability of the simulations
 
 z_psy_con_vs_med_con <- 0
-for(i in 1: length(list_model_1_no_wl)){
-z_psy_con_vs_med_con[i] <- list_model_1_no_wl[[i]]$zval[condition=="psychotherapy_control"]
+for(i in 1: length(list_model_1_meta_reg)){
+z_psy_con_vs_med_con[i] <- list_model_1_meta_reg[[i]]$zval[condition=="psychotherapy_control"]
 
 }
 
@@ -990,93 +1070,199 @@ dev.off()
 
 ![](plot_means_wl.pdf)
 
-#### Meta-analysis of baseline values
+#### Addressing Regression to the Mean
 
-We next conducted a meta-analysis to test for differences in means at baseline.
+We first conducted a meta-analysis to test for differences in means at baseline in the two instruments, CDRS-R and HAM-D on which there was a sufficient number of studies to metanalyse.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
-# Metanalysis of CDRS at baseline #
+### get CDRS studies
+cdrs_studies_for_baseline_metareg <- list_cdrs_study[[1]] # created this above, you can take any of these, as the means and sds are repeated.
 
-df_with_cdrs <-  df_appl_v_orange %>%          
-  filter(instrument_name == "cdrs") 
+#turn sds to sec
+cdrs_studies_for_baseline_metareg$baseline_stand_error <- cdrs_studies_for_baseline_metareg$baseline_sd/
+                                        sqrt(cdrs_studies_for_baseline_metareg$baseline_n)
 
-library(meta)
-means_cdrs_baseline_control <- metamean(n = baseline_n_control,
-                   mean = baseline_mean_control,
-                   sd = baseline_sd_control,
-                   studlab = new_study_id,
-                   data = df_with_cdrs,
-                   sm = "MRAW",
-                   fixed = FALSE,
-                   random = TRUE,
-                   method.tau = "REML",
-                   hakn = TRUE,
-                   title = "CDRS Scores at Baseline")
-summary(means_cdrs_baseline_control)
+model_1 <- as.formula(~ four_level_var)
+condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+                                                              #throughout
 
-subgroup_cdrs_baseline_control <- update.meta(means_cdrs_baseline_control, 
-            subgroup = psy_or_med, 
-            tau.common = FALSE)
-
-means_cdrs_baseline_active <- metamean(n = baseline_n_active,
-                                        mean = baseline_mean_active,
-                                        sd = baseline_sd_active,
-                                        studlab = new_study_id,
-                                        data = df_with_cdrs,
-                                        sm = "MRAW",
-                                        fixed = FALSE,
-                                        random = TRUE,
-                                        method.tau = "REML",
-                                        hakn = TRUE,
-                                        title = "CDRS Scores at Baseline")
-#summary(means_cdrs_baseline_active)
-
-subgroup_cdrs_baseline_active <- update.meta(means_cdrs_baseline_active, 
-            subgroup = psy_or_med, 
-            tau.common = FALSE)
-
-# Metanalysis of HAMD at baseline #
-df_with_hamd <-  df_appl_v_orange %>%          
-  filter(instrument_name == "hamd") 
-
-library(meta)
-means_hamd_baseline_control <- metamean(n = baseline_n_control,
-                                        mean = baseline_mean_control,
-                                        sd = baseline_sd_control,
-                                        studlab = new_study_id,
-                                        data = df_with_hamd,
-                                        sm = "MRAW",
-                                        fixed = FALSE,
-                                        random = TRUE,
-                                        method.tau = "REML",
-                                        hakn = TRUE,
-                                        title = "HAMD Scores at Baseline")
-#summary(means_hamd_baseline_control)
+results_cdrs_metareg_baseline <- run_metareg_and_extract(cdrs_studies_for_baseline_metareg,  
+                                                         model_1, condition)
 
 
-subgroup_hamd_baseline_control <- update.meta(means_hamd_baseline_control, 
-            subgroup = psy_or_med, 
-            tau.common = FALSE)
+### get HAM-D studies
+hamd_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
 
 
-means_hamd_baseline_active <- metamean(n = baseline_n_active,
-                                       mean = baseline_mean_active,
-                                       sd = baseline_sd_active,
-                                       studlab = new_study_id,
-                                       data = df_with_hamd,
-                                       sm = "MRAW",
-                                       fixed = FALSE,
-                                       random = TRUE,
-                                       method.tau = "REML",
-                                       hakn = TRUE,
-                                       title = "HAMD Scores at Baseline")
-#summary(means_hamd_baseline_active)
+
+list_hamd_study <- list_df_simulated[[1]][list_df_simulated[[1]]$new_study_id
+                                                          %in% hamd_study_ids,]
+
+hamd_studies_for_baseline_metareg <- list_hamd_study # 
+
+#turn sds to sec
+hamd_studies_for_baseline_metareg$baseline_stand_error <- hamd_studies_for_baseline_metareg$baseline_sd/
+                                        sqrt(hamd_studies_for_baseline_metareg$baseline_n)
+
+model_1 <- as.formula(~ four_level_var)
+condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+                                                              #throughout
+results_hamd_metareg_baseline <- run_metareg_and_extract(hamd_studies_for_baseline_metareg, 
+                                                         model_1, condition)
+
+results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_level_var)
 
 
-subgroup_hamd_baseline_active <- update.meta(means_hamd_baseline_active, 
-            subgroup = psy_or_med, 
-            tau.common = FALSE)
+```
+
+As can be seen in Table 3a and 3b, there baseline scores in medication studies were on average substantially higher for the CDRS (10.9 points for the control arms) and the HAM-D (7.3 points for the control arms), respectively. As can be seen in Supplementary Tables XX <!--# Charlotte, please create these out of results_cdrs_metareg_baseline[[1]]  and the same for HAM-D--> the differences were significant at p\<0.05 for CDRS, thought they did not reach statistical significance for the HAM-D (p = 0.0573). <!--# Charlotte, please add the n for each row. Easiest to modify the function so that it appends the baseline n together with the condition. -->
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+knitr:: kable(results_cdrs_metareg_baseline[[2]], caption="Table 3a CDRS baselilne scores")
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3 HAM-D baselilne scores")
+```
+
+We next addressed potential regression to the mean by residualising SMDs by the baseline scores in one regression model.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#### Let's start from the beginning and regress cohens on the baseline dataframe. 
+
+# create a new list with dfs for the sims
+df_long_for_metan_adj_cohens_d <- df_long_for_metan
+# rename the cohens_d value to make space for the new cohen's d
+df_long_for_metan_adj_cohens_d <-
+  df_long_for_metan_adj_cohens_d %>% 
+rename(unadjusted_cohens_d = cohens_d,
+) 
+# estimate the cohen's d from the residuals
+model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$baseline_mean, na.action=na.exclude)
+
+# there is a great effect of the baseline means, as shown here
+results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
+
+# extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
+df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
+
+# apply function to simulate standard errors
+list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d, 
+                                   num_repetitions = 1000, 
+                                   seed  = 1974,
+                                   n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)), 
+                                   a = 0.45, 
+                                   b = .9, 
+                                   mean = 0.65, 
+                                   sd = 0.2)
+
+
+# add the four level variable and re-level
+for(i in 1: length(list_df_simulated_adj_cohens_d)){
+  
+  list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
+  list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>% 
+    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+    )
+  
+  list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
+  
+  # relevel so that medication control becomes the reference category for the regression
+  #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+  list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
+                                                         "medication_control",
+                                                         "medication_active", 
+                                                         "psychotherapy_control",
+                                                         "psychotherapy_active")
+}
+
+
+
+
+
+# Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
+# specify model
+model_1 <- as.formula(~ four_level_var)
+
+# run metareg function 
+# here you can use the simulated results directly
+list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
+aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
+aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
+
+# extract SMDs from the  list
+list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
+
+df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
+
+
+
+
+
+```
+
+As can be seen in Table 4, the baseline mean has a very strong association with the SMD.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+knitr:: kable(results_adjusted_cohens_d 
+              
+              , caption = "Table 4. Effect of baseline values on SMDs")
+```
+
+Table 5 shows the adjusted SMDs with their confidence intervals that we estimated in metaregression. As can be inferred from the non-overlapping confidence intervals, the difference between the two control conditions was significant (details of the regression model can be found in Supplementary Table XX <!--# Charlotte, please add there the aggregate_results_overall_adjusted_cohens_d -->). Differences were significant between active medication and psychotherapy control, but not between any of the other groups.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+knitr:: kable (df_mean_coefs_from_sim_adjusted_cohens_d, caption = "Table 5. SMDs Adjusted by baseline score" )
+```
+
+Finally, we tested whether the simulated correlation values we used for simulation of the standard errors had an appreciable effect on the values of the adjusted SMDs. Supplemental Figure X shows that the variability of the estimated z-value was minimal<!--# Charlotte, the figure below should be supplemental-->. 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+# plot the mean z for the difference between controls
+z_psy_con_vs_med_con <- 0
+for(i in 1: length(list_model_1_meta_reg_adj_cohens_d )){
+  z_psy_con_vs_med_con[i] <- list_model_1_meta_reg_adj_cohens_d [[i]]$zval[condition=="psychotherapy_control"]
+  
+}
+
+
+
+stability_sims_adjusted_cohens_d <- data.frame(n_sims = 1:1000, z_value = z_psy_con_vs_med_con)
+
+
+stab_sims_adjusted_cohens_d <- stability_sims_adjusted_cohens_d %>%
+  ggplot(aes(x = n_sims, y = z_value)) +
+  geom_point() +
+  geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
+  geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "black") +
+  annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line significant)", hjust = -0.1, vjust = 0) +
+  annotate("text", x = 300, y = stability_sims_adjusted_cohens_d$z_value[1] - 0.1, label = "simulated z-values",
+           hjust = -0.1, vjust = 0) +
+  theme_minimal() +
+  labs(
+    x = "Number of Simulations",
+    y = "z-value",
+    title = "Stability of the Statistic of the Difference between \nMedication and Psychotherapy Control Arms",
+    subtitle = "Results from 1000 simulations with within-group standard errors"
+  )
+stab_sims_adjusted_cohens_d
+pdf(file = "stab_sims_adjusted_cohens_d.pdf")
+stab_sims_adjusted_cohens_d
+dev.off()
 
 
 ```
