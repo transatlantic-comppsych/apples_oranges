@@ -508,7 +508,7 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
 
 # Here I am creating a new column for df_long_for_metan, to be able to identify which studies featured a condition of interest. 
-# for CBT, fluox, esc
+# for CBT, fluox, esc. I am calling this cfe
 cbt_fluox_esc_study_ids <- df_with_distinct_instruments %>%
   filter(active_type %in% c("cbt", "Fluoxetine", "Escitalopram")) %>%
   pull(new_study_id)
@@ -522,8 +522,22 @@ wl_study_ids <- df_with_distinct_instruments %>%
 df_with_distinct_instruments <- df_with_distinct_instruments %>%
   mutate(key2 = ifelse(new_study_id %in% wl_study_ids, 2, NA))
 
+# for wl and cau
+wl_or_cau_study_ids <- df_with_distinct_instruments %>%
+  filter(control_type %in% c("wl", "cau")) %>%
+  pull(new_study_id)
 df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key = paste(key1, key2, sep = "_"))
+  mutate(key3 = ifelse(new_study_id %in% wl_or_cau_study_ids, 3, NA))
+
+# for cdrs only
+cdrs_study_ids <- df_with_distinct_instruments %>%
+  filter(instrument_name == "cdrs")) %>%
+  pull(new_study_id)
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key4 = ifelse(new_study_id %in% cdrs_study_ids, 4, NA))
+
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key = paste(key1, key2, key3, key4, sep = "_"))
 
 
 # Step 2: turn dataframes to long
@@ -745,7 +759,6 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) # CHARLOTTE please check
 df_count_studies <- count_studies(df_long_for_metan ) # CHARLOTTE please check
 # CB checked both, both correct.
-
 
 # specify model
 model_1 <- as.formula(~ four_level_var)
