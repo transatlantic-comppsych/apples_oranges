@@ -508,7 +508,7 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
 
 # Here I am creating a new column for df_long_for_metan, to be able to identify which studies featured a condition of interest. 
-# for CBT, fluox, esc
+# for CBT, fluox, esc. I am calling this cfe
 cbt_fluox_esc_study_ids <- df_with_distinct_instruments %>%
   filter(active_type %in% c("cbt", "Fluoxetine", "Escitalopram")) %>%
   pull(new_study_id)
@@ -522,8 +522,22 @@ wl_study_ids <- df_with_distinct_instruments %>%
 df_with_distinct_instruments <- df_with_distinct_instruments %>%
   mutate(key2 = ifelse(new_study_id %in% wl_study_ids, 2, NA))
 
+# for wl and cau
+wl_or_cau_study_ids <- df_with_distinct_instruments %>%
+  filter(control_type %in% c("wl", "cau")) %>%
+  pull(new_study_id)
 df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key = paste(key1, key2, sep = "_"))
+  mutate(key3 = ifelse(new_study_id %in% wl_or_cau_study_ids, 3, NA))
+
+# for cdrs only
+cdrs_study_ids <- df_with_distinct_instruments %>%
+  filter(instrument_name == "cdrs") %>%
+  pull(new_study_id)
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key4 = ifelse(new_study_id %in% cdrs_study_ids, 4, NA))
+
+df_with_distinct_instruments <- df_with_distinct_instruments %>%
+  mutate(key = paste(key1, key2, key3, key4, sep = "_"))
 
 
 # Step 2: turn dataframes to long
@@ -674,7 +688,6 @@ cat("critical value of z =", x, "corresponding to an alpha = 0.05." , "\n")
 
 ```
 
-
 Second, we restricted the metaregression to studies using CBT and the FDA-approved antidepressants fluoxetine and escitalopram.
 
 Third, we restricted the metaregression to studies that *did not* use waitlist as their control.
@@ -745,7 +758,6 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) # CHARLOTTE please check
 df_count_studies <- count_studies(df_long_for_metan ) # CHARLOTTE please check
 # CB checked both, both correct.
-
 
 # specify model
 model_1 <- as.formula(~ four_level_var)
@@ -1226,7 +1238,7 @@ Table 5 shows the adjusted SMDs with their confidence intervals that we estimate
 knitr:: kable (df_mean_coefs_from_sim_adjusted_cohens_d, caption = "Table 5. SMDs Adjusted by baseline score" )
 ```
 
-Finally, we tested whether the simulated correlation values we used for simulation of the standard errors had an appreciable effect on the values of the adjusted SMDs. Supplemental Figure X shows that the variability of the estimated z-value was minimal<!--# Charlotte, the figure below should be supplemental-->. 
+Finally, we tested whether the simulated correlation values we used for simulation of the standard errors had an appreciable effect on the values of the adjusted SMDs. Supplemental Figure X shows that the variability of the estimated z-value was minimal<!--# Charlotte, the figure below should be supplemental-->.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
@@ -1265,4 +1277,136 @@ stab_sims_adjusted_cohens_d
 dev.off()
 
 
+```
+
+We have also run models to take into accountregression to the mean within CDRS and HAMD.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+####code to extract baseline-adjusted post means for CDRS and HAMD 
+
+ 
+
+de_meaned_baselilne_mean_cdrs <- (list_cdrs_study[[1]]$baseline_mean - mean(list_cdrs_study[[1]]$baseline_mean, na.rm = TRUE)) 
+
+                                    
+
+ 
+
+                                 
+
+lm_for_cdrs_smds <- lm(list_cdrs_study[[1]]$post_mean ~ de_meaned_baselilne_mean_cdrs +list_cdrs_study[[1]]$four_level_var,
+
+ 
+
+  na.action=na.exclude,
+
+   )
+
+ 
+
+ 
+
+#summary(lm_for_cdrs_smds)
+
+ 
+
+coefs_lm_for_cdrs_smds  <- broom:: tidy(lm_for_cdrs_smds)
+
+ 
+
+condition <- coefs_lm_for_cdrs_smds$term
+
+cdrs_smds <-c(coefs_lm_for_cdrs_smds$estimate[1], coefs_lm_for_cdrs_smds$estimate[-1] + coefs_lm_for_cdrs_smds$estimate[1])
+
+cdrs_upper_ci <- cdrs_smds + coefs_lm_for_cdrs_smds$std.error*1.96
+
+cdrs_lower_ci <- cdrs_smds - coefs_lm_for_cdrs_smds$std.error*1.96
+
+ 
+
+cdrs_smd_with_cis <- data.frame (
+
+  condition = levels(list_hamd_study$four_level_var),
+
+  cdrs_smds = cdrs_smds[-2],
+
+  cdrs_upper_ci = cdrs_upper_ci[-2],
+
+  cdrs_lower_ci = cdrs_lower_ci[-2]
+
+)
+
+ 
+
+ 
+
+# do the same for hamd
+
+de_meaned_baselilne_mean_hamd <- (list_hamd_study$baseline_mean - mean(list_hamd_study$baseline_mean, na.rm = TRUE)) 
+
+ 
+
+ 
+
+ 
+
+lm_for_hamd_smds <- lm(list_hamd_study$post_mean ~ de_meaned_baselilne_mean_hamd +list_hamd_study$four_level_var,
+
+                      
+
+                       na.action=na.exclude,
+
+)
+
+ 
+
+ 
+
+#summary(lm_for_hamd_smds)
+
+ 
+
+coefs_lm_for_hamd_smds  <- broom:: tidy(lm_for_hamd_smds)
+
+ 
+
+ 
+
+condition <- coefs_lm_for_hamd_smds$term
+
+hamd_smds <-c(coefs_lm_for_hamd_smds$estimate[1], coefs_lm_for_hamd_smds$estimate[-1] + coefs_lm_for_hamd_smds$estimate[1])
+
+hamd_upper_ci <- hamd_smds + coefs_lm_for_hamd_smds$std.error*1.96
+
+hamd_lower_ci <- hamd_smds - coefs_lm_for_hamd_smds$std.error*1.96
+
+ 
+
+hamd_smd_with_cis <- data.frame (
+
+condition = levels(list_hamd_study$four_level_var),
+
+hamd_smds = hamd_smds[-2],
+
+hamd_upper_ci = hamd_upper_ci[-2],
+
+hamd_lower_ci = hamd_lower_ci[-2]
+
+)
+
+ 
+
+ 
+
+
+```
+
+Tables 6a and 6b show the baeline-mean adjusted SMDs for the CDRS at outcome when the baseline measurement has been taken into account. <!--# Here Intercept refers to teh psychotherapy control. Sorry about the labelling of the rows, will improve. -->
+
+```{r}
+knitr:: kable(cdrs_smd_with_cis, caption = "Table 6a. CDRS baseline mean adjsuted SMDs")
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+knitr:: kable(hamd_smd_with_cis, caption = "Table 6. HAM-D baseline-mean adjusted SMDs")
 ```
