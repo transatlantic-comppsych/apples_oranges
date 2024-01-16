@@ -507,54 +507,23 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
   group_by(new_study_id) %>% 
   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
 
-# Here I am creating a new column for df_long_for_metan, to be able to identify which studies featured a condition of interest. 
-# for CBT, fluox, esc. I am calling this cfe
-cbt_fluox_esc_study_ids <- df_with_distinct_instruments %>%
-  filter(active_type %in% c("cbt", "Fluoxetine", "Escitalopram")) %>%
-  pull(new_study_id)
-df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key1 = ifelse(new_study_id %in% cbt_fluox_esc_study_ids, 1, NA))
-
-# for wl 
-wl_study_ids <- df_with_distinct_instruments %>%
-  filter(control_type == "wl") %>%
-  pull(new_study_id)
-df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key2 = ifelse(new_study_id %in% wl_study_ids, 2, NA))
-
-# for wl and cau
-wl_or_cau_study_ids <- df_with_distinct_instruments %>%
-  filter(control_type %in% c("wl", "cau")) %>%
-  pull(new_study_id)
-df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key3 = ifelse(new_study_id %in% wl_or_cau_study_ids, 3, NA))
-
-# for cdrs only
-cdrs_study_ids <- df_with_distinct_instruments %>%
-  filter(instrument_name == "cdrs") %>%
-  pull(new_study_id)
-df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key4 = ifelse(new_study_id %in% cdrs_study_ids, 4, NA))
-
-df_with_distinct_instruments <- df_with_distinct_instruments %>%
-  mutate(key = paste(key1, key2, key3, key4, sep = "_"))
-
-
 # Step 2: turn dataframes to long
 # A: turn long the rows with active
 active_df <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, key, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
+  dplyr:: select(new_study_id, active_type, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
                  baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active) %>% 
   rename(treatment = descr_active) %>% 
+  rename(type = active_type) %>% 
   rename_with(~ str_remove(., "_active")) %>% 
   mutate(arm_effect_size = "cohens_d_active") %>% # chose this clunky name because I had used this variable name in previous code and don't want to bread the rest
   group_by(new_study_id) %>% #go through each study id and remove duplicates
   distinct(treatment, .keep_all = TRUE)
 
 control_df <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, key, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
+  dplyr:: select(new_study_id, control_type, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
                  baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control) %>% 
   rename(treatment = descr_control) %>% 
+  rename(type = control_type) %>% 
   rename_with(~ str_remove(., "_control")) %>% 
   mutate(arm_effect_size = "cohens_d_control") %>% #chose this clunky name because I had used this variable name in previous code and don't want to bread the rest
   group_by(new_study_id) %>% #go through each study id and remove duplicates
@@ -580,10 +549,17 @@ df_long_for_metan <- df_long_for_metan %>%
 
 
 # save this as the master dataframe  --------------------------------------
-# use this datafram to perform all operations below in quarto
+# use this dataframe to perform all operations below in quarto
 # ask Charlotte to check steps above (lines 986 to 1121)
 write.csv(df_long_for_metan, "df_long_for_metan.csv", row.names = F)
 
+#this will be important later in checking for multi arm psy studies 
+check_active_dups <- df_long_for_metan %>%
+  filter(new_study_id %in% cbt_fluox_esc_study_ids) %>% 
+  filter (psy_or_med == 1) %>% 
+  group_by(new_study_id) %>%
+  filter(n() >= 3)
+write.csv(check_active_dups, "check_active_dups.csv")
 
 ########### simulate so that each study has a value from a distribution of 
 ######## of correlations. 
@@ -789,21 +765,24 @@ df_mean_coefs_from_sim <- data.frame(cbind(df_mean_coefs_from_sim, n = df_count_
 cbt_fluox_esc_study_ids <-
   df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
 
-# use those ids to subset all dataframes in the list
-list_cbt_fluox_esc_study <- list()
+# Use those ids to subset all dataframes in the list
+# By searching for IDs we have mistakenly included multiple active arms. E.g. for Atkinson which has dulox and fluox. 
+# So we need to further subset the simulated dfs. For the active arms, I am filtering out conditions that do not meet our criterion. 
+# This leaves all the control conditions from trials where the active is cbt, fluox or esc. 
+# We may have multiple controls per study id for this reason, though this isn't a problem 
+# conceptually.
 
-for(i in 1: length(list_df_simulated)){
-  
-  list_cbt_fluox_esc_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-                                                          %in% cbt_fluox_esc_study_ids,]
-  
-}
+list_cbt_fluox_esc_study <- lapply(list_df_simulated, function(df) {
+  df %>%
+    filter(new_study_id %in% cbt_fluox_esc_study_ids) %>%
+    filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
+})
 
 # count the number of studies
-study_count_cbt_fluox_esc_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cbt_fluox_esc_study_ids,])
-# CHARLOTTE please check. CB - come back to this, possible problem.
-
-
+cbt_fluox_esc_study <- df_long_for_metan %>%
+  filter(new_study_id %in% cbt_fluox_esc_study_ids,
+         !(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt")))) 
+study_count_cbt_fluox_esc_study <- count_studies(cbt_fluox_esc_study)
 
 # apply the metareg function to the list of cbt, fluox, esc
 model_1 <- as.formula(~ four_level_var)

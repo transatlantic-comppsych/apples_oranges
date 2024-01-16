@@ -1,0 +1,31 @@
+,new_study_id,type,treatment,psy_or_med,baseline_n,cohens_d,baseline_mean,baseline_sd,post_mean,post_sd,arm_effect_size
+1,"Charkhandeh, 2016",cbt,cbt,1,65,-1.721518987,29.46,5.47,19.94,5.59,cohens_d_active
+17,"Charkhandeh, 2016",other ctr,Reiki,1,63,-0.652444444,30,5.37,26.33,5.88,cohens_d_control
+18,"Charkhandeh, 2016",wl,wlc,1,60,0.005934718,30.35,5.45,30.38,4.66,cohens_d_control
+2,"Clarke, 1999",cbt,cbt + parenting group,1,32,-1.282442748,15.1,6,6.7,7.1,cohens_d_active
+3,"Clarke, 1999",cbt,cbt,1,37,-1.663366337,13,5.3,4.6,4.8,cohens_d_active
+19,"Clarke, 1999",wl,wlc,1,27,-1.054263566,14.5,5.9,7.7,7,cohens_d_control
+4,"Kahn, 1990",cbt,cbt,1,17,-0.630075387,31.11,9.58,7.29,66.03,cohens_d_active
+5,"Kahn, 1990",other psy,self-modeling,1,17,-1.787122208,27.18,7.84,13.58,7.38,cohens_d_active
+20,"Kahn, 1990",other ctr,Relaxation,1,17,-1.30547818,26.94,10.83,12.88,10.71,cohens_d_control
+21,"Kahn, 1990",wl,wlc,1,17,-0.089030207,28.06,9.75,26.94,15.41,cohens_d_control
+6,"Lewinsohn, 1990",cbt,cwb adolescents + parents,1,19,-1.487927565,21.26,11.35,6.47,8.53,cohens_d_active
+7,"Lewinsohn, 1990",cbt,cwb adolescents only,1,21,-1.003870968,21.67,11.34,10,11.91,cohens_d_active
+22,"Lewinsohn, 1990",wl,wlc,1,19,-0.310456011,23.84,11.43,20.47,10.28,cohens_d_control
+8,"Liddle, 1990",cbt,cbt (social competence training),1,11,-1.170688114,21,4.45,14.45,6.74,cohens_d_active
+9,"Liddle, 1990",cbt,cbt,1,11,-1.170688114,21,4.45,14.45,6.74,cohens_d_active
+23,"Liddle, 1990",other ctr,attention placebo (drama),1,10,-0.537153089,22.3,4.24,19.3,6.93,cohens_d_control
+24,"Liddle, 1990",wl,wlc,1,10,-0.750246792,20.7,3.34,16.9,6.79,cohens_d_control
+10,"Reynolds, 1986",cbt,cbt,1,9,-2.706422018,21.11,7.75,6.36,3.15,cohens_d_active
+25,"Reynolds, 1986",other ctr,Relaxation training,1,11,-2.185328185,17.09,6.36,5.77,4,cohens_d_control
+26,"Reynolds, 1986",wl,wlc,1,10,0.184313725,16.9,5.48,18.31,9.82,cohens_d_control
+11,"Rossello, 1999",cbt,cbt,1,25,-0.93956044,20.12,6.95,13.28,7.61,cohens_d_active
+12,"Rossello, 1999",ipt,ipt,1,23,-1.484330484,21.21,7.53,10.79,6.51,cohens_d_active
+27,"Rossello, 1999",wl,wlc,1,23,-0.670826833,20.13,5.99,15.83,6.83,cohens_d_control
+13,"Stallard, 2012",cbt,cbt,1,392,-0.426056338,10.64,4.91,8.22,6.45,cohens_d_active
+28,"Stallard, 2012",other ctr,attention control,1,374,-0.398104265,10.6,4.67,8.5,5.88,cohens_d_control
+29,"Stallard, 2012",cau,cau,1,298,-0.705550329,10.56,4.93,6.81,5.7,cohens_d_control
+14,"Stice, 2008",cbt,cbt based bibliotherapy,1,80,-0.47849788,18.2,7.53,14.25,8.98,cohens_d_active
+15,"Stice, 2008",cbt,cbt,1,89,-0.955131511,20.03,10.35,10.77,9.04,cohens_d_active
+16,"Stice, 2008",sup,sup,1,88,-0.547677262,20.27,9.83,14.67,10.62,cohens_d_active
+30,"Stice, 2008",cau,assessment only,1,84,-0.304691618,19.6,9.23,16.71,9.74,cohens_d_control
