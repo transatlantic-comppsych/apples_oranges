@@ -767,7 +767,7 @@ cbt_fluox_esc_study_ids <-
 
 # Use those ids to subset all dataframes in the list
 # By searching for IDs we have mistakenly included multiple active arms. E.g. for Atkinson which has dulox and fluox. 
-# So we need to further subset the simulated dfs. For the active arms, I am filtering out conditions that do not meet our criterion. 
+# So we need to further subset the simulated dfs. For the active arms, I am filtering out conditions that do not meet our criteria. 
 # This leaves all the control conditions from trials where the active is cbt, fluox or esc. 
 # We may have multiple controls per study id for this reason, though this isn't a problem 
 # conceptually.
@@ -783,6 +783,7 @@ cbt_fluox_esc_study <- df_long_for_metan %>%
   filter(new_study_id %in% cbt_fluox_esc_study_ids,
          !(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt")))) 
 study_count_cbt_fluox_esc_study <- count_studies(cbt_fluox_esc_study)
+# CB checked, looks good now.
 
 # apply the metareg function to the list of cbt, fluox, esc
 model_1 <- as.formula(~ four_level_var)
@@ -806,29 +807,25 @@ coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluo
  coef_and_se_means_cbt_fluox_esc_study$n  <- study_count_cbt_fluox_esc_study[study_count_cbt_fluox_esc_study$is_missing ==F,]$n
 
 
- 
-
 # C. Estimate Means and CIs without WL ---------------------------------------
-# grab the ids for no waitlist
+
+ # grab the ids for no waitlist
 no_wl_ids <-df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
- 
-  
 
 # use them to loop over the simulated list to subset all the dataframes.
-list_no_wl <- list()
 
-for(i in 1: length(list_df_simulated)){
-  
-  list_no_wl[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-                                            %in% no_wl_ids,]
-  
-}
+list_no_wl <- lapply(list_df_simulated, function(df) {
+  df %>%
+    filter(new_study_id %in% no_wl_ids) %>%
+    filter(!(arm_effect_size == "cohens_d_control" & type == "wl")) 
+})
 
 # count studies 
-study_count_no_wl_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_ids,])
-# CHARLOTTE please check
-# CB come back to this, possible problem.
-
+no_wl_studies <- df_long_for_metan %>% 
+  filter(new_study_id %in% no_wl_ids) %>%
+  filter(!(arm_effect_size == "cohens_d_control" & type == "wl"))
+study_count_no_wl_study <- count_studies(no_wl_studies)
+# CB checked, looks good!
 
 # use this model as above
 model_1 <- as.formula(~ four_level_var)
@@ -854,22 +851,26 @@ coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_
                                                      ==FALSE,]$n
 
 # D. Estimate Means and CIs without WL and CAU --------------------------------------- 
-# grab the ids for no waitlist and cau
-no_wl_or_cau_ids <- df_appl_v_orange[df_appl_v_orange$control_type != "wl" & df_appl_v_orange$control_type != "cau",]$new_study_id
-  
-# use them to loop over the simulated list to subset all the dataframes.
-list_no_wl_or_cau <- list()
+ # grab the ids for no waitlist and cau
+no_wl_cau_ids <- df_appl_v_orange %>%
+  filter(!(control_type %in% c("wl", "cau"))) %>%
+  pull(new_study_id)
 
-for(i in 1: length(list_df_simulated)){
-  
-  list_no_wl_or_cau[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-                                            %in% no_wl_or_cau_ids,]
-  
-}
+# use them to loop over the simulated list to subset all the dataframes.
+
+list_no_wl_cau <- lapply(list_df_simulated, function(df) {
+  df %>%
+    filter(new_study_id %in% no_wl_cau_ids) %>%
+    filter(!(arm_effect_size == "cohens_d_control" & type %in% c("wl", "cau")))
+})
 
 # count studies 
-study_count_no_wl_or_cau_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% no_wl_or_cau_ids,])
-# CHARLOTTE please check
+no_wl_cau_studies <- df_long_for_metan %>% 
+  filter(new_study_id %in% no_wl_cau_ids) %>%
+  filter(!(arm_effect_size == "cohens_d_control" & type %in% c("wl", "cau")))
+study_count_no_wl_cau_study <- count_studies(no_wl_cau_studies)
+# CB checked, looks good!
+
 
 # use this model as above
 model_1 <- as.formula(~ four_level_var)
@@ -915,8 +916,7 @@ for(i in 1: length(list_df_simulated)){
 
 # count the number of studies
 study_count_cdrs_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cdrs_study_ids,])
-
-#CHARLOTTE please check. CB - come back to this, possible problem. 
+# CB checked, correct. 
 
 # apply the metareg function to the list of cbt, fluox, esc
 model_1 <- as.formula(~ four_level_var)
