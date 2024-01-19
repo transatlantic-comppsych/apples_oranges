@@ -440,6 +440,22 @@ library(tidyverse)
 
 df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
 
+# Charlotte to add in instrument end point values (mins / maxs)
+# We will use these to transform the scale into % as follows: (score - min of the scale)/(max-min)
+# We have done this for both means and standard deviations
+
+df_scale_ranges <- read.csv("scale_ranges.csv")
+df_appl_v_orange <- full_join(df_appl_v_orange, df_scale_ranges, by = "instrument_name")
+
+df_appl_v_orange <- df_appl_v_orange %>% 
+  mutate(perc_baseline_mean_active = (baseline_mean_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_baseline_sd_active = (baseline_sd_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_baseline_mean_control = (baseline_mean_control - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_baseline_sd_control = (baseline_sd_control - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_post_mean_active = (post_mean_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_post_sd_active = (post_sd_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_post_mean_control = (post_mean_control - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_post_sd_control = (post_sd_control - scale_min) / (scale_max - scale_min)) 
 
 
 #Need to use SMDs, ie our Cohen's d and then use Standard error of SMD, to achieve this
@@ -507,11 +523,14 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
   group_by(new_study_id) %>% 
   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
 
+write.csv(df_with_distinct_instruments, "df_with_distinct_instruments.csv")
+
 # Step 2: turn dataframes to long
 # A: turn long the rows with active
 active_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, active_type, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
-                 baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active) %>% 
+                 baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active,
+                 perc_baseline_mean_active, perc_baseline_sd_active, perc_post_mean_active, perc_post_sd_active) %>% 
   rename(treatment = descr_active) %>% 
   rename(type = active_type) %>% 
   rename_with(~ str_remove(., "_active")) %>% 
@@ -521,7 +540,8 @@ active_df <- df_with_distinct_instruments %>%
 
 control_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, control_type, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
-                 baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control) %>% 
+                 baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control,
+                 perc_baseline_mean_control, perc_baseline_sd_control, perc_post_mean_control, perc_post_sd_control) %>% 
   rename(treatment = descr_control) %>% 
   rename(type = control_type) %>% 
   rename_with(~ str_remove(., "_control")) %>% 
@@ -777,6 +797,8 @@ list_cbt_fluox_esc_study <- lapply(list_df_simulated, function(df) {
     filter(new_study_id %in% cbt_fluox_esc_study_ids) %>%
     filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
 })
+
+view(list_cbt_fluox_esc_study[[1]])
 
 # count the number of studies
 cbt_fluox_esc_study <- df_long_for_metan %>%

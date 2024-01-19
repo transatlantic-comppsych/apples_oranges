@@ -1,0 +1,15 @@
+instrument_name,scale_min,scale_max
+apai,0,105
+bdi,0,63
+cdi,0,54
+cdrs,17,113
+ces_d,0,60
+dass,0,42
+hamd,0,52
+ksads,1,4
+madrs,0,60
+mfq,0,66
+smfq,0,26
+pfc,0,80
+phq_9,0,27
+rads,30,120
