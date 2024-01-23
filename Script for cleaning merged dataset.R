@@ -18,8 +18,6 @@ merged_dataset <- bind_rows(df_full_med, df_full_psych)
 merged_dataset <- dplyr:: select(merged_dataset, -c(primary, hierarchy, time))
 merged_dataset <- merged_dataset %>% relocate(descr_active, .after = control_type)
 merged_dataset <- merged_dataset %>% relocate(descr_control, .after = descr_active)
-merged_dataset <- merged_dataset %>% relocate(mean_age, .after = age_group)
-merged_dataset <- merged_dataset %>% relocate(percent_women, .after = control_mean_age)
 merged_dataset <- merged_dataset %>% relocate(responders_active: cuij_responders_control, .after = observed_resp_rate_control)
 
 #create vector indicating instrument primacy according to our hierarchy
@@ -110,17 +108,24 @@ cor(merged_dataset$responders_control, merged_dataset$cuij_responders_control, m
 #rename dataframe
 df_appl_v_orange <- merged_dataset
 
-# We have mean_age and percent_women reported overall for psy trials but per arm for med trials
-
-# create overall mean age variable for all studies 
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (active_mean_age * baseline_n_active + control_mean_age * baseline_n_control)
-                                                 /(baseline_n_active + baseline_n_control))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(mean_age, overall_mean_age))
-
+# We have percent_women reported overall for psy trials but per arm for med trials
 #create overall percent women variable for all studies
 df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
                                                  /(baseline_n_active + baseline_n_control))
 df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+
+# we have separate age variables for each arm and for overall. Where age is reported per arm, I will calculate an overall. 
+# I'm using an old variable name so I don't have the change the rest of the code
+ 
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (age_m_active * baseline_n_active + age_m_control * baseline_n_control)
+                                                 /(baseline_n_active + baseline_n_control))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(age_m_overall, overall_mean_age))
+
+# I'd like to create a pooled SD for age
+df_appl_v_orange <- df_appl_v_orange %>%  
+  mutate(pooled_sd_age = sqrt(  (   (baseline_n_active - 1)*((age_sd_active)^2)   + (baseline_n_control - 1)*((age_sd_control)^2)) /
+                                                                        (baseline_n_active + baseline_n_control - 2)))
+df_appl_v_orange <- df_appl_v_orange %>%  mutate(sd_age = coalesce(age_sd_overall , pooled_sd_age))
 
 # calculate cohens d
 df_appl_v_orange <- df_appl_v_orange %>% 

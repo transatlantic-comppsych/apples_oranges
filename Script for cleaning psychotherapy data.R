@@ -1,11 +1,11 @@
 library(tidyverse)
 library(dplyr)
 library(readxl)
+library(stringr)
 
 set.seed(1998) # to reproduce anything with random numbers
 
 Full_Dataset_Cuijpers_MA <- read_excel("Full_Dataset_Cuijpers_MA.xlsx")
-View(Full_Dataset_Cuijpers_MA)
 
 # Sub commas for dots and convert to numeric variables
 
@@ -88,7 +88,7 @@ df_full <- full_join(df_full, for_merge)
 # create dataframe with main variables needed for meta-analysis
 df_full_psych <- df_full %>% 
   select(c(Column1, study, year, condition_arm1, condition_arm2, descr_arm1, descr_arm2, instrument, rating,
-           mean_arm1: n_arm2, baseline_m_arm1:baseline_n_arm2, mean_age, percent_women, responders_arm1, responders_arm2, 
+           mean_arm1: n_arm2, baseline_m_arm1:baseline_n_arm2, percent_women, responders_arm1, responders_arm2, 
            ee, ec, country, comorbid_mental, `comorbid_mental?`, diagnosis))
 
 # rename variables
@@ -112,17 +112,26 @@ df_full_psych$baseline_sd_active <- gsub(",", ".", df_full_psych$baseline_sd_act
 df_full_psych$baseline_n_active <- gsub(",", ".", df_full_psych$baseline_n_active)
 df_full_psych$baseline_sd_control <- gsub(",", ".", df_full_psych$baseline_sd_control)
 df_full_psych$baseline_n_control <- gsub(",", ".", df_full_psych$baseline_n_control)
-df_full_psych$mean_age <- gsub(",", ".", df_full_psych$mean_age)
 
 df_full_psych$baseline_sd_active <- as.numeric(df_full_psych$baseline_sd_active)
 df_full_psych$baseline_n_active <- as.numeric(df_full_psych$baseline_n_active)
 df_full_psych$baseline_sd_control <- as.numeric(df_full_psych$baseline_sd_control)
 df_full_psych$baseline_n_control <- as.numeric(df_full_psych$baseline_n_control)
-df_full_psych$mean_age <- as.numeric(df_full_psych$mean_age)
 
 # We have noticed a few errors in Cuijpers dataset
-# One is regarding the incorrect extraction of data for De Jong Heesen 2020. I have fixed this in full dataset Cuijpers MA. 
+# One is regarding the incorrect extraction of data for De Jong Heesen 2020. I have fixed this in Full_Dataset_Cuijpers MA. 
 # Error was for baseline mean and SD in control arm on the CDI parent
+
+# Now merge in new age variables. Dayna has extracted mean and sds for age for psy studies. 
+# These live in Working_Dataset_Psychotherapy.
+
+Working_Dataset_Psychotherapy <- read_excel("Working_Dataset_Psychotherapy.xlsx")
+Working_Dataset_Psychotherapy <- Working_Dataset_Psychotherapy %>% 
+  dplyr:: select(Column1, age_m_arm1:age_sd_overall) %>%
+  rename_all(~ gsub("arm1", "active", gsub("arm2", "control", .))) %>%
+  mutate_all(~ as.numeric(gsub(",", ".", as.character(.))))
+
+df_full_psych <- full_join(df_full_psych, Working_Dataset_Psychotherapy, by = "Column1")
 
 # I am going to filter out recent studies published after the release of Cuijpers MA. This is because we are running a search for med
 # studies up to the last date of Cuijpers search (01/01/2021), and we want to be consistent.

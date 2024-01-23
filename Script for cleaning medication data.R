@@ -14,7 +14,8 @@ Working_Dataset_Medication <- read_excel("Working_Dataset_Medication.xlsx",
                                                        "numeric", "numeric", "numeric", "numeric", 
                                                        "numeric", "numeric", "text", "numeric", 
                                                        "text", "text", "text", "text", 
-                                                       "numeric", "numeric", "numeric", "numeric", 
+                                                       "numeric", "numeric", "numeric", "numeric",
+                                                       "numeric", "numeric", "numeric", "numeric",
                                                        "text", "text"))
 View(Working_Dataset_Medication)
 
@@ -30,9 +31,10 @@ Working_Dataset_Medication <- Working_Dataset_Medication %>% rename(active_type 
                               baseline_mean_active = dru_baseline_m, baseline_sd_active	= dru_baseline_sd, baseline_n_active =	dru_baseline_n_arm1,
                               baseline_mean_control = pla_baseline_m, baseline_sd_control	= pla_baseline_sd, baseline_n_control =	pla_baseline_n, 
                               active_mean_change = dru_mean_change,	active_sd_change = dru_sd_change, active_n_change =	dru_n_change,	
-                              control_mean_change = pla_mean_change, control_sd_change = pla_sd_change, control_n_change	= pla_n_change)
-Working_Dataset_Medication <- Working_Dataset_Medication %>% rename(active_mean_age = dru_mean_age, control_mean_age = pla_mean_age, 
-                                                                    active_percent_women	= dru_percent_women, control_percent_women =	pla_percent_women)
+                              control_mean_change = pla_mean_change, control_sd_change = pla_sd_change, control_n_change	= pla_n_change,
+                              age_m_active = dru_mean_age, age_sd_active = dru_sd_age, age_m_control = pla_mean_age, 
+                              age_sd_control = pla_sd_age, 
+                              active_percent_women	= dru_percent_women, control_percent_women =	pla_percent_women)
 
 #rename response variables to clarify that these numbers represent OBSERVED/REPORTED response rates
 # rather than those estimated by us
