@@ -573,14 +573,6 @@ df_long_for_metan <- df_long_for_metan %>%
 # ask Charlotte to check steps above (lines 986 to 1121)
 write.csv(df_long_for_metan, "df_long_for_metan.csv", row.names = F)
 
-#this will be important later in checking for multi arm psy studies 
-check_active_dups <- df_long_for_metan %>%
-  filter(new_study_id %in% cbt_fluox_esc_study_ids) %>% 
-  filter (psy_or_med == 1) %>% 
-  group_by(new_study_id) %>%
-  filter(n() >= 3)
-write.csv(check_active_dups, "check_active_dups.csv")
-
 ########### simulate so that each study has a value from a distribution of 
 ######## of correlations. 
 
@@ -798,8 +790,6 @@ list_cbt_fluox_esc_study <- lapply(list_df_simulated, function(df) {
     filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
 })
 
-view(list_cbt_fluox_esc_study[[1]])
-
 # count the number of studies
 cbt_fluox_esc_study <- df_long_for_metan %>%
   filter(new_study_id %in% cbt_fluox_esc_study_ids,
@@ -852,7 +842,7 @@ study_count_no_wl_study <- count_studies(no_wl_studies)
 # use this model as above
 model_1 <- as.formula(~ four_level_var)
 
-# apply the metareg function to the list of cbt, fluox, esc
+# apply the metareg function to the list of no wl
 list_model_1_no_wl <- run_metaregression(list_no_wl , model_1)
 
 # extract coefficients and model characteristics.
@@ -897,24 +887,24 @@ study_count_no_wl_cau_study <- count_studies(no_wl_cau_studies)
 # use this model as above
 model_1 <- as.formula(~ four_level_var)
 
-# apply the metareg function to the list of cbt, fluox, esc
-list_model_1_no_wl_or_cau <- run_metaregression(list_no_wl_or_cau , model_1)
+# apply the metareg function to the list of no wl or cau
+list_model_1_no_wl_cau <- run_metaregression(list_no_wl_cau , model_1)
 
 # extract coefficients and model characteristics.
 condition <- levels(list_df_simulated[[1]]$four_level_var)
-aggregate_results_no_wl_or_cau <-  aggregate_model_results(list_model_1_no_wl_or_cau, condition)
-aggregate_results_no_wl_or_cau <- cbind(aggregate_results_no_wl_or_cau, condition)
+aggregate_results_no_wl_cau <- aggregate_model_results(list_model_1_no_wl_cau, condition)
+aggregate_results_no_wl_cau <- cbind(aggregate_results_no_wl_cau, condition)
   
 # now use the function to extract the coefficients
-means_no_wl_or_cau <-  lapply(list_model_1_no_wl_or_cau, extract_coefficients_func)
+means_no_wl_cau <-  lapply(list_model_1_no_wl_cau, extract_coefficients_func)
 
 # run the mean function for no wl
 condition <- levels(list_df_simulated[[1]]$four_level_var) # for the condition argument
-coef_and_se_means_no_wl_or_cau <- calculate_mean_coefs_ses(means_no_wl_or_cau, condition)
-coef_and_se_means_no_wl_or_cau <- data.frame(cbind(condition,coef_and_se_means_no_wl_or_cau))
+coef_and_se_means_no_wl_cau <- calculate_mean_coefs_ses(means_no_wl_cau, condition)
+coef_and_se_means_no_wl_cau <- data.frame(cbind(condition,coef_and_se_means_no_wl_cau))
 
 
-coef_and_se_means_no_wl_or_cau$n <- study_count_no_wl_or_cau_study[study_count_no_wl_or_cau_study$is_missing 
+coef_and_se_means_no_wl_cau$n <- study_count_no_wl_cau_study[study_count_no_wl_cau_study$is_missing 
                                                      ==FALSE,]$n
 
 
@@ -940,7 +930,7 @@ for(i in 1: length(list_df_simulated)){
 study_count_cdrs_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% cdrs_study_ids,])
 # CB checked, correct. 
 
-# apply the metareg function to the list of cbt, fluox, esc
+# apply the metareg function to the list of cdrs studies
 model_1 <- as.formula(~ four_level_var)
 list_model_1_cdrs_study <- run_metaregression(list_cdrs_study , model_1)
 
@@ -948,8 +938,8 @@ list_model_1_cdrs_study <- run_metaregression(list_cdrs_study , model_1)
 condition <- levels(list_df_simulated[[1]]$four_level_var)
 aggregate_results_cdrs_study <-  aggregate_model_results(list_model_1_cdrs_study, condition)
 
-# extract SMDs from the list for cbt fluox escit
-means_cdrs_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
+# extract SMDs from the list for cdrs
+means_cdrs_study <-  lapply(list_model_1_cdrs_study, extract_coefficients_func)
 
 # calculate mean SMDs and ses
 condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
