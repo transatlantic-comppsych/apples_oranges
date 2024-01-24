@@ -737,6 +737,7 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 # C) the no WL sample
 # D) the no WL or CAU sample
 # E) the CDRS only sample
+# F) percentage variables
 
 
 # A. Estimate Means and CIs for the overall ----------------------------------
@@ -948,6 +949,34 @@ coef_and_se_means_cdrs_study <- data.frame(cbind(condition, coef_and_se_means_cd
 
 # add the ns to the dataframe
 coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study$is_missing ==F,]$n
+
+# F. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
+
+# count studies - same as for overall sample
+n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) 
+df_count_studies <- count_studies(df_long_for_metan )
+
+# specify model
+model_1 <- as.formula(~ four_level_var + perc_baseline_mean )
+
+# run metareg function 
+# here you can use the simulated results directly
+list_model_1_meta_reg_perc <- run_metaregression(list_df_simulated, model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_perc <-  aggregate_model_results(list_model_1_meta_reg_perc, condition)
+aggregate_results_perc <- cbind(aggregate_results_perc, condition)
+
+# extract SMDs from the  list
+means_perc <-  lapply(list_model_1_meta_reg_perc, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+df_mean_coefs_perc <- calculate_mean_coefs_ses(means_perc, condition)
+df_mean_coefs_perc <- data.frame(cbind(condition,df_mean_coefs_perc))
+
+# add the ns
+df_mean_coefs_perc <- data.frame(cbind(df_mean_coefs_perc, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
 
 ```
 
