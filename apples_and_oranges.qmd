@@ -994,7 +994,7 @@ df_long_for_metan <- df_long_for_metan %>%
 
 group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
 
-#Plot cohens d per arm
+# Plot cohens d per arm
 
 ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
   geom_point(position = position_jitter(width = 0.2), size = 3) +
@@ -1009,14 +1009,32 @@ ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
   theme_minimal() +
   theme(legend.position = "none")
 
-#Plot percentage  baseline means 
+# Now look at change scores of percentage transformed variables
 
-ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+df_long_for_metan <- df_long_for_metan %>% 
+  mutate(perc_change = perc_post_mean - perc_baseline_mean)
+
+ggplot(df_long_for_metan, aes(x = group, y = perc_change, color = group)) +
   geom_point(position = position_jitter(width = 0.2), size = 3) +
+  geom_segment(x = 4.5, xend = 4.5, y = -0.3, yend = -0.25, 
+               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = "Psychotherapy Control", y = -0.3, label = "Less Effective", color = "grey", vjust = 0, hjust = .3) +
+  geom_segment(x = 4.5, xend = 4.5, y = -0.4, yend = -0.45, 
+               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+  geom_text(x = "Psychotherapy Control", y = -0.4, label = "More Effective", color = "grey", vjust = 0, hjust = .3) +
   scale_color_manual(values = group_colors) +
-  labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+  labs(title = "Scatter plot of change scores (percentage transformed) by group", x = NULL, y = "Change") +
   theme_minimal() +
   theme(legend.position = "none")
+
+# # Plot percentage  baseline means 
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+#   geom_point(position = position_jitter(width = 0.2), size = 3) +
+#   scale_color_manual(values = group_colors) +
+#   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
 
 # Box plots
 
