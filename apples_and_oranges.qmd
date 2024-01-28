@@ -449,13 +449,14 @@ df_appl_v_orange <- full_join(df_appl_v_orange, df_scale_ranges, by = "instrumen
 
 df_appl_v_orange <- df_appl_v_orange %>% 
   mutate(perc_baseline_mean_active = (baseline_mean_active - scale_min) / (scale_max - scale_min)) %>% 
-  mutate(perc_baseline_sd_active = (baseline_sd_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_baseline_sd_active = baseline_sd_active / (scale_max - scale_min)) %>%  # this #is the best way to estimate the SD of the linear transform of the percentage 
+
   mutate(perc_baseline_mean_control = (baseline_mean_control - scale_min) / (scale_max - scale_min)) %>% 
-  mutate(perc_baseline_sd_control = (baseline_sd_control - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_baseline_sd_control = baseline_sd_control  / (scale_max - scale_min)) %>% 
   mutate(perc_post_mean_active = (post_mean_active - scale_min) / (scale_max - scale_min)) %>% 
-  mutate(perc_post_sd_active = (post_sd_active - scale_min) / (scale_max - scale_min)) %>% 
+  mutate(perc_post_sd_active = post_sd_active  / (scale_max - scale_min)) %>% 
   mutate(perc_post_mean_control = (post_mean_control - scale_min) / (scale_max - scale_min)) %>% 
-  mutate(perc_post_sd_control = (post_sd_control - scale_min) / (scale_max - scale_min)) 
+  mutate(perc_post_sd_control = post_sd_control  / (scale_max - scale_min)) 
 
 
 #Need to use SMDs, ie our Cohen's d and then use Standard error of SMD, to achieve this
@@ -638,7 +639,7 @@ $$ \begin{aligned}
         2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
         3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
     \end{cases}
-\end{aligned}$$ {#eq-10}
+\end{aligned}$$ {#eq-10} 
 
 where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the mean. Similarly, each coefficient represents the contrast between the reference category and each level, for an example and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
 
@@ -952,16 +953,29 @@ coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study
 
 # F. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
 
-# count studies - same as for overall sample
-n_unique_studies <- length(unique(df_long_for_metan$new_study_id)) 
-df_count_studies <- count_studies(df_long_for_metan )
+
+# the first thing to do is to create a new dataset with the percentage cohen's d
+
+list_df_simulated_percentage <- list_df_simulated
+
+for(i in 1: length(list_df_simulated_percentage)){
+  
+  list_df_simulated_percentage[[i]]$cohens_d <- 
+            (list_df_simulated_percentage[[i]]$perc_post_mean - list_df_simulated_percentage[[i]]$perc_baseline_mean)/
+    ((list_df_simulated_percentage[[i]]$perc_post_sd + list_df_simulated_percentage[[i]]$perc_baseline_sd)/2)     
+                  
+  
+}
+
+
+
 
 # specify model
-model_1 <- as.formula(~ four_level_var + perc_baseline_mean )
+model_1 <- as.formula(~ four_level_var )
 
 # run metareg function 
 # here you can use the simulated results directly
-list_model_1_meta_reg_perc <- run_metaregression(list_df_simulated, model_1)
+list_model_1_meta_reg_perc <- run_metaregression(list_df_simulated_percentage, model_1)
 
 # extract coefficients and model characteristics.
 condition <- levels(list_df_simulated[[1]]$four_level_var)
@@ -977,6 +991,32 @@ df_mean_coefs_perc <- data.frame(cbind(condition,df_mean_coefs_perc))
 
 # add the ns
 df_mean_coefs_perc <- data.frame(cbind(df_mean_coefs_perc, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
+
+
+##### now for the baseline controlled variable
+# specify model
+model_2 <- as.formula(~ four_level_var + perc_baseline_mean )
+
+# run metareg function 
+# here you can use the simulated results directly
+list_model_2_meta_reg_perc <- run_metaregression(list_df_simulated_percentage, model_2)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_perc_mod_2 <-  aggregate_model_results(list_model_2_meta_reg_perc, condition)
+aggregate_results_perc_mod_2 <- cbind(aggregate_results_perc_mod_2, condition)
+
+# extract SMDs from the  list
+means_perc_mod_2 <-  lapply(list_model_2_meta_reg_perc, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+df_mean_coefs_perc_mod_2 <- calculate_mean_coefs_ses(means_perc_mod_2, condition)
+df_mean_coefs_perc_mod_2 <- data.frame(cbind(condition,df_mean_coefs_perc_mod_2))
+
+# add the ns
+df_mean_coefs_perc_mod_2 <- data.frame(cbind(df_mean_coefs_perc_mod_2, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
+
+
 
 # Plots  -----------------------
 
