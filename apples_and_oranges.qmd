@@ -130,19 +130,19 @@ NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: 
 
 As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
 
-$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$
+$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-4}
 
 where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to:
 
-$$ SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$
+$$ SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-5}
 
 where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
 In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: <!--# Georgina, I have used the Truncated Normal, we can obviously do sensitivity analyses with other ones -->
 
-$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$
+$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$ {#eq-6}
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
@@ -608,24 +608,24 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$. Therefore, we can estimate a two stage model with:
 
 $$Y_i \sim \mathcal{N}(\theta_i, \sigma_i^2)
-$$
+$$ {#eq-7}
 
 $$\theta_i \sim \mathcal{N}(x_i\beta, \tau_i^2)
-$$ {#eq-6}
+$$ {#eq-8}
 
 where $Y_i$ is the estimated effect size for study i, has a normal distribution with $\theta_i$ as its true mean effect and sampling error $\sigma^2$. Whereas $\theta_i$ is a study-specific instantiation of the distribution of effect sizes, with $\tau^2$ representing heterogeneity.
 
 This then gives rise to:
 
-$$Y_i = x_i\beta_i + u_i + \epsilon_i$$ {#eq-7}
+$$Y_i = x_i\beta_i + u_i + \epsilon_i$$ {#eq-9}
 
 where,
 
-$$u_i \sim N(0, \tau^2) $$ {#eq-8}
+$$u_i \sim N(0, \tau^2) $$ {#eq-10}
 
 describes the deviation of each study from the mean of the distribution, and,
 
-$$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-9}
+$$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-11}
 
 describes the sampling error.
 
@@ -639,13 +639,13 @@ $$ \begin{aligned}
         2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
         3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
     \end{cases}
-\end{aligned}$$ {#eq-10} 
+\end{aligned}$$ {#eq-12}
 
 where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the mean. Similarly, each coefficient represents the contrast between the reference category and each level, for an example and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
 
 $$
 z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
-$$ {#eq-11}
+$$ {#eq-13}
 
 We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
 
@@ -681,17 +681,19 @@ Second, we restricted the metaregression to studies using CBT and the FDA-approv
 
 Third, we restricted the metaregression to studies that *did not* use waitlist as their control.
 
-Fourth, we tested whether our results could be accounted for by differential regression to the mean. In an initial step, we tested in metaregression as above for differences in baseline means for those medication and psychotherapy studies that shared the same instruments. We then accounted for the effect that possible differing baseline values across all studies studies' outcomes by regressing the SMDs of studies on their respective baseline values of the instrument with which the SMD was calculated. For example, in a study that used the CDRS, this was used to calculate the SMD. This SMD was then used as the outcome and the baseline value of the CDRS, termed *BaselineScore* below, in that study was used as the independent variable as follows: $$
-SMD = \beta_0 + \beta_1 BaselineScore + \epsilon
-$$ {#eq-12}
-
-This allows us to estimate the effect of the baseline score on the SMD by evaluating $\beta_1$. We can then re-arrange Equation 12 to extract the residuals, that is, the variability in the SMD that is not accounted for by the baseline score.
+Fourth, we tested whether our results could be accounted for by differential regression to the mean. In an initial step, we tested in metaregression as above for differences in baseline means. For this we used a min-max normalisation to turn each study arm mean score into a percentage using the following formalism:
 
 $$
-\epsilon = SMD - (\beta_0 + \beta_1 BaselineScore) ) \
-$$
+\text{outcome}_{percent} = \frac{\bar{X} - \text{scale}_{min}}{\text{scale}_{max} - \text{scale}_{min}}
+$$ {#eq-14}
 
-where, $\epsilon$ is the adjusted SMD, for which we simulated standard errors and then used it the outcome in metaregression, as described above for the unadjusted SMDs.
+where, $$\bar{X}$$ is the mean score of each study arm on the primary questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible value of the scale in question, and for which the the standard deviation is calculated thus:
+
+$$
+\text{SD}_{Xpercent} = \frac{\text{SD}_{X}}{\text{scale}_{max} - \text{scale}_{min}}
+$$ {#eq-15}
+
+where $\text{SD}_{X}$ is the original standard deviation of the mean for X. Applying equations (12) and (13) on the baseline and outcome means and standard deviations of each study allowed us to then calculate SMDs and standard errors using equations (4) and (5)
 
 # Results
 
@@ -1019,79 +1021,79 @@ df_mean_coefs_perc_mod_2 <- data.frame(cbind(df_mean_coefs_perc_mod_2, n = df_co
 
 
 # Plots  -----------------------
-
-#define groups
-df_long_for_metan <- df_long_for_metan %>%
-  mutate(
-    group = case_when(
-      psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
-      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
-      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
-      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
-      TRUE ~ NA_character_  
-    )
-  )
-
-group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
-
-# Plot cohens d per arm
-
-ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
-  geom_point(position = position_jitter(width = 0.2), size = 3) +
-  geom_segment(x = 4.5, xend = 4.5, y = -3.5, yend = -3, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -3, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
-  geom_segment(x = 4.5, xend = 4.5, y = -4, yend = -4.5, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -4.5, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
-  scale_color_manual(values = group_colors) +
-  labs(title = "Scatter plot of Cohen's d by group", x = NULL, y = "Cohen's d") +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-# Now look at change scores of percentage transformed variables
-
-df_long_for_metan <- df_long_for_metan %>% 
-  mutate(perc_change = perc_post_mean - perc_baseline_mean)
-
-ggplot(df_long_for_metan, aes(x = group, y = perc_change, color = group)) +
-  geom_point(position = position_jitter(width = 0.2), size = 3) +
-  geom_segment(x = 4.5, xend = 4.5, y = -0.3, yend = -0.25, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -0.3, label = "Less Effective", color = "grey", vjust = 0, hjust = .3) +
-  geom_segment(x = 4.5, xend = 4.5, y = -0.4, yend = -0.45, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -0.4, label = "More Effective", color = "grey", vjust = 0, hjust = .3) +
-  scale_color_manual(values = group_colors) +
-  labs(title = "Scatter plot of change scores (percentage transformed) by group", x = NULL, y = "Change") +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-# # Plot percentage  baseline means 
 # 
-# ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+# #define groups
+# df_long_for_metan <- df_long_for_metan %>%
+#   mutate(
+#     group = case_when(
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
+#       TRUE ~ NA_character_  
+#     )
+#   )
+
+# group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
+# 
+# # Plot cohens d per arm
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
 #   geom_point(position = position_jitter(width = 0.2), size = 3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -3.5, yend = -3, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -3, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -4, yend = -4.5, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -4.5, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
 #   scale_color_manual(values = group_colors) +
-#   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+#   labs(title = "Scatter plot of Cohen's d by group", x = NULL, y = "Cohen's d") +
 #   theme_minimal() +
 #   theme(legend.position = "none")
-
-# Box plots
-
-ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
-  geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
-  scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
-  geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
-  geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5, 
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
-  scale_fill_manual(values = group_colors) +
-  labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# 
+# # Now look at change scores of percentage transformed variables
+# 
+# df_long_for_metan <- df_long_for_metan %>% 
+#   mutate(perc_change = perc_post_mean - perc_baseline_mean)
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = perc_change, color = group)) +
+#   geom_point(position = position_jitter(width = 0.2), size = 3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -0.3, yend = -0.25, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -0.3, label = "Less Effective", color = "grey", vjust = 0, hjust = .3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -0.4, yend = -0.45, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -0.4, label = "More Effective", color = "grey", vjust = 0, hjust = .3) +
+#   scale_color_manual(values = group_colors) +
+#   labs(title = "Scatter plot of change scores (percentage transformed) by group", x = NULL, y = "Change") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
+# 
+# # # Plot percentage  baseline means 
+# # 
+# # ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+# #   geom_point(position = position_jitter(width = 0.2), size = 3) +
+# #   scale_color_manual(values = group_colors) +
+# #   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+# #   theme_minimal() +
+# #   theme(legend.position = "none")
+# 
+# # Box plots
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
+#   geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
+#   scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
+#   scale_fill_manual(values = group_colors) +
+#   labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
 
 ```
 
@@ -1223,6 +1225,26 @@ We first conducted a meta-analysis to test for differences in means at baseline 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
+### do ALL studies using percentage at baseline
+all_studies_baseline_metareg <- list_df_simulated_percentage[[1]]
+
+
+#turn sds to sec
+all_studies_baseline_metareg$baseline_stand_error <- all_studies_baseline_metareg$perc_baseline_sd/
+                                        sqrt(all_studies_baseline_metareg$baseline_n)
+
+
+model_1 <- as.formula(~ four_level_var)
+condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+                                                              #throughout
+# also change this for the function to work
+all_studies_baseline_metareg$baseline_mean <- all_studies_baseline_metareg$perc_baseline_mean
+results_all_studies_metareg_baseline <- run_metareg_and_extract(all_studies_baseline_metareg,  
+                                                         model_1, condition)
+
+
+
+
 ### get CDRS studies
 cdrs_studies_for_baseline_metareg <- list_cdrs_study[[1]] # created this above, you can take any of these, as the means and sds are repeated.
 
@@ -1271,100 +1293,100 @@ knitr:: kable(results_cdrs_metareg_baseline[[2]], caption="Table 3a CDRS baselil
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3 HAM-D baselilne scores")
+knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3b HAM-D baselilne scores")
 ```
 
-We next addressed potential regression to the mean by residualising SMDs by the baseline scores in one regression model.
+We next addressed the e
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #### Let's start from the beginning and regress cohens on the baseline dataframe. 
 
-# create a new list with dfs for the sims
-df_long_for_metan_adj_cohens_d <- df_long_for_metan
-# rename the cohens_d value to make space for the new cohen's d
-df_long_for_metan_adj_cohens_d <-
-  df_long_for_metan_adj_cohens_d %>% 
-rename(unadjusted_cohens_d = cohens_d,
-) 
-# estimate the cohen's d from the residuals
-model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$baseline_mean, na.action=na.exclude)
-
-# there is a great effect of the baseline means, as shown here
-results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
-
-# extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
-df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
-
-# apply function to simulate standard errors
-list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d, 
-                                   num_repetitions = 1000, 
-                                   seed  = 1974,
-                                   n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)), 
-                                   a = 0.45, 
-                                   b = .9, 
-                                   mean = 0.65, 
-                                   sd = 0.2)
-
-
-# add the four level variable and re-level
-for(i in 1: length(list_df_simulated_adj_cohens_d)){
-  
-  list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
-  list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>% 
-    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
-                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
-    )
-  
-  list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
-  
-  # relevel so that medication control becomes the reference category for the regression
-  #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
-  list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
-                                                         "medication_control",
-                                                         "medication_active", 
-                                                         "psychotherapy_control",
-                                                         "psychotherapy_active")
-}
-
-
-
-
-
-# Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
-# specify model
-model_1 <- as.formula(~ four_level_var)
-
-# run metareg function 
-# here you can use the simulated results directly
-list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_1)
-
-# extract coefficients and model characteristics.
-condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
-aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
-aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
-
-# extract SMDs from the  list
-list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
-
-# calculate mean SMDs and ses
-df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
-
-df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
-
-
-
-
+# # create a new list with dfs for the sims
+# df_long_for_metan_adj_cohens_d <- df_long_for_metan
+# # rename the cohens_d value to make space for the new cohen's d
+# df_long_for_metan_adj_cohens_d <-
+#   df_long_for_metan_adj_cohens_d %>% 
+# rename(unadjusted_cohens_d = cohens_d,
+# ) 
+# # estimate the cohen's d from the residuals
+# model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$baseline_mean, na.action=na.exclude)
+# 
+# # there is a great effect of the baseline means, as shown here
+# results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
+# 
+# # extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
+# df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
+# 
+# # apply function to simulate standard errors
+# list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d, 
+#                                    num_repetitions = 1000, 
+#                                    seed  = 1974,
+#                                    n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)), 
+#                                    a = 0.45, 
+#                                    b = .9, 
+#                                    mean = 0.65, 
+#                                    sd = 0.2)
+# 
+# 
+# # add the four level variable and re-level
+# for(i in 1: length(list_df_simulated_adj_cohens_d)){
+#   
+#   list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
+#   list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>% 
+#     mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+#                                       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+#     )
+#   
+#   list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
+#   
+#   # relevel so that medication control becomes the reference category for the regression
+#   #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+#   list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
+#                                                          "medication_control",
+#                                                          "medication_active", 
+#                                                          "psychotherapy_control",
+#                                                          "psychotherapy_active")
+# }
+# 
+# 
+# 
+# 
+# 
+# # Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
+# # specify model
+# model_1 <- as.formula(~ four_level_var)
+# 
+# # run metareg function 
+# # here you can use the simulated results directly
+# list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_1)
+# 
+# # extract coefficients and model characteristics.
+# condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
+# aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
+# aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
+# 
+# # extract SMDs from the  list
+# list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
+# 
+# # calculate mean SMDs and ses
+# df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
+# 
+# df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
+# 
+# 
+# 
+# 
 
 ```
 
 As can be seen in Table 4, the baseline mean has a very strong association with the SMD.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-knitr:: kable(results_adjusted_cohens_d 
-              
-              , caption = "Table 4. Effect of baseline values on SMDs")
+# knitr:: kable(results_adjusted_cohens_d 
+#               
+#               , caption = "Table 4. Effect of baseline values on SMDs")
 ```
 
 Table 5 shows the adjusted SMDs with their confidence intervals that we estimated in metaregression. As can be inferred from the non-overlapping confidence intervals, the difference between the two control conditions was significant (details of the regression model can be found in Supplementary Table XX <!--# Charlotte, please add there the aggregate_results_overall_adjusted_cohens_d -->). Differences were significant between active medication and psychotherapy control, but not between any of the other groups.
@@ -1376,162 +1398,162 @@ knitr:: kable (df_mean_coefs_from_sim_adjusted_cohens_d, caption = "Table 5. SMD
 Finally, we tested whether the simulated correlation values we used for simulation of the standard errors had an appreciable effect on the values of the adjusted SMDs. Supplemental Figure X shows that the variability of the estimated z-value was minimal<!--# Charlotte, the figure below should be supplemental-->.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
-# plot the mean z for the difference between controls
-z_psy_con_vs_med_con <- 0
-for(i in 1: length(list_model_1_meta_reg_adj_cohens_d )){
-  z_psy_con_vs_med_con[i] <- list_model_1_meta_reg_adj_cohens_d [[i]]$zval[condition=="psychotherapy_control"]
-  
-}
-
-
-
-stability_sims_adjusted_cohens_d <- data.frame(n_sims = 1:1000, z_value = z_psy_con_vs_med_con)
-
-
-stab_sims_adjusted_cohens_d <- stability_sims_adjusted_cohens_d %>%
-  ggplot(aes(x = n_sims, y = z_value)) +
-  geom_point() +
-  geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
-  geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
-               arrow = arrow(length = unit(0.3, "cm")),
-               color = "black") +
-  annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line significant)", hjust = -0.1, vjust = 0) +
-  annotate("text", x = 300, y = stability_sims_adjusted_cohens_d$z_value[1] - 0.1, label = "simulated z-values",
-           hjust = -0.1, vjust = 0) +
-  theme_minimal() +
-  labs(
-    x = "Number of Simulations",
-    y = "z-value",
-    title = "Stability of the Statistic of the Difference between \nMedication and Psychotherapy Control Arms",
-    subtitle = "Results from 1000 simulations with within-group standard errors"
-  )
-stab_sims_adjusted_cohens_d
-pdf(file = "stab_sims_adjusted_cohens_d.pdf")
-stab_sims_adjusted_cohens_d
-dev.off()
-
+# 
+# # plot the mean z for the difference between controls
+# z_psy_con_vs_med_con <- 0
+# for(i in 1: length(list_model_1_meta_reg_adj_cohens_d )){
+#   z_psy_con_vs_med_con[i] <- list_model_1_meta_reg_adj_cohens_d [[i]]$zval[condition=="psychotherapy_control"]
+#   
+# }
+# 
+# 
+# 
+# stability_sims_adjusted_cohens_d <- data.frame(n_sims = 1:1000, z_value = z_psy_con_vs_med_con)
+# 
+# 
+# stab_sims_adjusted_cohens_d <- stability_sims_adjusted_cohens_d %>%
+#   ggplot(aes(x = n_sims, y = z_value)) +
+#   geom_point() +
+#   geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
+#   geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
+#                arrow = arrow(length = unit(0.3, "cm")),
+#                color = "black") +
+#   annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line significant)", hjust = -0.1, vjust = 0) +
+#   annotate("text", x = 300, y = stability_sims_adjusted_cohens_d$z_value[1] - 0.1, label = "simulated z-values",
+#            hjust = -0.1, vjust = 0) +
+#   theme_minimal() +
+#   labs(
+#     x = "Number of Simulations",
+#     y = "z-value",
+#     title = "Stability of the Statistic of the Difference between \nMedication and Psychotherapy Control Arms",
+#     subtitle = "Results from 1000 simulations with within-group standard errors"
+#   )
+# stab_sims_adjusted_cohens_d
+# pdf(file = "stab_sims_adjusted_cohens_d.pdf")
+# stab_sims_adjusted_cohens_d
+# dev.off()
+# 
 
 ```
 
 We have also run models to take into accountregression to the mean within CDRS and HAMD.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-####code to extract baseline-adjusted post means for CDRS and HAMD 
-
- 
-
-de_meaned_baselilne_mean_cdrs <- (list_cdrs_study[[1]]$baseline_mean - mean(list_cdrs_study[[1]]$baseline_mean, na.rm = TRUE)) 
-
-                                    
-
- 
-
-                                 
-
-lm_for_cdrs_smds <- lm(list_cdrs_study[[1]]$post_mean ~ de_meaned_baselilne_mean_cdrs +list_cdrs_study[[1]]$four_level_var,
-
- 
-
-  na.action=na.exclude,
-
-   )
-
- 
-
- 
-
-#summary(lm_for_cdrs_smds)
-
- 
-
-coefs_lm_for_cdrs_smds  <- broom:: tidy(lm_for_cdrs_smds)
-
- 
-
-condition <- coefs_lm_for_cdrs_smds$term
-
-cdrs_smds <-c(coefs_lm_for_cdrs_smds$estimate[1], coefs_lm_for_cdrs_smds$estimate[-1] + coefs_lm_for_cdrs_smds$estimate[1])
-
-cdrs_upper_ci <- cdrs_smds + coefs_lm_for_cdrs_smds$std.error*1.96
-
-cdrs_lower_ci <- cdrs_smds - coefs_lm_for_cdrs_smds$std.error*1.96
-
- 
-
-cdrs_smd_with_cis <- data.frame (
-
-  condition = levels(list_hamd_study$four_level_var),
-
-  cdrs_smds = cdrs_smds[-2],
-
-  cdrs_upper_ci = cdrs_upper_ci[-2],
-
-  cdrs_lower_ci = cdrs_lower_ci[-2]
-
-)
-
- 
-
- 
-
-# do the same for hamd
-
-de_meaned_baselilne_mean_hamd <- (list_hamd_study$baseline_mean - mean(list_hamd_study$baseline_mean, na.rm = TRUE)) 
-
- 
-
- 
-
- 
-
-lm_for_hamd_smds <- lm(list_hamd_study$post_mean ~ de_meaned_baselilne_mean_hamd +list_hamd_study$four_level_var,
-
-                      
-
-                       na.action=na.exclude,
-
-)
-
- 
-
- 
-
-#summary(lm_for_hamd_smds)
-
- 
-
-coefs_lm_for_hamd_smds  <- broom:: tidy(lm_for_hamd_smds)
-
- 
-
- 
-
-condition <- coefs_lm_for_hamd_smds$term
-
-hamd_smds <-c(coefs_lm_for_hamd_smds$estimate[1], coefs_lm_for_hamd_smds$estimate[-1] + coefs_lm_for_hamd_smds$estimate[1])
-
-hamd_upper_ci <- hamd_smds + coefs_lm_for_hamd_smds$std.error*1.96
-
-hamd_lower_ci <- hamd_smds - coefs_lm_for_hamd_smds$std.error*1.96
-
- 
-
-hamd_smd_with_cis <- data.frame (
-
-condition = levels(list_hamd_study$four_level_var),
-
-hamd_smds = hamd_smds[-2],
-
-hamd_upper_ci = hamd_upper_ci[-2],
-
-hamd_lower_ci = hamd_lower_ci[-2]
-
-)
-
- 
-
- 
+```{# {r, warning=FALSE, message = FALSE, echo=FALSE}
+# ####code to extract baseline-adjusted post means for CDRS and HAMD 
+# 
+#  
+# 
+# de_meaned_baselilne_mean_cdrs <- (list_cdrs_study[[1]]$baseline_mean - mean(list_cdrs_study[[1]]$baseline_mean, na.rm = TRUE)) 
+# 
+#                                     
+# 
+#  
+# 
+#                                  
+# 
+# lm_for_cdrs_smds <- lm(list_cdrs_study[[1]]$post_mean ~ de_meaned_baselilne_mean_cdrs +list_cdrs_study[[1]]$four_level_var,
+# 
+#  
+# 
+#   na.action=na.exclude,
+# 
+#    )
+# 
+#  
+# 
+#  
+# 
+# #summary(lm_for_cdrs_smds)
+# 
+#  
+# 
+# coefs_lm_for_cdrs_smds  <- broom:: tidy(lm_for_cdrs_smds)
+# 
+#  
+# 
+# condition <- coefs_lm_for_cdrs_smds$term
+# 
+# cdrs_smds <-c(coefs_lm_for_cdrs_smds$estimate[1], coefs_lm_for_cdrs_smds$estimate[-1] + coefs_lm_for_cdrs_smds$estimate[1])
+# 
+# cdrs_upper_ci <- cdrs_smds + coefs_lm_for_cdrs_smds$std.error*1.96
+# 
+# cdrs_lower_ci <- cdrs_smds - coefs_lm_for_cdrs_smds$std.error*1.96
+# 
+#  
+# 
+# cdrs_smd_with_cis <- data.frame (
+# 
+#   condition = levels(list_hamd_study$four_level_var),
+# 
+#   cdrs_smds = cdrs_smds[-2],
+# 
+#   cdrs_upper_ci = cdrs_upper_ci[-2],
+# 
+#   cdrs_lower_ci = cdrs_lower_ci[-2]
+# 
+# )
+# 
+#  
+# 
+#  
+# 
+# # do the same for hamd
+# 
+# de_meaned_baselilne_mean_hamd <- (list_hamd_study$baseline_mean - mean(list_hamd_study$baseline_mean, na.rm = TRUE)) 
+# 
+#  
+# 
+#  
+# 
+#  
+# 
+# lm_for_hamd_smds <- lm(list_hamd_study$post_mean ~ de_meaned_baselilne_mean_hamd +list_hamd_study$four_level_var,
+# 
+#                       
+# 
+#                        na.action=na.exclude,
+# 
+# )
+# 
+#  
+# 
+#  
+# 
+# #summary(lm_for_hamd_smds)
+# 
+#  
+# 
+# coefs_lm_for_hamd_smds  <- broom:: tidy(lm_for_hamd_smds)
+# 
+#  
+# 
+#  
+# 
+# condition <- coefs_lm_for_hamd_smds$term
+# 
+# hamd_smds <-c(coefs_lm_for_hamd_smds$estimate[1], coefs_lm_for_hamd_smds$estimate[-1] + coefs_lm_for_hamd_smds$estimate[1])
+# 
+# hamd_upper_ci <- hamd_smds + coefs_lm_for_hamd_smds$std.error*1.96
+# 
+# hamd_lower_ci <- hamd_smds - coefs_lm_for_hamd_smds$std.error*1.96
+# 
+#  
+# 
+# hamd_smd_with_cis <- data.frame (
+# 
+# condition = levels(list_hamd_study$four_level_var),
+# 
+# hamd_smds = hamd_smds[-2],
+# 
+# hamd_upper_ci = hamd_upper_ci[-2],
+# 
+# hamd_lower_ci = hamd_lower_ci[-2]
+# 
+# )
+# 
+#  
+# 
+#  
 
 
 ```
