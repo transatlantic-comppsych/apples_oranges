@@ -953,7 +953,56 @@ coef_and_se_means_cdrs_study <- data.frame(cbind(condition, coef_and_se_means_cd
 # add the ns to the dataframe
 coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study$is_missing ==F,]$n
 
-# F. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
+# F Clinical Levels Depression Sensitivity Analysis ---------------------------------------
+
+# We need to decide how we want to do this. We have mdd, mood, sub, and cut categories. For now I'll just exclude sub. 
+
+# test <- df_appl_v_orange %>%
+#   filter(psy_or_med == 1) %>%
+#   distinct(new_study_id, .keep_all = TRUE)
+# 
+# summary_test <- test %>%
+#   group_by(diagnosis) %>%
+#   summarise(count = n())
+
+#take study ids where sample has clinical levels of depression
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+# use those ids to subset all dataframes in the list
+list_clin_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+
+  list_clin_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                          %in% clin_study_ids,]
+
+}
+
+# count the number of studies
+study_count_clin_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% clin_study_ids,])
+# CB checked, correct. 
+
+# apply the metareg function to the list of clinical studies
+model_1 <- as.formula(~ four_level_var)
+list_model_1_clin_study <- run_metaregression(list_clin_study , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_clin_study <-  aggregate_model_results(list_model_1_clin_study, condition)
+
+# extract SMDs from the list for clinical studies
+means_clin_study <-  lapply(list_model_1_clin_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_clin_study <- calculate_mean_coefs_ses(means_clin_study, condition)
+coef_and_se_means_clin_study <- data.frame(cbind(condition, coef_and_se_means_clin_study))
+
+# add the ns to the dataframe
+coef_and_se_means_clin_study$n  <- study_count_clin_study[study_count_clin_study$is_missing ==F,]$n
+
+# G. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
 
 
 # the first thing to do is to create a new dataset with the percentage cohen's d
@@ -968,9 +1017,6 @@ for(i in 1: length(list_df_simulated_percentage)){
                   
   
 }
-
-
-
 
 # specify model
 model_1 <- as.formula(~ four_level_var )
