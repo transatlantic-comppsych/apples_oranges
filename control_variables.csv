@@ -1,0 +1,11 @@
+"","Group","Column","N","Mean","Std_Dev","Median","IQR"
+"1","psychotherapy_active","Number_of_sessions",62,14.6774193548387,11.9201911547391,12,6
+"2","psychotherapy_control","Number_of_sessions",26,8.57692307692308,7.91036321251092,8,10.25
+"3","psychotherapy_active","frequency_weeks",54,1.4212962962963,0.692294643064795,1,1
+"4","psychotherapy_control","frequency_weeks",23,0.805652173913043,0.634871684150403,1,0.795
+"5","psychotherapy_active","Length_of_sessions_mins",53,71.822641509434,28.6139734658371,60,40
+"6","psychotherapy_control","Length_of_sessions_mins",22,42.9545454545455,33.8733316548963,45,43.75
+"7","psychotherapy_active","Total_hours_of_intervention_hours",52,15.1025,9.81806875203101,12,10.025
+"8","psychotherapy_control","Total_hours_of_intervention_hours",21,7.77619047619048,8.71037626982352,6,9.5
+"9","psychotherapy_active","Total_period_of_intervention_weeks",61,11.4590163934426,7.7191833991509,10,5
+"10","psychotherapy_control","Total_period_of_intervention_weeks",30,9.342,7.88310869889669,8,7
