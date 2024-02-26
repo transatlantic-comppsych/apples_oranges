@@ -503,7 +503,6 @@ df_appl_v_orange$baseline_st_error_control <-
   df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
 
 
-
 # Turn into a long database with unique rows ------------------------------
 
 
@@ -558,6 +557,12 @@ df_long_for_metan <- rbind(active_df, control_df)
 
 df_long_for_metan <- df_long_for_metan %>%
   filter(!(new_study_id == "March, 2004" & is.na(treatment)))
+
+# Turn age sd into se
+
+df_long_for_metan <- df_long_for_metan %>% 
+  mutate (se_age = sd_age / sqrt(baseline_n) )
+
 
 #dim(df_long_for_metan ) #check dimension
 #make sure no study lost
@@ -1434,8 +1439,6 @@ summary_result <- filtered_data %>%
 
 # Now the CBT + med studies, filtering out the subclinical studies
 
-# Now CBT + all med studies
-
 clin_cbt_meds_study_ids <-
   df_appl_v_orange[(df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0) & df_appl_v_orange$diagnosis != "sub", ]$new_study_id
 
@@ -1458,19 +1461,42 @@ results_clin_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(clin_c
 
 # Now start looking at perc_women variable 
 
-met_perc_women <- metagen(TE = "percent_women",
-                           seTE = "percent_women_std_error",
-                           studlab = "new_study_id",
-                          data = df_long_for_metan,
+df_for_gender_metan <- list_df_simulated[[1]] %>% 
+  filter(!is.na(percent_women))
+
+met_perc_women <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan,
                            sm = "SMD",
                            fixed = FALSE,
                            random = TRUE,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "percentage women across studies",
-                          subgroup = "four_level_var",
-                          tau.common = FALSE,
-                          na.rm = TRUE)
+                           subgroup = four_level_var,
+                           tau.common = FALSE)
+met_perc_women
+
+# Now start looking at age variable
+
+df_for_age_metan <- list_df_simulated[[1]] %>% 
+  filter(!is.na(mean_age))
+
+met_age <- metagen(TE = mean_age,
+                           seTE = sd_age / sqrt(baseline_n),
+                           studlab = new_study_id,
+                           data = df_for_age_metan,
+                           sm = "SMD",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across studies",
+                           subgroup = four_level_var,
+                           tau.common = FALSE)
+
+met_age
 
 # ### get CDRS clin studies
 #  clin_cdrs_studies_baseline_metareg <- cdrs_studies_for_baseline_metareg %>% 
