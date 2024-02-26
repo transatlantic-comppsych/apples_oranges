@@ -1381,29 +1381,6 @@ mdd_studies_baseline_metareg$baseline_mean <- mdd_studies_baseline_metareg$perc_
 results_mdd_studies_baseline_metareg <- run_metareg_and_extract(mdd_studies_baseline_metareg,  
                                                          model_1, condition)
 
-# # Now CBT studies
-# 
-# cbt_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$active_type == "cbt",]$new_study_id
-# 
-# cbt_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-#   filter(new_study_id %in% cbt_study_ids) %>% 
-#   filter(!(arm_effect_size == "cohens_d_active" & !(type == "cbt")))
-# 
-# 
-# #turn sds to sec
-# cbt_studies_baseline_metareg$baseline_stand_error <- cbt_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(cbt_studies_baseline_metareg$baseline_n)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# cbt_studies_baseline_metareg$baseline_mean <- cbt_studies_baseline_metareg$perc_baseline_mean
-# results_cbt_studies_baseline_metareg <- run_metareg_and_extract(cbt_studies_baseline_metareg,  
-#                                                          model_1, condition)
-
 # Now CBT + all med studies
 
 cbt_meds_study_ids <-
@@ -1468,7 +1445,7 @@ met_perc_women <- metagen(TE = percent_women,
                            seTE = percent_women_std_error,
                            studlab = new_study_id,
                            data = df_for_gender_metan,
-                           sm = "SMD",
+                           sm = "",
                            fixed = FALSE,
                            random = TRUE,
                            method.tau = "REML",
@@ -1477,6 +1454,25 @@ met_perc_women <- metagen(TE = percent_women,
                            subgroup = four_level_var,
                            tau.common = FALSE)
 met_perc_women
+
+# looking at clinical sample only
+
+df_for_gender_metan_clin <- df_for_gender_metan %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_perc_women_clin <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across clinical studies",
+                           subgroup = four_level_var,
+                           tau.common = FALSE)
+met_perc_women_clin
 
 # Now start looking at age variable
 
@@ -1487,12 +1483,32 @@ met_age <- metagen(TE = mean_age,
                            seTE = sd_age / sqrt(baseline_n),
                            studlab = new_study_id,
                            data = df_for_age_metan,
-                           sm = "SMD",
+                           sm = "",
                            fixed = FALSE,
                            random = TRUE,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "age across studies",
+                           subgroup = four_level_var,
+                           tau.common = FALSE)
+
+met_age
+
+# looking at clinical sample only
+
+df_for_age_metan_clin <- df_for_age_metan %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_age <- metagen(TE = mean_age,
+                           seTE = sd_age / sqrt(baseline_n),
+                           studlab = new_study_id,
+                           data = df_for_age_metan_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across clinical studies",
                            subgroup = four_level_var,
                            tau.common = FALSE)
 
