@@ -478,21 +478,6 @@ df_appl_v_orange <- df_appl_v_orange %>%
 df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
 
 
-
-# Create SEs proportions for percentage women --------------------------------------------
-
-# # We also need to calculate SE for proportion women for the baseline calculations
-# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
-
-product_perc_women <-  (df_appl_v_orange$percent_women/100)*
-  (1-(df_appl_v_orange$percent_women/100) ) 
-
-total_n <- df_appl_v_orange$baseline_n_active + 
-  df_appl_v_orange$baseline_n_control
-
-df_appl_v_orange$percent_women_std_error <- sqrt(product_perc_women/total_n )
-
-
 # Calculate SE for baseline severity --------------------------------------
 
 
@@ -528,11 +513,19 @@ df_with_distinct_instruments <-  df_appl_v_orange %>%
 write.csv(df_with_distinct_instruments, "df_with_distinct_instruments.csv")
 
 # Step 2: turn dataframes to long
+
+# A small bit of cleaning
+
+df_with_distinct_instruments <- df_with_distinct_instruments %>% 
+  rename (percent_women_active = active_percent_women, 
+          percent_women_control = control_percent_women,
+          percent_women_overall = percent_women)
+
 # A: turn long the rows with active
 active_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, active_type, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
                  baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active,
-                 perc_baseline_mean_active, perc_baseline_sd_active, perc_post_mean_active, perc_post_sd_active, percent_women, percent_women_std_error, mean_age, sd_age) %>% 
+                 perc_baseline_mean_active, perc_baseline_sd_active, perc_post_mean_active, perc_post_sd_active, percent_women_overall, percent_women_active, age_m_active, age_sd_active, age_m_overall, age_sd_overall) %>% 
   rename(treatment = descr_active) %>% 
   rename(type = active_type) %>% 
   rename_with(~ str_remove(., "_active")) %>% 
@@ -543,7 +536,7 @@ active_df <- df_with_distinct_instruments %>%
 control_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, control_type, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
                  baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control,
-                 perc_baseline_mean_control, perc_baseline_sd_control, perc_post_mean_control, perc_post_sd_control, percent_women, percent_women_std_error, mean_age, sd_age) %>% 
+                 perc_baseline_mean_control, perc_baseline_sd_control, perc_post_mean_control, perc_post_sd_control, percent_women_overall, percent_women_control, age_m_control, age_sd_control, age_m_overall, age_sd_overall) %>% 
   rename(treatment = descr_control) %>% 
   rename(type = control_type) %>% 
   rename_with(~ str_remove(., "_control")) %>% 
@@ -558,11 +551,33 @@ df_long_for_metan <- rbind(active_df, control_df)
 df_long_for_metan <- df_long_for_metan %>%
   filter(!(new_study_id == "March, 2004" & is.na(treatment)))
 
-# Turn age sd into se
+# I'm going to perform  the operations to calculate overall age and percent women here now, I previously did this in the other script, however it actually needs to be done once the dataframe is turned long. 
 
 df_long_for_metan <- df_long_for_metan %>% 
-  mutate (se_age = sd_age / sqrt(baseline_n) )
+  group_by(new_study_id) %>%
+  mutate(n_overall = sum(baseline_n)) %>% 
+  mutate(age_overall = sum(age_m * baseline_n) / sum(baseline_n)) %>% 
+  mutate(mean_age = coalesce(age_overall, age_m_overall)) %>% 
+  mutate(pooled_sd_age = sqrt(sum((age_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
+  mutate(se_age = pooled_sd_age / sqrt(n_overall)) %>% 
+  mutate(gender_overall = sum(percent_women * baseline_n) / sum(baseline_n)) %>% 
+  mutate(percent_women = coalesce(percent_women_overall, gender_overall)) 
+         
+# now just get rid of the unnecessary columns as these are causing clutter
 
+df_long_for_metan <- df_long_for_metan %>% 
+  select(-c(percent_women_overall, age_m, age_sd, age_m_overall, age_sd_overall, age_overall, gender_overall))
+
+# Create SEs proportions for percentage women --------------------------------------------
+
+# # We also need to calculate SE for proportion women for the baseline calculations
+# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
+
+df_long_for_metan <- df_long_for_metan %>% 
+  mutate(product_perc_women = (percent_women/100)* (1-(percent_women/100)) )
+
+df_long_for_metan <- df_long_for_metan %>% 
+  mutate(percent_women_std_error = sqrt(product_perc_women/ n_overall ))
 
 #dim(df_long_for_metan ) #check dimension
 #make sure no study lost
@@ -711,7 +726,6 @@ The data for the studies included in this metanalysis are summarised in Suppleme
 # Get Ns, run metareg, prepare graphing ------------------------------------------------------
 library(tidyverse)
 library(metafor)
-
 
 # add a new multilevel variable to the simulated data for the regression
 
@@ -1021,7 +1035,6 @@ for(i in 1: length(list_df_simulated_percentage)){
             (list_df_simulated_percentage[[i]]$perc_post_mean - list_df_simulated_percentage[[i]]$perc_baseline_mean)/
     ((list_df_simulated_percentage[[i]]$perc_post_sd + list_df_simulated_percentage[[i]]$perc_baseline_sd)/2)     
                   
-  
 }
 
 # specify model
@@ -1045,7 +1058,6 @@ df_mean_coefs_perc <- data.frame(cbind(condition,df_mean_coefs_perc))
 
 # add the ns
 df_mean_coefs_perc <- data.frame(cbind(df_mean_coefs_perc, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
-
 
 ##### now for the baseline controlled variable
 # specify model
@@ -1313,7 +1325,6 @@ hamd_study_ids <-
   df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
 
 
-
 list_hamd_study <- list_df_simulated[[1]][list_df_simulated[[1]]$new_study_id
                                                           %in% hamd_study_ids,]
 
@@ -1436,9 +1447,15 @@ clin_cbt_meds_studies_baseline_metareg$baseline_mean <- clin_cbt_meds_studies_ba
 results_clin_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(clin_cbt_meds_studies_baseline_metareg,  
                                                          model_1, condition)
 
+# Looking at demographics at baseline
+# Currently we have both control and active conditions, we just need each study once
+
+df_baseline_demographics <- df_long_for_metan %>% 
+  distinct(new_study_id, .keep_all = TRUE)
+
 # Now start looking at perc_women variable 
 
-df_for_gender_metan <- list_df_simulated[[1]] %>% 
+df_for_gender_metan <- df_baseline_demographics %>% 
   filter(!is.na(percent_women))
 
 met_perc_women <- metagen(TE = percent_women,
@@ -1451,7 +1468,7 @@ met_perc_women <- metagen(TE = percent_women,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "percentage women across studies",
-                           subgroup = four_level_var,
+                           subgroup = psy_or_med,
                            tau.common = FALSE)
 met_perc_women
 
@@ -1470,17 +1487,40 @@ met_perc_women_clin <- metagen(TE = percent_women,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "percentage women across clinical studies",
-                           subgroup = four_level_var,
+                           subgroup = psy_or_med,
                            tau.common = FALSE)
 met_perc_women_clin
 
+# Now looking at the CBT + med studies only
+
+cbt_meds_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
+
+df_for_gender_metan_cbt <- df_for_gender_metan %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_perc_women_cbt <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across cbt and med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_perc_women_cbt
+
 # Now start looking at age variable
 
-df_for_age_metan <- list_df_simulated[[1]] %>% 
+df_for_age_metan <- df_baseline_demographics %>% 
   filter(!is.na(mean_age))
 
 met_age <- metagen(TE = mean_age,
-                           seTE = sd_age / sqrt(baseline_n),
+                           seTE = se_age,
                            studlab = new_study_id,
                            data = df_for_age_metan,
                            sm = "",
@@ -1489,7 +1529,7 @@ met_age <- metagen(TE = mean_age,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "age across studies",
-                           subgroup = four_level_var,
+                           subgroup = psy_or_med,
                            tau.common = FALSE)
 
 met_age
@@ -1499,8 +1539,8 @@ met_age
 df_for_age_metan_clin <- df_for_age_metan %>%
   filter(new_study_id %in% clin_study_ids)
 
-met_age <- metagen(TE = mean_age,
-                           seTE = sd_age / sqrt(baseline_n),
+met_age_clin <- metagen(TE = mean_age,
+                           seTE = se_age,
                            studlab = new_study_id,
                            data = df_for_age_metan_clin,
                            sm = "",
@@ -1509,10 +1549,56 @@ met_age <- metagen(TE = mean_age,
                            method.tau = "REML",
                            hakn = TRUE,
                            title = "age across clinical studies",
-                           subgroup = four_level_var,
+                           subgroup = psy_or_med,
                            tau.common = FALSE)
 
-met_age
+met_age_clin
+
+# Now cbt studies only
+
+df_for_age_metan_cbt <- df_for_age_metan %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_age_cbt <- metagen(TE = mean_age,
+                           seTE = se_age,
+                           studlab = new_study_id,
+                           data = df_for_age_metan_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across cbt + med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+met_age_cbt
+
+# Now look at baseline severity for overall psy vs med
+# Need to calculate the variables first
+
+df_for_baseline_severity <- df_long_for_metan %>% 
+  group_by(new_study_id) %>%
+  mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
+  mutate(pooled_perc_sd_baseline = sqrt(sum((perc_baseline_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
+  mutate(perc_se_baseline = pooled_perc_sd_baseline / sqrt(n_overall)) 
+
+df_for_baseline_severity <- df_for_baseline_severity %>% 
+  distinct(new_study_id, .keep_all = TRUE)
+
+met_sev <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
 
 # ### get CDRS clin studies
 #  clin_cdrs_studies_baseline_metareg <- cdrs_studies_for_baseline_metareg %>% 

@@ -108,24 +108,26 @@ cor(merged_dataset$responders_control, merged_dataset$cuij_responders_control, m
 #rename dataframe
 df_appl_v_orange <- merged_dataset
 
-# We have percent_women reported overall for psy trials but per arm for med trials
-#create overall percent women variable for all studies
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
-                                                 /(baseline_n_active + baseline_n_control))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+# The code below should actually be implemented once we turn the dataframe to long, which we do in the quarto. So I will not run this code here. 
 
-# we have separate age variables for each arm and for overall. Where age is reported per arm, I will calculate an overall. 
-# I'm using an old variable name so I don't have the change the rest of the code
- 
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (age_m_active * baseline_n_active + age_m_control * baseline_n_control)
-                                                 /(baseline_n_active + baseline_n_control))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(age_m_overall, overall_mean_age))
-
-# I'd like to create a pooled SD for age
-df_appl_v_orange <- df_appl_v_orange %>%  
-  mutate(pooled_sd_age = sqrt(  (   (baseline_n_active - 1)*((age_sd_active)^2)   + (baseline_n_control - 1)*((age_sd_control)^2)) /
-                                                                        (baseline_n_active + baseline_n_control - 2)))
-df_appl_v_orange <- df_appl_v_orange %>%  mutate(sd_age = coalesce(age_sd_overall , pooled_sd_age))
+# # We have percent_women reported overall for psy trials but per arm for med trials
+# #create overall percent women variable for all studies
+# df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_percent_women = (active_percent_women * baseline_n_active + control_percent_women * baseline_n_control)
+#                                                  /(baseline_n_active + baseline_n_control))
+# df_appl_v_orange <- df_appl_v_orange %>%  mutate(percent_women = coalesce(percent_women, overall_percent_women))
+# 
+# # we have separate age variables for each arm and for overall. Where age is reported per arm, I will calculate an overall. 
+# # I'm using an old variable name so I don't have the change the rest of the code
+#  
+# df_appl_v_orange <- df_appl_v_orange %>%  mutate(overall_mean_age = (age_m_active * baseline_n_active + age_m_control * baseline_n_control)
+#                                                  /(baseline_n_active + baseline_n_control))
+# df_appl_v_orange <- df_appl_v_orange %>%  mutate(mean_age = coalesce(age_m_overall, overall_mean_age))
+# 
+# # I'd like to create a pooled SD for age
+# df_appl_v_orange <- df_appl_v_orange %>%  
+#   mutate(pooled_sd_age = sqrt(  (   (baseline_n_active - 1)*((age_sd_active)^2)   + (baseline_n_control - 1)*((age_sd_control)^2)) /
+#                                                                         (baseline_n_active + baseline_n_control - 2)))
+# df_appl_v_orange <- df_appl_v_orange %>%  mutate(sd_age = coalesce(age_sd_overall , pooled_sd_age))
 
 # calculate cohens d
 df_appl_v_orange <- df_appl_v_orange %>% 
@@ -164,7 +166,7 @@ meds_baseline_means[[i]] <- df_appl_v_orange  %>%
   filter(psy_or_med == 0, (instrument_name == inst_names[i])) %>% 
   summarise(n = n(), total_n_control = sum(baseline_n_control, na.rm = T), 
             total_n_active = sum(baseline_n_active, na.rm = T),
-            avg_age = mean(mean_age, na.rm = T),
+ #           avg_age = mean(mean_age, na.rm = T),
             avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
             sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
@@ -175,7 +177,7 @@ psy_baseline_means[[i]] <- df_appl_v_orange  %>%
   filter(psy_or_med == 1, (instrument_name == inst_names[i])) %>% 
   summarise(n = n(), total_n_control = sum(baseline_n_control, na.rm = T), 
             total_n_active = sum(baseline_n_active, na.rm = T),
-             avg_age = mean(mean_age, na.rm = T),
+      #       avg_age = mean(mean_age, na.rm = T),
             avg_baseline_mean_act = mean(baseline_mean_active, na.rm = T), 
             sd_baseline_mean_act = sd(baseline_mean_active, na.rm = T), 
             avg_baseline_mean_ctrl = mean(baseline_mean_control, na.rm = T), 
@@ -250,7 +252,7 @@ df_demographics <- df_first_row %>% dplyr:: select(study, year, psy_or_med, acti
                                            instrument_name, baseline_mean_active, baseline_sd_active, baseline_n_active,
                                            baseline_mean_control, baseline_sd_control, baseline_n_control, 
                                            post_mean_active, post_sd_active, post_n_active, post_mean_control, post_sd_control, post_n_control,
-                                           cohens_d_active, cohens_d_control,  mean_age, percent_women)
+                                           cohens_d_active, cohens_d_control, percent_women)
 
 # combine arm description variables across psy and med
 df_demographics$descr_active <- ifelse(is.na(df_demographics$descr_active), df_demographics$active_type, df_demographics$descr_active)
@@ -270,7 +272,7 @@ df_means_demo <- df_demographics %>%
   group_by(psy_or_med) %>% 
   summarise(mean_cohens_d_active = mean(cohens_d_active, na.rm = TRUE),
   mean_cohens_d_control = mean(cohens_d_control, na.rm = TRUE),
-  mean_age = mean(mean_age, na.rm = TRUE), 
+#  mean_age = mean(mean_age, na.rm = TRUE), 
   mean_percent_women = mean(percent_women, na.rm = TRUE),
   missing_d = sum(is.na(cohens_d_active)))
 
@@ -303,9 +305,9 @@ n <- c(get_cdrs_means$total_n_control[1],get_cdrs_means$total_n_control[2])
 s <- c(get_cdrs_means$sd_d_ctrl[1],get_cdrs_means$sd_d_ctrl[2])
 t.test.fromSummaryStats(mu,n,s)
 
-df_demographics %>% 
-  group_by(psy_or_med ) %>% 
-  summarise (avg_age = mean(mean_age, na.rm = T), sd_age = sd(mean_age, na.rm = T))
+# df_demographics %>% 
+#   group_by(psy_or_med ) %>% 
+#   summarise (avg_age = mean(mean_age, na.rm = T), sd_age = sd(mean_age, na.rm = T))
 
 #openxlsx:: write.xlsx(df_stats_per_instrument, file = "test_2.xlsx", colNames = T, borders = "columns", asTable = F)
 
