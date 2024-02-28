@@ -84,33 +84,48 @@ format:
 
 # Introduction
 
-Depression is the leading cause of disability in adolescents and influential guidelines recommend that it be treated with either psychotherapy or anti-depressant medication or their combination. The evidence base for this recommendation typically derives from the appraisal of randomised controlled trials (RCTs) in which one modality (psychotherapy or anti-depressants) are compared against a control condition. In this paper we: a) test the hypothesis that medication control arms are more efficacious than psychotherapy control arms and that this undermines the validity of treatment comparisons and therefore of existing guidelines about depression treatment; b) explore how variation in treatment control arms can itself be exploited to advance our thinking concerning the mechanisms of depression and its treatment.
+There are two principal treatment modalities for adolescent depression: psychotherapy, medication, or both. Where does one turn to find the evidence that will inform their treatment options? This question is relevant for patients and their carers, for clinicians and for policy makers when they plan services. However, the question is particularly difficult to answer for adolescent depression, where there are limited data from head-to-head trials of medication and psychotherapy, and where recommendations must therefore be derived from indirect comparisons of treatment efficacy.
 
-Clinicians across medicine and other health professions are faced with choices between different treatment modalities for their patients, be it between surgical or medical (drug-based) treatments or, in the case of adolescent depression, between psychotherapy and antidepressant medication. To make informed choices, clinicians rely on the extant evidence, frequently summarised in the form of national guidelines or other treatment recommendations. Such a comparison is inherent in the internationally influential UK National Institute of Clinical Excellence (NICE) guidelines for adolescent depression which recommend that youth be first offered psychological therapy over medication for most presentations of depression. Such comparisons between the two treatment modalities are inherent in other recommendations, e.g. the practice parameter issued by the American Academy of Child and Adolescent Psychiatry or the Royal Australian and New Zealand College of Psychiatrists.
+Guidelines, such as the ones that the internationally influential UK National Institute of Clinical Excellence (NICE) have produced for adolescent depression, are a principal source of such information. NICE recommend that youth be first offered psychological therapy (specifically cognitive behaviour therapy and interpersonal therapy) over medication for most presentations of depression. This conclusion is in keeping with two sources of evidence. On the one hand, medication meta-analyses that cast doubt on the efficacy of most antidepressants, with the exception of fluoxetine (ref); and on the other hand, psychotherapy meta-analyses that conclude psychotherapy to be effective for adolescent depression (ref). However, such conclusions seem at odds with those of a recent network meta-analysis (ref), an established method of comparing treatments with each other using both direct (head-to-head) and indirect (indirectly treatment A with treatment C, via studies that directly compare treatments A with B and B with C) evidence. Indeed, the network meta-analysis concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than pill placebo or psychological controls. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make decisions on treatment options for adolescent depression?  
 
-These recommendations are not based on head to head trials between modalities; only one head-to-head trial exists in adolescent depression. Instead, they rely on the comparison of the results of randomised controlled trials (RCTs) of each modality against RCTs of the other. In other words, it rests on a comparison of comparisons.
+In this paper, we examine whether the existing evidence base for adolescent depression treatment can offer valid answers to such questions. Below, we provide a conceptual framework for answering such questions and state our hypotheses that we will test using data from existing trials. Two points are relevant to indirect comparisons of treatment modalities with each other.
 
-In the case of antidepressant studies, the control is the placebo pill (standard also in the rest of medicine), whilst controls for psychotherapy studies can vary substantially from waiting list to treatment as usual to an attention control, such as psychoeducation. Stated in simple formal terms, the comparison relies on testing this equality,
+First, whether the participants of trials in one modality are comparable to those in another modality. Second, whether key conditions of the trial, such as the effects of control conditions or the number of sites involved in a trial, are comparable.
 
-$$Effect_{Med} = Effect_{Psy}$$ {#eq-1}
+Starting with the first point, to be able to compare between different trials one must assume that these trials sample from the same population. If they do not, then the validity of any comparisons, including those conducted through network metanalysis (which rests on the principal of transitivity) are questionable.
 
-where *Effect* denotes the effect on depression that either medication (*Med* ) or psychotherapy (*Psy*) have. Yet for this indirect comparison to be valid, some basic assumptions need to hold. The most important of these is the *all-else-being-equal,* or more technically *ceteris paribus,* assumption with regards to trial design. By necessity, therefore, the control conditions for each antidepressant and psychotherapy trials must be equal for inferences to be valid. We call this the *equality of controls* assumption.
+Indeed, comparing outcomes (Y) between psychotherapy and medication trials requires us to contrast what is called the sample average treatment effect $\tau$ of each, defined in the following way:
 
-The importance of this assumption can be easily intuited by expanding equation 1 to include the comparisons on which each side of that equation rests:
+$$
+\tau_{psy} =  E(Y_{1} - Y_{0} \,|\, S, psy)
+$$
+$$
+\tau_{med} =  E(Y_{1} - Y_{0} \,|\, S, med)\ 
+$$ {#eq-1}
 
-$$Effect_{MedActive} - Effect_{MedControls} = Effect_{PsyActive} - Effect_{PsyControls}$$ {#eq-2}
+where the operator E denotes the expectation over the differences in outcomes between those who received the intervention (T = 1) and those who received the control condition (T = 0), for each sample, $S$, where psy and med stand for psychotherapy and medication respectively.
 
-where MedActive and PsyActive are the active arms of antidepressant and psychotherapy trials, respectively, and MedControls and PsyControls the respective control arms. The assumption here has to be that the controls are equal, that is, $$ Effect_{MedControls} = Effect_{PsyControls}$$ A simple example from medicine helps illustrate why this assumption is important Let the two modalities of treatment for appendicitis be antibiotic medication and surgery, and let there be a set of trials for each modality. In the medication trials, on average 40% of participants respond to the antibiotics and only 0% to placebo; in the surgery trial, 80% of people respond to surgery and 40% to sham. If one relied on Equation 1 to compare the treatments they would arrive at the absurd conclusion that the two treatments are equal and recommend to a patient that it does not really matter which one they choose. Playing around with numbers in which no equality of the respective control arms is required, leads to other risible conclusions. Yet, in the dicussion about depression treatments, a focus on the equality of controls is surprisingly absent.
+Obviously, this comparison rests on the assumption that trials in both modalities sample from the same population, $P$, of patients. Formally, this can be expressed as follows:
 
-The importance of testing the equality of controls assumption for patients and the public can be vast because treatment guidelines, clinicians' advice to patients, and patients' informed choices are all affected by the validity of treatment comparisons. Similarly, the rational allocation of public funds towards treatment modalities rests on valid comparisons between them.
+$$E(Y_{1} \,|\, \text{S, psy}) = E(Y_{1} \,|\, P, \text{psy})$$
 
-Beyond its immediate clinical importance, understanding the nature of controls in clinical trials of depression is key for reasons of causal inference and mechanistic understanding of treatment. Adolescent depression is notable for a relatively high placebo effect: the proportion of adolescents responding to placebo is higher in depression than in anxiety, and it is higher for adolescent vs adult depression. The reasons for these differences remain unclear and are typically treated as nuisance effects to be minimised by using trial designs such as a placebo lead in period. However, an alternative view is that placebo effects, or more generally, variability in the response to control conditions, may be informative about mechanisms of improvement. If, for example, the antidepressant effect of placebo is stronger than that of equivalent control arms in psychotherapy, then we ought to ask about the possible explanations of such differences and consider whether they can be exploited for improving treatment delivery, as previously suggested.
+$$E(Y_{1} \,|\, \text{S, med}) = E(Y_{1} \,|\, P, \text{med})$$ {#eq-2}
 
-In this paper, we have two aims: first, test whether the equality of controls assumption of adolescent depression treatment holds, and therefore scrutinise the validity of current recommendations concerning choice between treatment modalities; second,we explore the variabiliity in trial control arms across and within the two treatment modalities and examine how they relate to anti-depressant effects.
+signifying that the effect found in the population would be expected to be found in the same population for each treatment.
 
-Our main hypothesis is that the within group effect of psychotherapy controls is substantially weaker than that of the placebo pill and we will test this using random effects meta-regression. We will also use series of sensitivity analyses. First we compared CBT trial arms with those of trials involving fluoxetine and escitalopram. CBT is the most widely studied treatment and, similar to fluoxetine, it has metanalytic evidence supporting its use. Both fluoxetine and escitalopram are approved by the FDA as treatments for adolescent depression. We also conduct analyses excluding waitlist control arms as it could be argued that waitlist control arms represent outliers amongst psychotherapy control studies that reduce the estimate of the overall efficacy. Finally, we also conduct sensitivity analyses in the form of simulations, to ensure that results are robust to estimations of the standard error of the change scores.
+This assumption may be hard to meet. Clinical experience and empirical evidence (ref: (<https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4156137/>, <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7669695/#:~:text=Adolescents%20also%20may%20be%20more,medications%2C%20and%20fewer%20anxiety%20symptoms.> , <https://pubmed.ncbi.nlm.nih.gov/16502131/>) indicate that patients and parents often have preferences between psychotherapy and medication, meaning that there is likely to be a self-selection bias with respect to who participates in psychotherapy versus medication trials. Moreover, these treatment preferences correlate with clinically-relevant characteristics of the participants, including severity, gender and comorbidity. Some of these characteristics, particularly baseline severity, may moderate treatment response (ref) and therefore, if they differ across psychotherapy and medication trials, they may confound comparisons.
 
-We then go on to examine the control arms of psychological treatments in both a qualitative/descriptive way (e.g. the content of attention control) and by quantifying characteristics such as session frequency, duration of delivery. We then explore how these characteristics relate to the magnitude of within group change.
+Here we will compare between four key sample characteristics, namely baseline severity in the outcome, number of sites, gender and age in each sample.
+
+In terms of the second point, differences in trial design may impact outcomes in a differential way between antidepressant and psychotherapy trials. Perhaps the most obvious way in which this happens is the fact that participants in psychotherapy trials are unblinded in terms of treatment allocation; by contrast, in new antidepressant trials, patients (and raters) were found to be unlikely to be able to judge treatment allocation (cite: Assessment of blinding in randomized controlled trials of antidepressants for depressive disorders 2000−2020: A systematic review and meta-analysis, Lancet). This creates differential expectations between medication and psychotherapy trials. Importantly, the placebo control has been developed in order to match as closely as possible the intervention condition, so as to minimise differences in expectancy between conditions. By contrast, psychotherapy control arms vary across waitlist controls, treatment as usual and active controls. These differences in expectation essentially favour the psychotherapy active condition and disadvantage the psychotherapy control (thus potentially the difference between them), because participants in the active condition could be content for receiving the “cutting edge treatment” whilst those in the control will be dissatisfied for having  missed out on “proper treatment”. And this is important because expectancy is associated with treatment outcomes. This also poses problems when trying to infer indirect comparisons in network metanalyses where, for example, CBT is compared to placebo control and medication — given the likely differential expectation effects, comparisons to the unblinded psychotherapy controls may be biased. 
+
+Another difference in design that has potential implications for which patients are selected into the trial is the number of sites in a trial. Previous research has shown that in medication trials the number of sites is positively related to the magnitude of the placebo response. This phenomenon is hard to explain fully with the data available, but may be due to lower quality of phenotyping in such studies, with higher measurement (and therefore diagnostic classification) errors, leading to issues such as spontaneous remission or regression to the mean. In contrast to medication trials, psychotherapy trials typically involve one or fewer sites.
+
+An inter-related issue concerns the nature of control interventions being used. Control conditions in trials are meant to generate counterfactual conditions (CITE RUBIN et al) to the intervention: what would have been the outcome in an individual had they not received the intervention. This implies that there is a latent distribution of values that represent that counterfactual condition which control arms in trials are meant to approximate. Those latent values of the counterfactual condition should, on average, not be different between psychotherapy and medication trials, provided that the samples are representative of the same underlying population (see Eqs 1& 2). If the average response to placebo and psychotherapy controls differs systematically from each other, then this is either due to the fact that the trials sample from different populations or because the control conditions differ in their effects (e.g. because of how much they do or do not protect against expectancy effects).
+
+Understanding the nature of controls for each treatment modality is important for a similar reason. Often, in the public domain, psychotherapy and medication are compared to each other on the basis of their respective effect sizes. However, as evident from Eqs 1 and 2, these effect sizes represent differences between the active intervention and the control condition (placebo or psychotherapy control). For these effect sizes to be comparable, placebo and psychotherapy controls ought to be the equal. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100% - 60% and another arose from a difference of 40% - 0%.
+
+In this paper, we examine psychotherapy and medication trials in the following ways. First, we compare key baseline characteristics of medication vs psychotherapy trials, specifically the extent to which they are comparable in a) baseline severity; b) number of sites involved; c) gender composition and d) age. Second, we assess the mean efficacy of psychotherapy controls vs placebo. We recognise that both these sets of analyses pull data out of the randomised comparisons between treatment arms. However, we believe that this is justified for two reasons: a) because it is important to make transparent to all, particularly decision makers in healthcare, the raw data before these are entered into more complex modelling such as network metanalysis, as this allows them to form opinions about the quality and limitations of the input data; b) our aim here is not to make claims about the relative efficacy of each treatment arm, but rather establish whether the conditions for the possibility of comparisons are fulfilled. Thus, the comparisons between control conditions are not meant to lead to inferences about placebo being “more efficacious” than psychotherapy controls, but rather to make transparent the problem that they seem to derive from different distributions. Third, we examine the quality of psychotherapy controls as such, by scrutinising the extent to which they are matched to the active intervention in ways such as number or frequency of sessions, and therefore, whether they represent fair pairings from which to draw valid efficacy inferences. 
 
 @stringarisDevelopmentalPathwaysChildhood2014
 
@@ -120,27 +135,25 @@ We then go on to examine the control arms of psychological treatments in both a 
 
 For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from Cuijpers' (2023) systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions. Cuijpers made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to Cuijpers' (2023) meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers' (2023) literature search.
 
-Medication studies were drawn from Cipriani's (2016) network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive any responses. **Yet to do** We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers' (2023) review to ensure we analysed an equivalently up-to-date database of medication trials. We used the same search terms outlined in Cipriani (2016).
-
-NOTE: **Charlotte** to please check code lines 986 to 1121. **CB**: Done. NOTE: **Charlotte** please check that the studies I have in the *df_long_for_metan* dataframe makes sense and correspond to what you would expect. In the beginning of the results below, I explain in detail what is missing where. **CB**: I've checked and there are fewer psy active conditions that I expected - it seems some of the trials with multiple active arms have been filtered out. I have now fixed this and the numbers look correct. The numbers look right for med studies. One thing - for psy the no of studies with missing Cohens d for controls should probably be considered 6 (not 7) as it is absent for March/TADS because we removed it (didn't want placebo to be considered as a psy control) rather than there being missing data. <!--# Charlotte, that's all great. What we now need here is an account of exactly how  we searched and how we used the other datasets. Follow previous examples, though in our case, it will be a lot about how we used the accounts of others. Please make sure to say where that we asked about missing information. **CB** Completed above. -->
+Medication studies were drawn from Cipriani's (2016) network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive any responses. We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers' (2023) review to ensure we analysed an equivalently up-to-date database of medication trials. We used the same search terms outlined in Cipriani (2016).
 
 ## Statistical Analysis
 
 ### Measures of Effect
 
-As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
+As the measure of effect of each individual study, we used the within-group standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
 
-$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-4}
+$$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$ {#eq-3}
 
 where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. NOTE **Charlotte**, please add note here with what we did to impute SDs where missing, e.g. using the pre to impute the post etc. In general state here the rules we used citing the Cochrane book. **CB** Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
 
-For the purposes of metanalysis, it is necessary to estimate a standard error of the change score, that is of the SMD. This is calculated according to:
+For the purposes of metanalysis, it is necessary to estimate a standard error of the SMD. This is calculated according to:
 
-$$ SE_{change} = \sqrt{\frac{r_{t_{1}t_{2}}}{n} + \frac{SMD^2}{2n}}$$ {#eq-5}
+$$ SE_{SMD} = \sqrt{\frac{2(1 -r_{t_{1}t_{2}})}{n} + \frac{SMD^2}{2n}}$$ {#eq-5}
 
 where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
-In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: <!--# Georgina, I have used the Truncated Normal, we can obviously do sensitivity analyses with other ones -->
+In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics: 
 
 $$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$ {#eq-6}
 
@@ -282,10 +295,10 @@ aggregate_model_results <- function(list_model_1_meta_reg, condition) {
 
 
 
-###########4. Function to extract the SMDs  (SMD, ses, CI) for each level of the dummy #variable. The output is used below in 5.
-# it is a slightly awkward one, because I couldnt' come up with a better way to add the intercept to #each coefficient
+###########4. Function to extract the SMDs  (SMD, ses, CI) for each level of the dummy variable. The output is used below in 5.
+# it is a slightly awkward one, because I couldn't' come up with a better way to add the intercept to each coefficient
 # given the named output of the built in coef function. 
-# here I exctract the coeffcients
+# here I extract the coefficients
 extract_coefficients_func <- function(df_with_coefs){
   list_coefs <- list()
   coefs <- 0
@@ -311,8 +324,8 @@ extract_coefficients_func <- function(df_with_coefs){
 
 
 ############5. Function to get the means out of the SMDs (this is similar to Func 3 and I should at some point create one more general one)
-# here the argument list_of_dfs is the list of extracted coefficients that you get out of the #extract_coefficients_func
-# which itself you get from the run_metaregression function. The argument conditions refers to #the levels of the variable that describes each study arm
+# here the argument list_of_dfs is the list of extracted coefficients that you get out of the extract_coefficients_func
+# which itself you get from the run_metaregression function. The argument conditions refers to the levels of the variable that describes each study arm
 
 calculate_mean_coefs_ses <- function(list_of_dfs, conditions) {
   df_coefs <- matrix(NA, nrow = length(list_of_dfs), ncol = length(conditions))
@@ -429,9 +442,13 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
   return(list(baseline_metareg_results = baseline_metareg_results, df_baseline_means_with_cis = df_baseline_means_with_cis))
 }
 
+# Double coding SE for argyris
+double_check <- list_df_simulated[[1]] 
 
+double_check <- double_check %>% 
+  mutate (se_check = sqrt(  ((2*(1 - correlation_sim_values )/baseline_n) + (cohens_d^2/ 2*baseline_n) )))
 
-
+view(double_check)
 
 ```
 
@@ -442,17 +459,16 @@ library(tidyverse)
 
 df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
 
-# Charlotte to add in instrument end point values (mins / maxs)
-# We will use these to transform the scale into % as follows: (score - min of the scale)/(max-min)
-# We have done this for both means and standard deviations
+# Here we add in instrument end point values (mins / maxs).
+# We will use these to transform the scale into % as follows: (observed score - min of the scale)/(max-min)
+# We have done this for both means and standard deviations.
 
 df_scale_ranges <- read.csv("scale_ranges.csv")
 df_appl_v_orange <- full_join(df_appl_v_orange, df_scale_ranges, by = "instrument_name")
 
 df_appl_v_orange <- df_appl_v_orange %>% 
   mutate(perc_baseline_mean_active = (baseline_mean_active - scale_min) / (scale_max - scale_min)) %>% 
-  mutate(perc_baseline_sd_active = baseline_sd_active / (scale_max - scale_min)) %>%  # this #is the best way to estimate the SD of the linear transform of the percentage 
-
+  mutate(perc_baseline_sd_active = baseline_sd_active / (scale_max - scale_min)) %>%  # this is the best way to estimate the SD of the linear transformation of the score 
   mutate(perc_baseline_mean_control = (baseline_mean_control - scale_min) / (scale_max - scale_min)) %>% 
   mutate(perc_baseline_sd_control = baseline_sd_control  / (scale_max - scale_min)) %>% 
   mutate(perc_post_mean_active = (post_mean_active - scale_min) / (scale_max - scale_min)) %>% 
@@ -460,26 +476,20 @@ df_appl_v_orange <- df_appl_v_orange %>%
   mutate(perc_post_mean_control = (post_mean_control - scale_min) / (scale_max - scale_min)) %>% 
   mutate(perc_post_sd_control = post_sd_control  / (scale_max - scale_min)) 
 
+# Need to use SMDs (ie our Cohen's d) and then use standard error of SMD, to achieve this I need test-retest reliabilities of instruments.
 
-#Need to use SMDs, ie our Cohen's d and then use Standard error of SMD, to achieve this
-# I need reliabilities.
-
-# note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
+# CDRS reliability taken from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
 # Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
 # Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
 # for the CDRS-R total score in 53 clinic-referred 6- to 12-year-olds.
 
 
 ### A few more tidying things from Argyris before doing metanalyses
-# # discovered an error in the percentage women of the Fristad study. I have checked in the
-# # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
-# # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
-# # check again. # CB checked and all good.
+# Discovered some errors in the percentage women variable. Have gone back and checked. 
 df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
 
 
 # Calculate SE for baseline severity --------------------------------------
-
 
 df_appl_v_orange$baseline_st_error_active <- 
   df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
@@ -487,18 +497,16 @@ df_appl_v_orange$baseline_st_error_active <-
 df_appl_v_orange$baseline_st_error_control <-
   df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
 
-
 # Turn into a long database with unique rows ------------------------------
 
-
-### Important: create a dataset that will have unique control studies (see problem that we identified with Charlotte, 
-#namely common control conditions)
-# create new id with Charlotte to help with better identification and work with duplicates (see below) 
+### Important: create a dataset that will have unique control studies (see problem that we identified, namely common control conditions)
+# create new id to help with better identification and work with duplicates (see below) 
 df_appl_v_orange  <- df_appl_v_orange  %>%
   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
                                   .default = study ))
 
 # We are going to use the descr_active and descr_control columns rather than active_type and control_type columns, as these have unique values for each study. However the descr columns are empty for med studies, so I'm going to paste values across to fix this error.
+
 df_appl_v_orange <- df_appl_v_orange %>% 
   mutate(descr_active = if_else(is.na(descr_active ), active_type , descr_active ))
 
@@ -514,7 +522,7 @@ write.csv(df_with_distinct_instruments, "df_with_distinct_instruments.csv")
 
 # Step 2: turn dataframes to long
 
-# A small bit of cleaning
+# A small bit of cleaning so the code below will work
 
 df_with_distinct_instruments <- df_with_distinct_instruments %>% 
   rename (percent_women_active = active_percent_women, 
@@ -546,12 +554,12 @@ control_df <- df_with_distinct_instruments %>%
 
 df_long_for_metan <- rbind(active_df, control_df)
 
-# I'm going to remove the March / TADS psy control row. It is currently filled with NAs which implies missing data, however it is actually the case that this condition doesn't exist. 
+# I'm going to remove the March / TADS psy control row. It is currently filled with NAs which implies missing data, however it is actually the case that this condition doesn't exist as such (the control is placebo, which is not a psy control). 
 
 df_long_for_metan <- df_long_for_metan %>%
   filter(!(new_study_id == "March, 2004" & is.na(treatment)))
 
-# I'm going to perform  the operations to calculate overall age and percent women here now, I previously did this in the other script, however it actually needs to be done once the dataframe is turned long. 
+# I'm going to perform  the operations to calculate overall age and percent women here now. 
 
 df_long_for_metan <- df_long_for_metan %>% 
   group_by(new_study_id) %>%
@@ -593,7 +601,7 @@ df_long_for_metan <- df_long_for_metan %>%
 
 # save this as the master dataframe  --------------------------------------
 # use this dataframe to perform all operations below in quarto
-# ask Charlotte to check steps above (lines 986 to 1121)
+
 write.csv(df_long_for_metan, "df_long_for_metan.csv", row.names = F)
 
 ########### simulate so that each study has a value from a distribution of 
@@ -620,6 +628,7 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 
 #list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
 #summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
+
 
 
 ```
@@ -1599,6 +1608,50 @@ met_sev <- metagen(TE = perc_baseline_overall,
                            title = "baseline severity",
                            subgroup = psy_or_med,
                            tau.common = FALSE)
+
+met_sev
+
+# clinical sample
+
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+df_for_baseline_severity_clin <- df_for_baseline_severity %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_sev_clin <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity clinical",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_sev_clin
+
+# cbt + med
+
+df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_sev_cbt <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity cbt + med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_sev_cbt
 
 # ### get CDRS clin studies
 #  clin_cdrs_studies_baseline_metareg <- cdrs_studies_for_baseline_metareg %>% 
