@@ -139,6 +139,26 @@ Medication studies were drawn from Cipriani's (2016) network meta-analysis exami
 
 ## Statistical Analysis
 
+### Sample characteristics
+
+We will test in a metaregression for differences between psychotherapy versus medication trials in sample characteristics at baseline. 
+
+First, we compared depression severity levels at baseline. In order to compare across different instruments, we performed a min-max normalisation to turn each study arm mean score at baseline into a percentage using the following formalism:
+
+$$
+\text{outcome}_{percent} = \frac{\bar{X} - \text{scale}_{min}}{\text{scale}_{max} - \text{scale}_{min}}
+$$ {#eq-3}
+
+where, $$\bar{X}$$ is the mean score for each study arm on the primary outcome questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible values of the scale in question, respectively. The standard deviation is calculated thus:
+
+$$
+\text{SD}_{Xpercent} = \frac{\text{SD}_{X}}{\text{scale}_{max} - \text{scale}_{min}}
+$$ {#eq-4}
+
+where $\text{SD}_{X}$ is the original standard deviation of the mean at baseline. 
+
+We also conducted metaregressions to compare psychotherapy vs medication trials on the gender composition of the sample, mean age, and number of trial sites. 
+
 ### Measures of Effect
 
 As the measure of effect of each individual study, we used the within-group standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
@@ -158,8 +178,6 @@ In particular, we simulated one thousand truncated distribution of standard erro
 $$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$ {#eq-6}
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
-
-<!--# Charlotte, I am particularly keen for you to code independently the SE calculation, maybe use all the other parts as they are, but check the SEs. Once you have re-assured yourself about it, could you please read the code for the other steps below, but break it down by taking it out of the function and probably out of the loop and verifying that you would get the same results for one dataset, e.g. the first one in the list of 1000. It would be amazing to verify the results this way. Finally, as discussed, we can vary the parammeters of the distribution if we have better a prioris-->
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 ###########Libraries needed
@@ -223,7 +241,6 @@ run_metaregression <- function(list_of_datasets, model_formula) {
   return(list_model_meta_reg)
 }
 
-
 #########2. Function to count studies with missingness etc. 
 
 count_studies <- function(df) {
@@ -248,10 +265,7 @@ count_studies <- function(df) {
   return(df_count_studies)
 }
 
-
-
 ##########3. Function to extract mean coefficients and to extract model characteristics
-
 
 aggregate_model_results <- function(list_model_1_meta_reg, condition) {
   df_coefs <- matrix(NA, nrow = length(list_model_1_meta_reg), ncol = length(condition))
@@ -293,12 +307,10 @@ aggregate_model_results <- function(list_model_1_meta_reg, condition) {
   return(df_coefficients_model)
 }
 
-
-
 ###########4. Function to extract the SMDs  (SMD, ses, CI) for each level of the dummy variable. The output is used below in 5.
 # it is a slightly awkward one, because I couldn't' come up with a better way to add the intercept to each coefficient
-# given the named output of the built in coef function. 
-# here I extract the coefficients
+# given the named output of the built in coef function. here I extract the coefficients
+
 extract_coefficients_func <- function(df_with_coefs){
   list_coefs <- list()
   coefs <- 0
@@ -321,7 +333,6 @@ extract_coefficients_func <- function(df_with_coefs){
   }
   return (df_coefficients )
 }
-
 
 ############5. Function to get the means out of the SMDs (this is similar to Func 3 and I should at some point create one more general one)
 # here the argument list_of_dfs is the list of extracted coefficients that you get out of the extract_coefficients_func
@@ -364,7 +375,6 @@ plot_means_function <- function(dataframe, subtitle) {
       "]"
     ) 
   }
-  
   
   # Recode condition for ease of plotting
   dataframe$condition <- str_replace_all(dataframe$condition, "_", " ")
@@ -442,19 +452,11 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
   return(list(baseline_metareg_results = baseline_metareg_results, df_baseline_means_with_cis = df_baseline_means_with_cis))
 }
 
-# Double coding SE for argyris
-double_check <- list_df_simulated[[1]] 
-
-double_check <- double_check %>% 
-  mutate (se_check = sqrt(  ((2*(1 - correlation_sim_values )/baseline_n) + (cohens_d^2/ 2*baseline_n) )))
-
-view(double_check)
-
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 library(tidyverse)
-# Start here------------------------------------------------------
+# Transforming data ------------------------------------------------------
 # import master dataset 
 
 df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
@@ -487,7 +489,9 @@ df_appl_v_orange <- df_appl_v_orange %>%
 ### A few more tidying things from Argyris before doing metanalyses
 # Discovered some errors in the percentage women variable. Have gone back and checked. 
 df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
-
+df_appl_v_orange[df_appl_v_orange$study=="Clarke, 1995",]$percent_women <-47.3
+df_appl_v_orange[df_appl_v_orange$study=="Moeini, 2019",]$percent_women <-100
+df_appl_v_orange[df_appl_v_orange$study=="Santomauro, 2016",]$percent_women <-40
 
 # Calculate SE for baseline severity --------------------------------------
 
@@ -571,7 +575,7 @@ df_long_for_metan <- df_long_for_metan %>%
   mutate(gender_overall = sum(percent_women * baseline_n) / sum(baseline_n)) %>% 
   mutate(percent_women = coalesce(percent_women_overall, gender_overall)) 
          
-# now just get rid of the unnecessary columns as these are causing clutter
+# Now just get rid of the unnecessary columns as these are causing clutter
 
 df_long_for_metan <- df_long_for_metan %>% 
   select(-c(percent_women_overall, age_m, age_sd, age_m_overall, age_sd_overall, age_overall, gender_overall))
@@ -600,7 +604,7 @@ df_long_for_metan <- df_long_for_metan %>%
 
 
 # save this as the master dataframe  --------------------------------------
-# use this dataframe to perform all operations below in quarto
+# use this dataframe to perform all operations below
 
 write.csv(df_long_for_metan, "df_long_for_metan.csv", row.names = F)
 
@@ -628,8 +632,6 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 
 #list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
 #summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
-
-
 
 ```
 
@@ -711,25 +713,436 @@ Second, we restricted the metaregression to studies using CBT and the FDA-approv
 
 Third, we restricted the metaregression to studies that *did not* use waitlist as their control.
 
-Fourth, we tested whether our results could be accounted for by differential regression to the mean. In an initial step, we tested in metaregression as above for differences in baseline means. For this we used a min-max normalisation to turn each study arm mean score into a percentage using the following formalism:
-
-$$
-\text{outcome}_{percent} = \frac{\bar{X} - \text{scale}_{min}}{\text{scale}_{max} - \text{scale}_{min}}
-$$ {#eq-14}
-
-where, $$\bar{X}$$ is the mean score of each study arm on the primary questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible value of the scale in question, and for which the the standard deviation is calculated thus:
-
-$$
-\text{SD}_{Xpercent} = \frac{\text{SD}_{X}}{\text{scale}_{max} - \text{scale}_{min}}
-$$ {#eq-15}
-
-where $\text{SD}_{X}$ is the original standard deviation of the mean for X. Applying equations (12) and (13) on the baseline and outcome means and standard deviations of each study allowed us to then calculate SMDs and standard errors using equations (4) and (5)
-
 # Results
 
-Studies included in the metaregression.
+## Included studies
 
 The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it. CB - I'm not sure I entirely understand. df_long_for_metan is already quite succinct (6 columns). I wonder if you are thinking of df_appl_v_orange which is more complete and includes means and sds etc. I'd say that's probably more appropriate to make available. I agree we should simplify it down a bit. Happy to do that once you confirm I'm on the right track here. If we decide to format it to be consistent with Cuijpers' data, we would have one row per comparison, rather than the long format we have in df_long_for_metan. -->
+
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD was missing and could not be imputed by any of the methods outlined above.
+
+<!--# Charlotte, for the paragraph below, please provide the numbers for each of the numbers wherever I have put an X. CB - done. I removed psychodynamic because there weren't any active conditions of this type. -->
+
+Placebo was the control condition for all medication trials; the active arm ranged from serotonin reuptake inhibitors, such as 6 fluoxetine and 2 escitalopram, to tricylics, such as 2 nortriptyline. In psychological trials, the control arm included 14 WL controls, 25 care as usual and several other conditions such as 4 attention control conditions; the active arm included 43 CBT and 8 IPT amongst others. All included trials and the types of treatment controls can be found in Suppelmenateray Table 1.
+
+## Sample characteristics at baseline in medication versus psychotherapy trials
+
+Using a random effects meta-regression we compared psychotherapy versus medication trials on four domains: gender composition, age, baseline depression severity levels, and number of trial sites. We first examined each of these across all studies, and then conducted two sensitivity analyses where we excluded psychotherapy studies which 1) recruited participants with sub clinical depression levels and 2) did not use CBT as the active intervention. 
+
+### Gender
+
+Gender composition was similar across psychotherapy and medication trials, 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# Start by looking at demographics at baseline
+# Currently we have both control and active conditions, we just need each study once
+
+df_baseline_demographics <- df_long_for_metan %>% 
+  distinct(new_study_id, .keep_all = TRUE)
+
+# Now start looking at perc_women variable 
+
+# The metagen function doesn't like when NAs result in the TE vector being a different length to subgroup vector. Need to start by removing NAs
+
+df_for_gender_metan <- df_baseline_demographics %>% 
+  filter(!is.na(percent_women))
+
+met_perc_women <- metagen(TE.random = percent_women,
+                           seTE.random = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+summary_results <- summary(met_perc_women, byvar = "subgroup")
+
+# Convert the results to a dataframe
+result_df <- data.frame(
+  TE = summary_met_perc_women$TE.random,
+  seTE = summary_met_perc_women$seTE.random,
+  lower = summary_met_perc_women$lower.random,
+  upper = summary_met_perc_women$upper.random
+)
+
+
+# looking at clinical sample only
+
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+df_for_gender_metan_clin <- df_for_gender_metan %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_perc_women_clin <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across clinical studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_perc_women_clin
+
+# Now looking at the CBT + med studies only
+
+cbt_meds_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
+
+df_for_gender_metan_cbt <- df_for_gender_metan %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_perc_women_cbt <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_gender_metan_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across cbt and med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_perc_women_cbt
+
+knitr:: kable(summary_table, "latex", caption = "Gender composition")
+
+
+# Now start looking at age variable
+
+df_for_age_metan <- df_baseline_demographics %>% 
+  filter(!is.na(mean_age))
+
+met_age <- metagen(TE = mean_age,
+                           seTE = se_age,
+                           studlab = new_study_id,
+                           data = df_for_age_metan,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+met_age
+
+# looking at clinical sample only
+
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+df_for_age_metan_clin <- df_for_age_metan %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_age_clin <- metagen(TE = mean_age,
+                           seTE = se_age,
+                           studlab = new_study_id,
+                           data = df_for_age_metan_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across clinical studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+met_age_clin
+
+# Now cbt studies only
+
+df_for_age_metan_cbt <- df_for_age_metan %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_age_cbt <- metagen(TE = mean_age,
+                           seTE = se_age,
+                           studlab = new_study_id,
+                           data = df_for_age_metan_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across cbt + med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+met_age_cbt
+
+# Now look at baseline severity for overall psy vs med
+# Need to calculate the variables first
+
+df_for_baseline_severity <- df_long_for_metan %>% 
+  group_by(new_study_id) %>%
+  mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
+  mutate(pooled_perc_sd_baseline = sqrt(sum((perc_baseline_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
+  mutate(perc_se_baseline = pooled_perc_sd_baseline / sqrt(n_overall)) 
+
+df_for_baseline_severity <- df_for_baseline_severity %>% 
+  distinct(new_study_id, .keep_all = TRUE)
+
+met_sev <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+met_sev
+
+# clinical sample
+
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+df_for_baseline_severity_clin <- df_for_baseline_severity %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_sev_clin <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity clinical",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_sev_clin
+
+# cbt + med
+
+df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
+  filter(new_study_id %in% cbt_meds_study_ids) %>% 
+  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+
+met_sev_cbt <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity cbt + med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+met_sev_cbt
+
+
+# ### do ALL studies using percentage at baseline
+# all_studies_baseline_metareg <- list_df_simulated_percentage[[1]]
+# 
+# 
+# #turn sds to sec
+# all_studies_baseline_metareg$baseline_stand_error <- all_studies_baseline_metareg$perc_baseline_sd/
+#                                         sqrt(all_studies_baseline_metareg$baseline_n)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# # also change this for the function to work
+# all_studies_baseline_metareg$baseline_mean <- all_studies_baseline_metareg$perc_baseline_mean
+# results_all_studies_metareg_baseline <- run_metareg_and_extract(all_studies_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# ### get CDRS studies
+# cdrs_studies_for_baseline_metareg <- list_cdrs_study[[1]] # created this above, you can take any of these, as the means and sds are repeated.
+# 
+# #turn sds to sec
+# cdrs_studies_for_baseline_metareg$baseline_stand_error <- cdrs_studies_for_baseline_metareg$baseline_sd/
+#                                         sqrt(cdrs_studies_for_baseline_metareg$baseline_n)
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# 
+# results_cdrs_metareg_baseline <- run_metareg_and_extract(cdrs_studies_for_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# ### get HAM-D studies
+# hamd_study_ids <-
+#   df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
+# 
+# 
+# list_hamd_study <- list_df_simulated[[1]][list_df_simulated[[1]]$new_study_id
+#                                                           %in% hamd_study_ids,]
+# 
+# hamd_studies_for_baseline_metareg <- list_hamd_study # 
+# 
+# #turn sds to sec
+# hamd_studies_for_baseline_metareg$baseline_stand_error <- hamd_studies_for_baseline_metareg$baseline_sd/
+#                                         sqrt(hamd_studies_for_baseline_metareg$baseline_n)
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# results_hamd_metareg_baseline <- run_metareg_and_extract(hamd_studies_for_baseline_metareg, 
+#                                                          model_1, condition)
+# 
+# results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_level_var)
+# 
+# 
+# # Now we want to do look at baseline severity when we exclude psy studies with sub clinical depression levels
+# 
+# # We will do in two ways
+# # First by excluding studies with a diagnostic classification of "sub"
+# 
+# clin_study_ids <-
+#   df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+# 
+# clin_studies_baseline_metareg <- all_studies_baseline_metareg %>%
+#   filter(new_study_id %in% clin_study_ids)
+# 
+# #turn sds to sec
+# clin_studies_baseline_metareg$baseline_stand_error <- clin_studies_baseline_metareg$perc_baseline_sd/
+#                                         sqrt(clin_studies_baseline_metareg$baseline_n)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# # also change this for the function to work
+# clin_studies_baseline_metareg$baseline_mean <- clin_studies_baseline_metareg$perc_baseline_mean
+# results_clin_studies_baseline_metareg <- run_metareg_and_extract(clin_studies_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# # Now lets include only studies with classification of "mdd"
+# 
+# mdd_study_ids <-
+#   df_appl_v_orange[df_appl_v_orange$diagnosis == "mdd",]$new_study_id
+# 
+# mdd_studies_baseline_metareg <- all_studies_baseline_metareg %>%
+#   filter(new_study_id %in% mdd_study_ids)
+# 
+# mdd_studies_baseline_metareg %>% 
+#   filter(four_level_var %in% c("psychotherapy_active","psychotherapy_control")) %>%
+#   summarise(n = n())
+# 
+# #turn sds to sec
+# mdd_studies_baseline_metareg$baseline_stand_error <- mdd_studies_baseline_metareg$perc_baseline_sd/
+#                                         sqrt(mdd_studies_baseline_metareg$baseline_n)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# # also change this for the function to work
+# mdd_studies_baseline_metareg$baseline_mean <- mdd_studies_baseline_metareg$perc_baseline_mean
+# results_mdd_studies_baseline_metareg <- run_metareg_and_extract(mdd_studies_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# # Now CBT + all med studies
+# 
+# cbt_meds_study_ids <-
+#   df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
+# 
+# cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
+#   filter(new_study_id %in% cbt_meds_study_ids) %>% 
+#   filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+# 
+# #turn sds to sec
+# cbt_meds_studies_baseline_metareg$baseline_stand_error <- cbt_meds_studies_baseline_metareg$perc_baseline_sd/
+#                                         sqrt(cbt_meds_studies_baseline_metareg$baseline_n)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# # also change this for the function to work
+# cbt_meds_studies_baseline_metareg$baseline_mean <- cbt_meds_studies_baseline_metareg$perc_baseline_mean
+# results_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(cbt_meds_studies_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# # Look at the diagnostics of included studies 
+# 
+# filtered_data <- df_appl_v_orange %>%
+#   filter(psy_or_med == 1) %>% 
+#   filter(new_study_id %in% cbt_meds_study_ids) %>%
+#   distinct(new_study_id, .keep_all = TRUE)
+# 
+# summary_result <- filtered_data %>%
+#   group_by(diagnosis) %>%
+#   summarise(count = n())
+# 
+# # Now the CBT + med studies, filtering out the subclinical studies
+# 
+# clin_cbt_meds_study_ids <-
+#   df_appl_v_orange[(df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0) & df_appl_v_orange$diagnosis != "sub", ]$new_study_id
+# 
+# clin_cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
+#   filter(new_study_id %in% clin_cbt_meds_study_ids) %>% 
+#   filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
+# 
+# #turn sds to sec
+# clin_cbt_meds_studies_baseline_metareg$baseline_stand_error <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_sd/
+#                                         sqrt(clin_cbt_meds_studies_baseline_metareg$baseline_n)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# # also change this for the function to work
+# clin_cbt_meds_studies_baseline_metareg$baseline_mean <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_mean
+# results_clin_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(clin_cbt_meds_studies_baseline_metareg,  
+#                                                          model_1, condition)
+
+
+# ### get CDRS clin studies
+#  clin_cdrs_studies_baseline_metareg <- cdrs_studies_for_baseline_metareg %>% 
+#    filter(new_study_id %in% clin_study_ids)
+#  
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# 
+# results_clin_cdrs_metareg_baseline <- run_metareg_and_extract(clin_cdrs_studies_baseline_metareg,  
+#                                                          model_1, condition)
+# 
+# # Just realised this is identical, as all the studies that use the CDRS have clinical samples. 
+# 
+# ### get HAM-D clin studies
+#  clin_hamd_studies_for_baseline_metareg <- hamd_studies_for_baseline_metareg %>% 
+#    filter(new_study_id %in% clin_study_ids)
+# 
+# 
+# model_1 <- as.formula(~ four_level_var)
+# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
+#                                                               #throughout
+# results_clin_hamd_studies_for_baseline_metareg <- run_metareg_and_extract(clin_hamd_studies_for_baseline_metareg, 
+#                                                          model_1, condition)
+# 
+# results_clin_hamd_studies_for_baseline_metareg$condition <-  levels(list_df_simulated[[1]]$four_level_var)
+# 
+#
+```
+
+
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Get Ns, run metareg, prepare graphing ------------------------------------------------------
@@ -802,8 +1215,6 @@ df_mean_coefs_from_sim <- data.frame(cbind(condition,df_mean_coefs_from_sim))
 
 # add the ns
 df_mean_coefs_from_sim <- data.frame(cbind(df_mean_coefs_from_sim, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
-
-
 
 # B. Estimate Means and CIs for CBT Fluox Esc --------------------------------
 #  grab ids for those studies
@@ -1033,7 +1444,6 @@ coef_and_se_means_clin_study$n  <- study_count_clin_study[study_count_clin_study
 
 # G. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
 
-
 # the first thing to do is to create a new dataset with the percentage cohen's d
 
 list_df_simulated_percentage <- list_df_simulated
@@ -1045,6 +1455,10 @@ for(i in 1: length(list_df_simulated_percentage)){
     ((list_df_simulated_percentage[[i]]$perc_post_sd + list_df_simulated_percentage[[i]]$perc_baseline_sd)/2)     
                   
 }
+
+list_df_simulated_percentage[[1]]
+
+list_df_simulated[[1]]
 
 # specify model
 model_1 <- as.formula(~ four_level_var )
@@ -1170,17 +1584,11 @@ df_mean_coefs_perc_mod_2 <- data.frame(cbind(df_mean_coefs_perc_mod_2, n = df_co
 
 ```
 
-### Analysis of all studies
 
-#### Number and type of of studies included
 
-In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD was missing and could not be imputed by any of the methods outlined above.
+#### Mean efficacy of psychotherapy versus medication control conditions
 
-<!--# Charlotte, for the paragraph below, please provide the numbers for each of the numbers wherever I have put an X. CB - done. I removed psychodynamic because there weren't any active conditions of this type. -->
-
-Placebo was the control condition for all medication trials; the active arm ranged from serotonin reuptake inhibitors, such as 6 fluoxetine and 2 escitalopram, to tricylics, such as 2 nortriptyline. In psychological trials, the control arm included 14 WL controls, 25 care as usual and several other conditions such as 4 attention control conditions; the active arm included 43 CBT and 8 IPT amongst others. All included trials and the types of treatment controls can be found in Suppelmenateray Table 1.
-
-#### Metaregression analysis.
+#### Quality and nature of psychotherapy controls across trials
 
 We applied metaregression to obtain the SMDs and confidence intervals of each of the four arms.
 
@@ -1296,391 +1704,7 @@ dev.off()
 
 We first conducted a meta-analysis to test for differences in means at baseline in the two instruments, CDRS-R and HAM-D on which there was a sufficient number of studies to metanalyse.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
-### do ALL studies using percentage at baseline
-all_studies_baseline_metareg <- list_df_simulated_percentage[[1]]
-
-
-#turn sds to sec
-all_studies_baseline_metareg$baseline_stand_error <- all_studies_baseline_metareg$perc_baseline_sd/
-                                        sqrt(all_studies_baseline_metareg$baseline_n)
-
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-# also change this for the function to work
-all_studies_baseline_metareg$baseline_mean <- all_studies_baseline_metareg$perc_baseline_mean
-results_all_studies_metareg_baseline <- run_metareg_and_extract(all_studies_baseline_metareg,  
-                                                         model_1, condition)
-
-### get CDRS studies
-cdrs_studies_for_baseline_metareg <- list_cdrs_study[[1]] # created this above, you can take any of these, as the means and sds are repeated.
-
-#turn sds to sec
-cdrs_studies_for_baseline_metareg$baseline_stand_error <- cdrs_studies_for_baseline_metareg$baseline_sd/
-                                        sqrt(cdrs_studies_for_baseline_metareg$baseline_n)
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-
-results_cdrs_metareg_baseline <- run_metareg_and_extract(cdrs_studies_for_baseline_metareg,  
-                                                         model_1, condition)
-
-### get HAM-D studies
-hamd_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
-
-
-list_hamd_study <- list_df_simulated[[1]][list_df_simulated[[1]]$new_study_id
-                                                          %in% hamd_study_ids,]
-
-hamd_studies_for_baseline_metareg <- list_hamd_study # 
-
-#turn sds to sec
-hamd_studies_for_baseline_metareg$baseline_stand_error <- hamd_studies_for_baseline_metareg$baseline_sd/
-                                        sqrt(hamd_studies_for_baseline_metareg$baseline_n)
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-results_hamd_metareg_baseline <- run_metareg_and_extract(hamd_studies_for_baseline_metareg, 
-                                                         model_1, condition)
-
-results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_level_var)
-
-
-# Now we want to do look at baseline severity when we exclude psy studies with sub clinical depression levels
-
-# We will do in two ways
-# First by excluding studies with a diagnostic classification of "sub"
-
-clin_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
-
-clin_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-  filter(new_study_id %in% clin_study_ids)
-
-#turn sds to sec
-clin_studies_baseline_metareg$baseline_stand_error <- clin_studies_baseline_metareg$perc_baseline_sd/
-                                        sqrt(clin_studies_baseline_metareg$baseline_n)
-
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-# also change this for the function to work
-clin_studies_baseline_metareg$baseline_mean <- clin_studies_baseline_metareg$perc_baseline_mean
-results_clin_studies_baseline_metareg <- run_metareg_and_extract(clin_studies_baseline_metareg,  
-                                                         model_1, condition)
-
-# Now lets include only studies with classification of "mdd"
-
-mdd_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$diagnosis == "mdd",]$new_study_id
-
-mdd_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-  filter(new_study_id %in% mdd_study_ids)
-
-mdd_studies_baseline_metareg %>% 
-  filter(four_level_var %in% c("psychotherapy_active","psychotherapy_control")) %>%
-  summarise(n = n())
-
-#turn sds to sec
-mdd_studies_baseline_metareg$baseline_stand_error <- mdd_studies_baseline_metareg$perc_baseline_sd/
-                                        sqrt(mdd_studies_baseline_metareg$baseline_n)
-
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-# also change this for the function to work
-mdd_studies_baseline_metareg$baseline_mean <- mdd_studies_baseline_metareg$perc_baseline_mean
-results_mdd_studies_baseline_metareg <- run_metareg_and_extract(mdd_studies_baseline_metareg,  
-                                                         model_1, condition)
-
-# Now CBT + all med studies
-
-cbt_meds_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
-
-cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-
-#turn sds to sec
-cbt_meds_studies_baseline_metareg$baseline_stand_error <- cbt_meds_studies_baseline_metareg$perc_baseline_sd/
-                                        sqrt(cbt_meds_studies_baseline_metareg$baseline_n)
-
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-# also change this for the function to work
-cbt_meds_studies_baseline_metareg$baseline_mean <- cbt_meds_studies_baseline_metareg$perc_baseline_mean
-results_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(cbt_meds_studies_baseline_metareg,  
-                                                         model_1, condition)
-
-# Look at the diagnostics of included studies 
-
-filtered_data <- df_appl_v_orange %>%
-  filter(psy_or_med == 1) %>% 
-  filter(new_study_id %in% cbt_meds_study_ids) %>%
-  distinct(new_study_id, .keep_all = TRUE)
-
-summary_result <- filtered_data %>%
-  group_by(diagnosis) %>%
-  summarise(count = n())
-
-# Now the CBT + med studies, filtering out the subclinical studies
-
-clin_cbt_meds_study_ids <-
-  df_appl_v_orange[(df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0) & df_appl_v_orange$diagnosis != "sub", ]$new_study_id
-
-clin_cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-  filter(new_study_id %in% clin_cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-
-#turn sds to sec
-clin_cbt_meds_studies_baseline_metareg$baseline_stand_error <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_sd/
-                                        sqrt(clin_cbt_meds_studies_baseline_metareg$baseline_n)
-
-
-model_1 <- as.formula(~ four_level_var)
-condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-                                                              #throughout
-# also change this for the function to work
-clin_cbt_meds_studies_baseline_metareg$baseline_mean <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_mean
-results_clin_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(clin_cbt_meds_studies_baseline_metareg,  
-                                                         model_1, condition)
-
-# Looking at demographics at baseline
-# Currently we have both control and active conditions, we just need each study once
-
-df_baseline_demographics <- df_long_for_metan %>% 
-  distinct(new_study_id, .keep_all = TRUE)
-
-# Now start looking at perc_women variable 
-
-df_for_gender_metan <- df_baseline_demographics %>% 
-  filter(!is.na(percent_women))
-
-met_perc_women <- metagen(TE = percent_women,
-                           seTE = percent_women_std_error,
-                           studlab = new_study_id,
-                           data = df_for_gender_metan,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "percentage women across studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-met_perc_women
-
-# looking at clinical sample only
-
-df_for_gender_metan_clin <- df_for_gender_metan %>%
-  filter(new_study_id %in% clin_study_ids)
-
-met_perc_women_clin <- metagen(TE = percent_women,
-                           seTE = percent_women_std_error,
-                           studlab = new_study_id,
-                           data = df_for_gender_metan_clin,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "percentage women across clinical studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-met_perc_women_clin
-
-# Now looking at the CBT + med studies only
-
-cbt_meds_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
-
-df_for_gender_metan_cbt <- df_for_gender_metan %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-
-met_perc_women_cbt <- metagen(TE = percent_women,
-                           seTE = percent_women_std_error,
-                           studlab = new_study_id,
-                           data = df_for_gender_metan_cbt,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "percentage women across cbt and med studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-met_perc_women_cbt
-
-# Now start looking at age variable
-
-df_for_age_metan <- df_baseline_demographics %>% 
-  filter(!is.na(mean_age))
-
-met_age <- metagen(TE = mean_age,
-                           seTE = se_age,
-                           studlab = new_study_id,
-                           data = df_for_age_metan,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "age across studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-met_age
-
-# looking at clinical sample only
-
-df_for_age_metan_clin <- df_for_age_metan %>%
-  filter(new_study_id %in% clin_study_ids)
-
-met_age_clin <- metagen(TE = mean_age,
-                           seTE = se_age,
-                           studlab = new_study_id,
-                           data = df_for_age_metan_clin,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "age across clinical studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-met_age_clin
-
-# Now cbt studies only
-
-df_for_age_metan_cbt <- df_for_age_metan %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-
-met_age_cbt <- metagen(TE = mean_age,
-                           seTE = se_age,
-                           studlab = new_study_id,
-                           data = df_for_age_metan_cbt,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "age across cbt + med studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-met_age_cbt
-
-# Now look at baseline severity for overall psy vs med
-# Need to calculate the variables first
-
-df_for_baseline_severity <- df_long_for_metan %>% 
-  group_by(new_study_id) %>%
-  mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
-  mutate(pooled_perc_sd_baseline = sqrt(sum((perc_baseline_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
-  mutate(perc_se_baseline = pooled_perc_sd_baseline / sqrt(n_overall)) 
-
-df_for_baseline_severity <- df_for_baseline_severity %>% 
-  distinct(new_study_id, .keep_all = TRUE)
-
-met_sev <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-met_sev
-
-# clinical sample
-
-clin_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
-
-df_for_baseline_severity_clin <- df_for_baseline_severity %>%
-  filter(new_study_id %in% clin_study_ids)
-
-met_sev_clin <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity_clin,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity clinical",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-met_sev_clin
-
-# cbt + med
-
-df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-
-met_sev_cbt <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity_cbt,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity cbt + med studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-met_sev_cbt
-
-# ### get CDRS clin studies
-#  clin_cdrs_studies_baseline_metareg <- cdrs_studies_for_baseline_metareg %>% 
-#    filter(new_study_id %in% clin_study_ids)
-#  
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# 
-# results_clin_cdrs_metareg_baseline <- run_metareg_and_extract(clin_cdrs_studies_baseline_metareg,  
-#                                                          model_1, condition)
-# 
-# # Just realised this is identical, as all the studies that use the CDRS have clinical samples. 
-# 
-# ### get HAM-D clin studies
-#  clin_hamd_studies_for_baseline_metareg <- hamd_studies_for_baseline_metareg %>% 
-#    filter(new_study_id %in% clin_study_ids)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# results_clin_hamd_studies_for_baseline_metareg <- run_metareg_and_extract(clin_hamd_studies_for_baseline_metareg, 
-#                                                          model_1, condition)
-# 
-# results_clin_hamd_studies_for_baseline_metareg$condition <-  levels(list_df_simulated[[1]]$four_level_var)
-# 
-# 
 
 ```
 
