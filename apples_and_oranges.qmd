@@ -582,8 +582,8 @@ df_long_for_metan <- df_long_for_metan %>%
 
 # Create SEs proportions for percentage women --------------------------------------------
 
-# # We also need to calculate SE for proportion women for the baseline calculations
-# # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
+# We also need to calculate SE for proportion women for the baseline calculations
+# for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
 
 df_long_for_metan <- df_long_for_metan %>% 
   mutate(product_perc_women = (percent_women/100)* (1-(percent_women/100)) )
@@ -717,7 +717,7 @@ Third, we restricted the metaregression to studies that *did not* use waitlist a
 
 ## Included studies
 
-The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. <!--# Charlotte, this should essentially be our df_long dataset, right? Perhaps, for the puproses of the table we can get rid of some of the columns. It would be good to have it in the way Pim had it. CB - I'm not sure I entirely understand. df_long_for_metan is already quite succinct (6 columns). I wonder if you are thinking of df_appl_v_orange which is more complete and includes means and sds etc. I'd say that's probably more appropriate to make available. I agree we should simplify it down a bit. Happy to do that once you confirm I'm on the right track here. If we decide to format it to be consistent with Cuijpers' data, we would have one row per comparison, rather than the long format we have in df_long_for_metan. -->
+The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. 
 
 In total, there were `r length(unique(df_long_for_metan$new_study_id))` studies which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy trials. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD was missing and could not be imputed by any of the methods outlined above.
 
@@ -731,7 +731,7 @@ Using a random effects meta-regression we compared psychotherapy versus medicati
 
 ### Gender
 
-Gender composition was similar across psychotherapy and medication trials, 
+Gender composition did not differ significantly between psychotherapy and medication trials (stats).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Start by looking at demographics at baseline
@@ -1588,7 +1588,7 @@ df_mean_coefs_perc_mod_2 <- data.frame(cbind(df_mean_coefs_perc_mod_2, n = df_co
 
 #### Mean efficacy of psychotherapy versus medication control conditions
 
-#### Quality and nature of psychotherapy controls across trials
+
 
 We applied metaregression to obtain the SMDs and confidence intervals of each of the four arms.
 
@@ -1699,6 +1699,137 @@ dev.off()
 ```
 
 ![](plot_means_wl.pdf)
+
+### Comparing the nature and intensity of control conditions in psychotherapy trials
+
+Text.
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+ 
+# We need to read in the appropriate dataset which describes the active and control conditions used in
+# psychotherapy trials.
+
+df_descr_psy_conditions <- readxl:: read_excel("for_despina_and_giannis_200224.xlsx")
+
+# checking id matchup
+# discrepancies <- setdiff(df_descr_psy_conditions$new_study_id, df_long_for_metan$new_study_id)  
+
+# Cleaning the dataset
+# For now lets look at variables pertaining to the nature / intensity of interventions
+
+colnames(df_descr_psy_conditions)
+
+df_descr_psy_conditions <- df_descr_psy_conditions %>% 
+  select(c(new_study_id, `Psychotherapy/control`, levels_var, number_of_sites, Number_of_sessions,
+           frequency_weeks, Length_of_sessions_mins, Total_hours_of_intervention_hours, total_hours_gsh,
+           Total_period_of_intervention_weeks, Format_group_individual, Delivery, Involvement_of_others))
+
+# rename for clarity and to match master dataframe
+df_descr_psy_conditions <- df_descr_psy_conditions %>% 
+  rename(treatment = 'Psychotherapy/control', no_sites = number_of_sites, no_sessions =
+           Number_of_sessions, freq_weeks = frequency_weeks, length_sessions_mins =
+           Length_of_sessions_mins, total_hours = Total_hours_of_intervention_hours,
+         total_period_weeks = Total_period_of_intervention_weeks, format = Format_group_individual, delivery =
+           Delivery, family_involv = Involvement_of_others)
+
+check <- df_descr_psy_conditions %>% 
+  filter(treatment == 'wlc')
+
+# Visual inspection
+
+# There are two studies where the waitlist condition has some intervention (i.e. values should not be set to 0)
+# Otherwise, I want values to be set to 0, not NA.
+
+df_descr_psy_conditions <- df_descr_psy_conditions %>%
+  mutate(
+    no_sessions = ifelse(treatment == "wlc" & !(new_study_id %in% c("Ackerson, 1998", "Diamond, 2002")), 0, no_sessions),
+    freq_weeks = ifelse(treatment == "wlc" & !(new_study_id %in% c("Ackerson, 1998", "Diamond, 2002")), 0, freq_weeks),
+    length_sessions_mins = ifelse(treatment == "wlc" & !(new_study_id %in% c("Ackerson, 1998", "Diamond, 2002")), 0, length_sessions_mins),
+    total_hours = ifelse(treatment == "wlc" & !(new_study_id %in% c("Ackerson, 1998", "Diamond, 2002")), 0, total_hours)
+  )
+
+# Now cau
+
+check <- df_descr_psy_conditions %>% 
+  filter(treatment == 'cau')
+
+# All studies except for Martinovic, Srivastava, Stikkelbroek and Weisz 2009 should have variables set to NA. 
+# This is because we cannot say that they did not feature 0 hours of intervention, but that for the most part
+# it is not reported or it is not possible to quantify.
+
+df_descr_psy_conditions <- df_descr_psy_conditions %>%
+  mutate(
+    no_sessions = ifelse(treatment == "cau" & !(new_study_id %in% c("Martinovic, 2006", "Srivastava, 2020", "Stikkelbroek, 2020", "Weisz, 2009")), NA, no_sessions),
+    freq_weeks = ifelse(treatment == "cau" & !(new_study_id %in% c("Martinovic, 2006", "Srivastava, 2020", "Stikkelbroek, 2020", "Weisz, 2009")), NA, freq_weeks),
+    length_sessions_mins = ifelse(treatment == "cau" & !(new_study_id %in% c("Martinovic, 2006", "Srivastava, 2020", "Stikkelbroek, 2020", "Weisz, 2009")), NA, length_sessions_mins),
+    total_hours = ifelse(treatment == "cau" & !(new_study_id %in% c("Martinovic, 2006", "Srivastava, 2020", "Stikkelbroek, 2020", "Weisz, 2009")), NA, total_hours)
+  )
+    
+# Now other controls 
+
+check <- df_descr_psy_conditions %>%
+  filter(!(treatment %in% c('cau', 'wlc'))) %>% 
+  filter(levels_var == "psychotherapy_control")
+
+# Made a few manual adjustments in the original excel sheet. 
+
+# List of columns to clean
+columns_to_clean <- c(
+  "no_sessions",
+  "freq_weeks",
+  "length_sessions_mins",
+  "total_hours",
+  "total_period_weeks"
+)
+
+# Convert non-numeric values to NA in specified columns
+df_descr_psy_conditions <- df_descr_psy_conditions %>%
+  mutate_at(vars(columns_to_clean), ~as.numeric(as.character(.)))
+
+# Define the function for summary stats
+
+group_function <- function(dataframe, my_groups, columns) {
+  result_dataframe <- data.frame(
+    Group = character(),
+    Column = character(),
+    N = numeric(),
+    Mean = numeric(),
+    Std_Dev = numeric(),
+    Median = numeric(),
+    IQR = numeric(),
+    stringsAsFactors = FALSE
+  )
+  unique_groups <- unique(dataframe[[my_groups]])
+  for (group in unique_groups) {
+    group_data <- dataframe[dataframe[[my_groups]] == group, ]
+    for (col in columns) {
+      col_data <- group_data[[col]]
+      n <- sum(!is.na(col_data))
+      mean_val <- mean(col_data, na.rm = TRUE)
+      std_dev <- sd(col_data, na.rm = TRUE)
+      median_val <- median(col_data, na.rm = TRUE)
+      iqr <- IQR(col_data, na.rm = TRUE)
+      result_dataframe <- rbind(result_dataframe,
+                                data.frame(Group = group,
+                                           Column = col, N = n, Mean = mean_val,
+                                           Std_Dev = std_dev, Median = median_val,
+                                           IQR = iqr, stringsAsFactors = FALSE))
+    }
+  }
+  return(result_dataframe)
+}
+
+sessions <- group_function(df_descr_psy_conditions,"levels_var","no_sessions")
+frequency <- group_function(df_descr_psy_conditions,"levels_var","freq_weeks")
+length_sessions_mins <- group_function(df_descr_psy_conditions,"levels_var","length_sessions_mins")
+total_hours <- group_function(df_descr_psy_conditions,"levels_var","total_hours")
+total_period_weeks <- group_function(df_descr_psy_conditions,"levels_var","total_period_weeks")
+
+control_summary <- rbind(sessions, frequency, length_sessions_mins, total_hours, total_period_weeks)
+
+
+```
+
 
 #### Addressing Regression to the Mean
 
