@@ -743,6 +743,66 @@ Psychotherapy trials featured a higher percentage of women when compared to medi
 df_baseline_demographics <- df_long_for_metan %>% 
   distinct(new_study_id, .keep_all = TRUE)
 
+# Define function for baseline metaanalyses  ----------------------------------------------
+
+# subgroup_df <- data.frame(psy_or_med = c(0, 1))
+# 
+# result <- list()
+# name_vec <- character()
+# 
+# # Loop over rows in the subgroup_df
+# for (i in 1:nrow(subgroup_df)) {
+#   
+#   # Call the metagen function for each row
+#   result[[i]] <- metagen(
+#     TE = percent_women,
+#     seTE = percent_women_std_error,
+#     studlab = new_study_id,
+#     data = df_for_gender_metan[df_for_gender_metan$psy_or_med == subgroup_df$psy_or_med[i], ],
+#     sm = "",
+#     fixed = FALSE,
+#     random = TRUE,
+#     method.tau = "REML",
+#     hakn = TRUE,
+#     title = paste("Subgroup:", subgroup_df$psy_or_med[i])
+#   )
+#   
+#   name_vec[i] = paste("Subgroup:", subgroup_df$psy_or_med[i])
+# }
+# 
+# # Now result contains the metagen results for each subgroup
+# # name_vec contains names for each subgroup
+# 
+# ## Function to extrac the key results for graphing and tabulating.
+# 
+# extract_stats <- function(result) {
+#  
+#   # get the summary table with results
+#   statistics <- summary(result)
+#   
+#   # Extract specific stats
+#   extracted_stats <- c(
+#     k_study = statistics$k.study,
+#     TE_random = statistics$TE.random,
+#     lower_random = statistics$lower.random,
+#     upper_random = statistics$upper.random,
+#     pval = statistics$pval.random,
+#     tau2 = statistics$tau2,
+#     lower_tau2 = statistics$lower.tau2,
+#     upper_tau2 = statistics$upper.tau2
+#   )
+#   
+#   return(extracted_stats)
+# }
+# 
+# extract_stats(result[[1]])
+# extract_stats(result[[2]])
+# 
+# # create a dataframe with the results
+# statistics_indiv_metan <- lapply(result, extract_stats) 
+# statistics_indiv_metan <- data.frame(do.call("rbind", statistics_indiv_metan))
+# statistics_indiv_metan$condition <- name_vec
+
 # Now start looking at perc_women variable 
 
 # The metagen function doesn't like when NAs result in the TE vector being a different length to subgroup vector. Need to start by removing NAs.
@@ -763,14 +823,48 @@ met_perc_women <- metagen(TE = percent_women,
                            subgroup = psy_or_med,
                            tau.common = FALSE)
 
-# Convert the results to a dataframe
+# met_perc_women_overall <- metagen(TE = percent_women,
+#                            seTE = percent_women_std_error,
+#                            studlab = new_study_id,
+#                            data = df_for_gender_metan,
+#                            sm = "",
+#                            fixed = FALSE,
+#                            random = TRUE,
+#                            method.tau = "REML",
+#                            hakn = TRUE,
+#                            title = "percentage women across studies")
+# 
+# subgroup_metan <-update.meta(met_perc_women_overall  , 
+#                               subgroup = df_for_gender_metan$psy_or_med, subgroup.name = "treatment modality",
+#                               tau.common = FALSE)
+
+# Use the summary function with the 'byvar' argument
+summary_met_perc_women <- summary(met_perc_women, byvar = "psy_or_med")
+
+# Extract specific statistics for each subgroup
+subgroup_names <- summary_met_perc_women$subgroup.name
+TE_random <- summary_met_perc_women$TE.random
+seTE_random <- summary_met_perc_women$seTE.random
+lower_random <- summary_met_perc_women$lower.random
+upper_random <- summary_met_perc_women$upper.random
+pval <- summary_met_perc_women$pval.random
+tau2 <- summary_met_perc_women$tau2
+lower_tau2 <- summary_met_perc_women$lower.tau2
+upper_tau2 <- summary_met_perc_women$upper.tau2
+
+# Create a data frame to store the results
 result_df <- data.frame(
-   subgroup = met_perc_women$subgroup.name,
-   TE = met_perc_women$TE.random,
-  seTE = met_perc_women$seTE.random,
-  lower = met_perc_women$lower.random,
-  upper = met_perc_women$upper.random
+  subgroup = subgroup_names,
+  TE_random = TE_random,
+  seTE_random = seTE_random,
+  lower_random = lower_random,
+  upper_random = upper_random,
+  pval = pval,
+  tau2 = tau2,
+  lower_tau2 = lower_tau2,
+  upper_tau2 = upper_tau2
 )
+
 
 knitr:: kable(result_df, "latex", caption = "Gender composition")
 
@@ -827,7 +921,7 @@ met_perc_women_cbt <- metagen(TE = percent_women,
 
 ### Age
 
-Description of results X.
+Description of results X + table.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Now start looking at age variable
@@ -982,6 +1076,8 @@ met_sev_cbt <- metagen(TE = perc_baseline_overall,
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
 ### Number of sites
+Write results, tabulate.
+
 ## This data lives in this spreadsheet for psy trials, we need to merge it in
 
 df_no_sites <- readxl:: read_excel("for_despina_and_giannis_200224.xlsx")
@@ -1085,77 +1181,7 @@ ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = 
 # results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_level_var)
 # 
 # 
-# # Now we want to do look at baseline severity when we exclude psy studies with sub clinical depression levels
-# 
-# # We will do in two ways
-# # First by excluding studies with a diagnostic classification of "sub"
-# 
-# clin_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
-# 
-# clin_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-#   filter(new_study_id %in% clin_study_ids)
-# 
-# #turn sds to sec
-# clin_studies_baseline_metareg$baseline_stand_error <- clin_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(clin_studies_baseline_metareg$baseline_n)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# clin_studies_baseline_metareg$baseline_mean <- clin_studies_baseline_metareg$perc_baseline_mean
-# results_clin_studies_baseline_metareg <- run_metareg_and_extract(clin_studies_baseline_metareg,  
-#                                                          model_1, condition)
-# 
-# # Now lets include only studies with classification of "mdd"
-# 
-# mdd_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$diagnosis == "mdd",]$new_study_id
-# 
-# mdd_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-#   filter(new_study_id %in% mdd_study_ids)
-# 
-# mdd_studies_baseline_metareg %>% 
-#   filter(four_level_var %in% c("psychotherapy_active","psychotherapy_control")) %>%
-#   summarise(n = n())
-# 
-# #turn sds to sec
-# mdd_studies_baseline_metareg$baseline_stand_error <- mdd_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(mdd_studies_baseline_metareg$baseline_n)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# mdd_studies_baseline_metareg$baseline_mean <- mdd_studies_baseline_metareg$perc_baseline_mean
-# results_mdd_studies_baseline_metareg <- run_metareg_and_extract(mdd_studies_baseline_metareg,  
-#                                                          model_1, condition)
-# 
-# # Now CBT + all med studies
-# 
-# cbt_meds_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0, ]$new_study_id
-# 
-# cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-#   filter(new_study_id %in% cbt_meds_study_ids) %>% 
-#   filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-# 
-# #turn sds to sec
-# cbt_meds_studies_baseline_metareg$baseline_stand_error <- cbt_meds_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(cbt_meds_studies_baseline_metareg$baseline_n)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# cbt_meds_studies_baseline_metareg$baseline_mean <- cbt_meds_studies_baseline_metareg$perc_baseline_mean
-# results_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(cbt_meds_studies_baseline_metareg,  
-#                                                          model_1, condition)
-# 
+
 # # Look at the diagnostics of included studies 
 # 
 # filtered_data <- df_appl_v_orange %>%
@@ -1167,27 +1193,7 @@ ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = 
 #   group_by(diagnosis) %>%
 #   summarise(count = n())
 # 
-# # Now the CBT + med studies, filtering out the subclinical studies
-# 
-# clin_cbt_meds_study_ids <-
-#   df_appl_v_orange[(df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$psy_or_med == 0) & df_appl_v_orange$diagnosis != "sub", ]$new_study_id
-# 
-# clin_cbt_meds_studies_baseline_metareg <- all_studies_baseline_metareg %>%
-#   filter(new_study_id %in% clin_cbt_meds_study_ids) %>% 
-#   filter(!(arm_effect_size == "cohens_d_active" & psy_or_med == 1 & !(type == "cbt")))
-# 
-# #turn sds to sec
-# clin_cbt_meds_studies_baseline_metareg$baseline_stand_error <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(clin_cbt_meds_studies_baseline_metareg$baseline_n)
-# 
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# clin_cbt_meds_studies_baseline_metareg$baseline_mean <- clin_cbt_meds_studies_baseline_metareg$perc_baseline_mean
-# results_clin_cbt_meds_studies_baseline_metareg <- run_metareg_and_extract(clin_cbt_meds_studies_baseline_metareg,  
-#                                                          model_1, condition)
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -1226,10 +1232,8 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 # A) the overall sample
 # B) the CBT vs Fluox and Escitalopram sample
 # C) the no WL sample
-# D) the no WL or CAU sample
-# E) the CDRS only sample
-# F) percentage variables
-
+# E) the CDRS only sample (**Argyris** do we still want this?)
+# F) Clinical Levels Depression
 
 # A. Estimate Means and CIs for the overall ----------------------------------
 
@@ -1352,55 +1356,6 @@ coef_and_se_means_no_wl <- data.frame(cbind(condition,coef_and_se_means_no_wl))
 coef_and_se_means_no_wl$n <- study_count_no_wl_study[study_count_no_wl_study$is_missing 
                                                      ==FALSE,]$n
 
-# D. Estimate Means and CIs without WL and CAU --------------------------------------- 
- # grab the ids for no waitlist and cau
-no_wl_cau_ids <- df_appl_v_orange %>%
-  filter(!(control_type %in% c("wl", "cau"))) %>%
-  pull(new_study_id)
-
-# use them to loop over the simulated list to subset all the dataframes.
-
-list_no_wl_cau <- lapply(list_df_simulated, function(df) {
-  df %>%
-    filter(new_study_id %in% no_wl_cau_ids) %>%
-    filter(!(arm_effect_size == "cohens_d_control" & type %in% c("wl", "cau")))
-})
-
-# count studies 
-no_wl_cau_studies <- df_long_for_metan %>% 
-  filter(new_study_id %in% no_wl_cau_ids) %>%
-  filter(!(arm_effect_size == "cohens_d_control" & type %in% c("wl", "cau")))
-study_count_no_wl_cau_study <- count_studies(no_wl_cau_studies)
-# CB checked, looks good!
-
-
-# use this model as above
-model_1 <- as.formula(~ four_level_var)
-
-# apply the metareg function to the list of no wl or cau
-list_model_1_no_wl_cau <- run_metaregression(list_no_wl_cau , model_1)
-
-# extract coefficients and model characteristics.
-condition <- levels(list_df_simulated[[1]]$four_level_var)
-aggregate_results_no_wl_cau <- aggregate_model_results(list_model_1_no_wl_cau, condition)
-aggregate_results_no_wl_cau <- cbind(aggregate_results_no_wl_cau, condition)
-  
-# now use the function to extract the coefficients
-means_no_wl_cau <-  lapply(list_model_1_no_wl_cau, extract_coefficients_func)
-
-# run the mean function for no wl
-condition <- levels(list_df_simulated[[1]]$four_level_var) # for the condition argument
-coef_and_se_means_no_wl_cau <- calculate_mean_coefs_ses(means_no_wl_cau, condition)
-coef_and_se_means_no_wl_cau <- data.frame(cbind(condition,coef_and_se_means_no_wl_cau))
-
-
-coef_and_se_means_no_wl_cau$n <- study_count_no_wl_cau_study[study_count_no_wl_cau_study$is_missing 
-                                                     ==FALSE,]$n
-
-
-# here are all three of them OVERALL, CBT and WL together. We may want to display them together. 
-# df_all_coefficients <- cbind(df_mean_coefs_from_sim, coef_and_se_means_cbt_fluox_esc_study,coef_and_se_means_no_wl)
-
 # E. CDRS Sensitivity Analysis ---------------------------------------
 
 cdrs_study_ids <-
@@ -1443,14 +1398,6 @@ coef_and_se_means_cdrs_study$n  <- study_count_cdrs_study[study_count_cdrs_study
 
 # We need to decide how we want to do this. We have mdd, mood, sub, and cut categories. For now I'll just exclude sub. 
 
-# test <- df_appl_v_orange %>%
-#   filter(psy_or_med == 1) %>%
-#   distinct(new_study_id, .keep_all = TRUE)
-# 
-# summary_test <- test %>%
-#   group_by(diagnosis) %>%
-#   summarise(count = n())
-
 #take study ids where sample has clinical levels of depression
 clin_study_ids <-
   df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
@@ -1487,146 +1434,6 @@ coef_and_se_means_clin_study <- data.frame(cbind(condition, coef_and_se_means_cl
 
 # add the ns to the dataframe
 coef_and_se_means_clin_study$n  <- study_count_clin_study[study_count_clin_study$is_missing ==F,]$n
-
-# G. Estimate Means and CIs for the overall sample using baseline percentage variable ----------------------------------
-
-# the first thing to do is to create a new dataset with the percentage cohen's d
-
-list_df_simulated_percentage <- list_df_simulated
-
-for(i in 1: length(list_df_simulated_percentage)){
-  
-  list_df_simulated_percentage[[i]]$cohens_d <- 
-            (list_df_simulated_percentage[[i]]$perc_post_mean - list_df_simulated_percentage[[i]]$perc_baseline_mean)/
-    ((list_df_simulated_percentage[[i]]$perc_post_sd + list_df_simulated_percentage[[i]]$perc_baseline_sd)/2)     
-                  
-}
-
-list_df_simulated_percentage[[1]]
-
-list_df_simulated[[1]]
-
-# specify model
-model_1 <- as.formula(~ four_level_var )
-
-# run metareg function 
-# here you can use the simulated results directly
-list_model_1_meta_reg_perc <- run_metaregression(list_df_simulated_percentage, model_1)
-
-# extract coefficients and model characteristics.
-condition <- levels(list_df_simulated[[1]]$four_level_var)
-aggregate_results_perc <-  aggregate_model_results(list_model_1_meta_reg_perc, condition)
-aggregate_results_perc <- cbind(aggregate_results_perc, condition)
-
-# extract SMDs from the  list
-means_perc <-  lapply(list_model_1_meta_reg_perc, extract_coefficients_func)
-
-# calculate mean SMDs and ses
-df_mean_coefs_perc <- calculate_mean_coefs_ses(means_perc, condition)
-df_mean_coefs_perc <- data.frame(cbind(condition,df_mean_coefs_perc))
-
-# add the ns
-df_mean_coefs_perc <- data.frame(cbind(df_mean_coefs_perc, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
-
-##### now for the baseline controlled variable
-# specify model
-model_2 <- as.formula(~ four_level_var + perc_baseline_mean )
-
-# run metareg function 
-# here you can use the simulated results directly
-list_model_2_meta_reg_perc <- run_metaregression(list_df_simulated_percentage, model_2)
-
-# extract coefficients and model characteristics.
-condition <- levels(list_df_simulated[[1]]$four_level_var)
-aggregate_results_perc_mod_2 <-  aggregate_model_results(list_model_2_meta_reg_perc, condition)
-aggregate_results_perc_mod_2 <- cbind(aggregate_results_perc_mod_2, condition)
-
-# extract SMDs from the  list
-means_perc_mod_2 <-  lapply(list_model_2_meta_reg_perc, extract_coefficients_func)
-
-# calculate mean SMDs and ses
-df_mean_coefs_perc_mod_2 <- calculate_mean_coefs_ses(means_perc_mod_2, condition)
-df_mean_coefs_perc_mod_2 <- data.frame(cbind(condition,df_mean_coefs_perc_mod_2))
-
-# add the ns
-df_mean_coefs_perc_mod_2 <- data.frame(cbind(df_mean_coefs_perc_mod_2, n = df_count_studies[df_count_studies$is_missing == FALSE, ]$n))
-
-
-
-# Plots  -----------------------
-# 
-# #define groups
-# df_long_for_metan <- df_long_for_metan %>%
-#   mutate(
-#     group = case_when(
-#       psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
-#       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
-#       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
-#       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
-#       TRUE ~ NA_character_  
-#     )
-#   )
-
-# group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
-# 
-# # Plot cohens d per arm
-# 
-# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
-#   geom_point(position = position_jitter(width = 0.2), size = 3) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -3.5, yend = -3, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -3, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -4, yend = -4.5, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -4.5, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
-#   scale_color_manual(values = group_colors) +
-#   labs(title = "Scatter plot of Cohen's d by group", x = NULL, y = "Cohen's d") +
-#   theme_minimal() +
-#   theme(legend.position = "none")
-# 
-# # Now look at change scores of percentage transformed variables
-# 
-# df_long_for_metan <- df_long_for_metan %>% 
-#   mutate(perc_change = perc_post_mean - perc_baseline_mean)
-# 
-# ggplot(df_long_for_metan, aes(x = group, y = perc_change, color = group)) +
-#   geom_point(position = position_jitter(width = 0.2), size = 3) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -0.3, yend = -0.25, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -0.3, label = "Less Effective", color = "grey", vjust = 0, hjust = .3) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -0.4, yend = -0.45, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -0.4, label = "More Effective", color = "grey", vjust = 0, hjust = .3) +
-#   scale_color_manual(values = group_colors) +
-#   labs(title = "Scatter plot of change scores (percentage transformed) by group", x = NULL, y = "Change") +
-#   theme_minimal() +
-#   theme(legend.position = "none")
-# 
-# # # Plot percentage  baseline means 
-# # 
-# # ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
-# #   geom_point(position = position_jitter(width = 0.2), size = 3) +
-# #   scale_color_manual(values = group_colors) +
-# #   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
-# #   theme_minimal() +
-# #   theme(legend.position = "none")
-# 
-# # Box plots
-# 
-# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
-#   geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
-#   scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
-#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
-#   geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5, 
-#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-#   geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
-#   scale_fill_manual(values = group_colors) +
-#   labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
-#   theme_minimal() +
-#   theme(legend.position = "none")
 
 ```
 
@@ -1963,3 +1770,83 @@ knitr:: kable(cdrs_smd_with_cis, caption = "Table 6a. CDRS baseline mean adjsute
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 knitr:: kable(hamd_smd_with_cis, caption = "Table 6. HAM-D baseline-mean adjusted SMDs")
 ```
+
+
+```{r}
+# Plots  -----------------------
+# 
+# #define groups
+# df_long_for_metan <- df_long_for_metan %>%
+#   mutate(
+#     group = case_when(
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
+#       TRUE ~ NA_character_  
+#     )
+#   )
+
+# group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
+# 
+# # Plot cohens d per arm
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
+#   geom_point(position = position_jitter(width = 0.2), size = 3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -3.5, yend = -3, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -3, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -4, yend = -4.5, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -4.5, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
+#   scale_color_manual(values = group_colors) +
+#   labs(title = "Scatter plot of Cohen's d by group", x = NULL, y = "Cohen's d") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
+# 
+# # Now look at change scores of percentage transformed variables
+# 
+# df_long_for_metan <- df_long_for_metan %>% 
+#   mutate(perc_change = perc_post_mean - perc_baseline_mean)
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = perc_change, color = group)) +
+#   geom_point(position = position_jitter(width = 0.2), size = 3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -0.3, yend = -0.25, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -0.3, label = "Less Effective", color = "grey", vjust = 0, hjust = .3) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -0.4, yend = -0.45, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -0.4, label = "More Effective", color = "grey", vjust = 0, hjust = .3) +
+#   scale_color_manual(values = group_colors) +
+#   labs(title = "Scatter plot of change scores (percentage transformed) by group", x = NULL, y = "Change") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
+# 
+# # # Plot percentage  baseline means 
+# # 
+# # ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+# #   geom_point(position = position_jitter(width = 0.2), size = 3) +
+# #   scale_color_manual(values = group_colors) +
+# #   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+# #   theme_minimal() +
+# #   theme(legend.position = "none")
+# 
+# # Box plots
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
+#   geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
+#   scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5, 
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
+#   scale_fill_manual(values = group_colors) +
+#   labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
+
+```
+

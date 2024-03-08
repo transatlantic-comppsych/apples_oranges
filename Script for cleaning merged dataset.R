@@ -1529,7 +1529,7 @@ list_df_simulated[[i]]$weights <-  weights(list_mod_3_meta_reg[[i]])  # this is 
 
 }
 
-
+library(tidyverse)
 
 # Run individual metanalyses ----------------------------------------------
 
