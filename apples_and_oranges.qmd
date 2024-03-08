@@ -617,7 +617,7 @@ df_with_distinct_instruments <- df_with_distinct_instruments %>%
 active_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, active_type, descr_active, psy_or_med, baseline_n_active, cohens_d_active,
                  baseline_mean_active, baseline_sd_active, post_mean_active, post_sd_active,
-                 perc_baseline_mean_active, perc_baseline_sd_active, perc_post_mean_active, perc_post_sd_active, percent_women_overall, percent_women_active, age_m_active, age_sd_active, age_m_overall, age_sd_overall) %>% 
+                 perc_baseline_mean_active, perc_baseline_sd_active, perc_post_mean_active, perc_post_sd_active, percent_women_overall, percent_women_active, age_m_active, age_sd_active, age_m_overall, age_sd_overall, no_sites) %>% 
   rename(treatment = descr_active) %>% 
   rename(type = active_type) %>% 
   rename_with(~ str_remove(., "_active")) %>% 
@@ -628,7 +628,7 @@ active_df <- df_with_distinct_instruments %>%
 control_df <- df_with_distinct_instruments %>% 
   dplyr:: select(new_study_id, control_type, descr_control, psy_or_med, baseline_n_control, cohens_d_control,
                  baseline_mean_control, baseline_sd_control,post_mean_control, post_sd_control,
-                 perc_baseline_mean_control, perc_baseline_sd_control, perc_post_mean_control, perc_post_sd_control, percent_women_overall, percent_women_control, age_m_control, age_sd_control, age_m_overall, age_sd_overall) %>% 
+                 perc_baseline_mean_control, perc_baseline_sd_control, perc_post_mean_control, perc_post_sd_control, percent_women_overall, percent_women_control, age_m_control, age_sd_control, age_m_overall, age_sd_overall, no_sites) %>% 
   rename(treatment = descr_control) %>% 
   rename(type = control_type) %>% 
   rename_with(~ str_remove(., "_control")) %>% 
@@ -643,7 +643,8 @@ df_long_for_metan <- rbind(active_df, control_df)
 df_long_for_metan <- df_long_for_metan %>%
   filter(!(new_study_id == "March, 2004" & is.na(treatment)))
 
-# I'm going to perform  the operations to calculate overall age and percent women here now. 
+# I'm going to perform  the operations to calculate overall age and percent women here now. We just want this per study rather than per arm
+# as we are going to compare psy vs med (2 subgroups) rather than the 4 arms
 
 df_long_for_metan <- df_long_for_metan %>% 
   group_by(new_study_id) %>%
@@ -659,6 +660,8 @@ df_long_for_metan <- df_long_for_metan %>%
 
 df_long_for_metan <- df_long_for_metan %>% 
   select(-c(percent_women_overall, age_m, age_sd, age_m_overall, age_sd_overall, age_overall, gender_overall))
+
+# Remember that these are now per study, not per arm. 
 
 # Create SEs proportions for percentage women --------------------------------------------
 
@@ -731,7 +734,7 @@ Placebo was the control condition for all medication trials; the active arm rang
 
 ### Gender
 
-Psychotherapy trials featured a higher percentage of women when compared to medication trials. This subgroup difference in gender composition reached statistical significance (stats). Excluding sub-clinical studies yielded very similar results (stats). This difference in gender composition however did not reach statistical significance when only CBT and medication trials were included (stats). 
+Psychotherapy trials featured a higher percentage of women when compared to medication trials. This subgroup difference in gender composition reached statistical significance (stats). Excluding sub-clinical studies yielded very similar results (stats). This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (stats). 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Start by looking at demographics at baseline
@@ -974,6 +977,58 @@ met_sev_cbt <- metagen(TE = perc_baseline_overall,
                            title = "baseline severity cbt + med studies",
                            subgroup = psy_or_med,
                            tau.common = FALSE)
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+### Number of sites
+## This data lives in this spreadsheet for psy trials, we need to merge it in
+
+df_no_sites <- readxl:: read_excel("for_despina_and_giannis_200224.xlsx")
+
+df_no_sites <- df_no_sites %>% 
+  select(c(new_study_id, number_of_sites)) %>% 
+  filter(!is.na(number_of_sites)) %>% 
+  distinct(new_study_id, .keep_all = TRUE) %>% 
+  mutate(number_of_sites = as.numeric(number_of_sites))
+
+df_baseline_demographics <- full_join(df_baseline_demographics, df_no_sites, by = "new_study_id")
+
+# we have different vectors for psy and med trials, lets coalesce
+
+df_baseline_demographics <- df_baseline_demographics %>%
+  mutate(no_sites = as.numeric(no_sites)) %>% 
+  mutate(sites = coalesce(no_sites, number_of_sites)) %>%
+  select(-no_sites, -number_of_sites)
+
+# we have a few rogue studies (Kitchen, McCarty and Wright). Kitchen was too recent (after 2021), McCarty and Wright are not in Cuijpers' master
+# dataset for some reason, though they are in the list of included studies in the table in his MA. For now I'm going to remove them because 
+# we don't have data for these trials. 
+
+df_baseline_demographics <- df_baseline_demographics %>% 
+  filter(!(new_study_id %in% c("Kitchen, 2021", "McCarty, 2013", "Wright, 2020")))
+
+# Lets look at results
+
+df_sites_summary_stats <- df_baseline_demographics %>%
+  group_by(psy_or_med) %>%
+  summarise(
+    mean_sites = mean(sites, na.rm = TRUE),
+    sd_sites = sd(sites, na.rm = TRUE),
+    n = n()
+  )
+
+# plot
+
+ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = factor(psy_or_med))) +
+  geom_point(position = position_jitter(width = 0.2), size = 2) +
+  labs(title = "Number of Sites for Psychotherapy and Medication Trials",
+       x = "Treatment Modality",
+       y = "Number of Sites") +
+  scale_color_discrete(name = "Treatment Type", labels = c("Medication", "Psychotherapy"))
+
+
+
 
 
 # ### do ALL studies using percentage at baseline
@@ -1689,7 +1744,7 @@ dev.off()
 
 ### Comparing the nature and intensity of control conditions in psychotherapy trials
 
-Text.
+Write results here.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
  
@@ -1773,7 +1828,7 @@ columns_to_clean <- c(
 df_descr_psy_conditions <- df_descr_psy_conditions %>%
   mutate_at(vars(columns_to_clean), ~as.numeric(as.character(.)))
 
-# Define the function for summary stats
+# Giannis' function for summary stats
 
 group_function <- function(dataframe, my_groups, columns) {
   result_dataframe <- data.frame(

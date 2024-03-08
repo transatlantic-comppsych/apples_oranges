@@ -16,7 +16,7 @@ Working_Dataset_Medication <- read_excel("Working_Dataset_Medication.xlsx",
                                                        "text", "text", "text", "text", 
                                                        "numeric", "numeric", "numeric", "numeric",
                                                        "numeric", "numeric", "numeric", "numeric",
-                                                       "text", "text"))
+                                                       "text", "text", "numeric"))
 Working_Dataset_Medication$year <- sub("\\.0$", "", Working_Dataset_Medication$year)
 
 #add vector indicating whether psychotherapy or medication, where 1 is psych and 0 is med

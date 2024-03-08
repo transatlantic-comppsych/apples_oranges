@@ -1623,9 +1623,6 @@ statistics_indiv_metan$treatment <- stringr::str_extract(statistics_indiv_metan$
 statistics_indiv_metan$arm <- stringr::str_remove(statistics_indiv_metan$condition, stringr::regex(pattern = "[a-z,-]+(?=\\s)", ignore_case = F)) 
 
 
-  
-
-
 
 # ATTEMPTS AT GRAPHING. ---------------------------------------------------
 
