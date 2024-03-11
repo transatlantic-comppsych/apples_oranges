@@ -257,7 +257,7 @@ cat("critical value of z =", x, "corresponding to an alpha = 0.05." , "\n")
 
 ### Comparing the control versus active arms of psychotherapy trials
 
-We ran a random effects meta-analysis in R's Meta package to compare the active versus control arms of psychotherapy trials on key variables of interest regarding the nature and intensity of the interventions. We extracted data pertaining to the number, duration and intensity of sessions, and the total cumulative hours and period of the intervention. Where a range was provided, the maximum was encoded (e.g. if a paper reported that an intervention involved 8-10 sessions lasting 50-60 minutes, we encoded the number and duration of sessions as 10 and 60, respectively). If sessions varied in frequency across an intervention, we calculated an average by dividing total number of sessions by length of intervention period. Similarly, if the length of sessions varied across the course of the intervention, we calculated a weighted average. Phone call, web-chat and online sessions were encoded as sessions, however guided self-help components were not. 
+We ran t-tests to compare the active versus control arms of psychotherapy trials on key variables of interest regarding the nature and intensity of the interventions. We extracted data pertaining to the number, duration and intensity of sessions, and the total cumulative hours and period of the intervention. Where a range was provided, the maximum was encoded (e.g. if a paper reported that an intervention involved 8-10 sessions lasting 50-60 minutes, we encoded the number and duration of sessions as 10 and 60, respectively). If sessions varied in frequency across an intervention, we calculated an average by dividing total number of sessions by length of intervention period. Similarly, if the length of sessions varied across the course of the intervention, we calculated a weighted average. Phone call, web-chat and online sessions were encoded as sessions, however guided self-help components were not. 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 ###########Libraries needed
@@ -734,7 +734,7 @@ Placebo was the control condition for all medication trials; the active arm rang
 
 ### Gender
 
-Psychotherapy trials featured a higher percentage of women when compared to medication trials. This subgroup difference in gender composition reached statistical significance (stats). Excluding sub-clinical studies yielded very similar results (stats). This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (stats). 
+Psychotherapy trials featured a significantly higher percentage of women when compared to medication trials (`results_met_perc_women_overall$pval_between`). On average, samples were comprised of `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1]`% women across psychotherapy trials and `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0]`% women across medication trials.  Excluding sub-clinical studies yielded very similar results (p = `results_met_perc_women_clin$pval_between`). This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (p = `results_met_perc_women_cbt$pval_between`). 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Start by looking at demographics at baseline
@@ -743,65 +743,33 @@ Psychotherapy trials featured a higher percentage of women when compared to medi
 df_baseline_demographics <- df_long_for_metan %>% 
   distinct(new_study_id, .keep_all = TRUE)
 
-# Define function for baseline metaanalyses  ----------------------------------------------
+# This is the function to extract statistics
 
-# subgroup_df <- data.frame(psy_or_med = c(0, 1))
-# 
-# result <- list()
-# name_vec <- character()
-# 
-# # Loop over rows in the subgroup_df
-# for (i in 1:nrow(subgroup_df)) {
-#   
-#   # Call the metagen function for each row
-#   result[[i]] <- metagen(
-#     TE = percent_women,
-#     seTE = percent_women_std_error,
-#     studlab = new_study_id,
-#     data = df_for_gender_metan[df_for_gender_metan$psy_or_med == subgroup_df$psy_or_med[i], ],
-#     sm = "",
-#     fixed = FALSE,
-#     random = TRUE,
-#     method.tau = "REML",
-#     hakn = TRUE,
-#     title = paste("Subgroup:", subgroup_df$psy_or_med[i])
-#   )
-#   
-#   name_vec[i] = paste("Subgroup:", subgroup_df$psy_or_med[i])
-# }
-# 
-# # Now result contains the metagen results for each subgroup
-# # name_vec contains names for each subgroup
-# 
-# ## Function to extrac the key results for graphing and tabulating.
-# 
-# extract_stats <- function(result) {
-#  
-#   # get the summary table with results
-#   statistics <- summary(result)
-#   
-#   # Extract specific stats
-#   extracted_stats <- c(
-#     k_study = statistics$k.study,
-#     TE_random = statistics$TE.random,
-#     lower_random = statistics$lower.random,
-#     upper_random = statistics$upper.random,
-#     pval = statistics$pval.random,
-#     tau2 = statistics$tau2,
-#     lower_tau2 = statistics$lower.tau2,
-#     upper_tau2 = statistics$upper.tau2
-#   )
-#   
-#   return(extracted_stats)
-# }
-# 
-# extract_stats(result[[1]])
-# extract_stats(result[[2]])
-# 
-# # create a dataframe with the results
-# statistics_indiv_metan <- lapply(result, extract_stats) 
-# statistics_indiv_metan <- data.frame(do.call("rbind", statistics_indiv_metan))
-# statistics_indiv_metan$condition <- name_vec
+extract_stats <- function(df) {
+
+  # get the summary table with results
+  statistics <- summary(df, byvar = "psy_or_med")
+
+  df_stats <- data.frame(
+  subgroup = statistics$subgroup.levels,
+  k_study = statistics$k.study.w,
+  TE_random = statistics$TE.random.w,
+  seTE_random = statistics$seTE.random.w,
+  lower_random = statistics$lower.random.w,
+  upper_random = statistics$upper.random.w,
+  tau2 = statistics$tau2.w)
+  
+  # Add an empty row at the top and column on right (this is for the test for subgroup differences p value)
+  df_stats <- rbind(data_frame(subgroup = NA, k_study = NA, TE_random = NA, seTE_random = NA, 
+                             lower_random = NA, upper_random = NA, tau2 = NA), df_stats)
+  df_stats <- cbind(df_stats, pval_between = NA)
+
+  # Set the value in the last row and last column as the between groups p val
+  df_stats[1, "pval_between"] <- statistics$pval.Q.b.random
+
+  return(df_stats) 
+  
+}
 
 # Now start looking at perc_women variable 
 
@@ -810,7 +778,7 @@ df_baseline_demographics <- df_long_for_metan %>%
 df_for_gender_metan <- df_baseline_demographics %>% 
   filter(!is.na(percent_women))
 
-met_perc_women <- metagen(TE = percent_women,
+met_perc_women_overall <- metagen(TE = percent_women,
                            seTE = percent_women_std_error,
                            studlab = new_study_id,
                            data = df_for_gender_metan,
@@ -819,54 +787,16 @@ met_perc_women <- metagen(TE = percent_women,
                            random = TRUE,
                            method.tau = "REML",
                            hakn = TRUE,
-                           title = "percentage women across studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
+                           title = "percentage women across studies")
 
-# met_perc_women_overall <- metagen(TE = percent_women,
-#                            seTE = percent_women_std_error,
-#                            studlab = new_study_id,
-#                            data = df_for_gender_metan,
-#                            sm = "",
-#                            fixed = FALSE,
-#                            random = TRUE,
-#                            method.tau = "REML",
-#                            hakn = TRUE,
-#                            title = "percentage women across studies")
-# 
-# subgroup_metan <-update.meta(met_perc_women_overall  , 
-#                               subgroup = df_for_gender_metan$psy_or_med, subgroup.name = "treatment modality",
-#                               tau.common = FALSE)
+met_perc_women_overall <- update(met_perc_women_overall,
+                              subgroup = df_for_gender_metan$psy_or_med, subgroup.name = "treatment modality",
+                              tau.common = FALSE)
 
-# Use the summary function with the 'byvar' argument
-summary_met_perc_women <- summary(met_perc_women, byvar = "psy_or_med")
+# Apply the function to the meta-analysis result
+results_met_perc_women_overall <- extract_stats(met_perc_women_overall)
 
-# Extract specific statistics for each subgroup
-subgroup_names <- summary_met_perc_women$subgroup.name
-TE_random <- summary_met_perc_women$TE.random
-seTE_random <- summary_met_perc_women$seTE.random
-lower_random <- summary_met_perc_women$lower.random
-upper_random <- summary_met_perc_women$upper.random
-pval <- summary_met_perc_women$pval.random
-tau2 <- summary_met_perc_women$tau2
-lower_tau2 <- summary_met_perc_women$lower.tau2
-upper_tau2 <- summary_met_perc_women$upper.tau2
-
-# Create a data frame to store the results
-result_df <- data.frame(
-  subgroup = subgroup_names,
-  TE_random = TE_random,
-  seTE_random = seTE_random,
-  lower_random = lower_random,
-  upper_random = upper_random,
-  pval = pval,
-  tau2 = tau2,
-  lower_tau2 = lower_tau2,
-  upper_tau2 = upper_tau2
-)
-
-
-knitr:: kable(result_df, "latex", caption = "Gender composition")
+knitr:: kable(results_met_perc_women_overall, caption = "Gender composition")
 
 # looking at clinical sample only
 
@@ -885,9 +815,16 @@ met_perc_women_clin <- metagen(TE = percent_women,
                            random = TRUE,
                            method.tau = "REML",
                            hakn = TRUE,
-                           title = "percentage women across clinical studies",
-                           subgroup = psy_or_med,
+                           title = "percentage women across clinical studies")
+
+met_perc_women_clin <- update(met_perc_women_clin,
+                           subgroup = df_for_gender_metan_clin$psy_or_med, subgroup.name = "treatment modality",
                            tau.common = FALSE)
+
+# Apply the function to the meta-analysis result
+results_met_perc_women_clin <- extract_stats(met_perc_women_clin)
+
+knitr:: kable(results_met_perc_women_clin, caption = "Gender composition in clinical studies")
 
 # Now looking at the CBT + med studies only
 
@@ -902,8 +839,7 @@ cbt_meds_study_ids <-
 # We may have multiple controls per study id for this reason, though this isn't a problem conceptually.
 
 df_for_gender_metan_cbt <- df_for_gender_metan %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
+  filter(new_study_id %in% cbt_meds_study_ids) 
 
 met_perc_women_cbt <- metagen(TE = percent_women,
                            seTE = percent_women_std_error,
@@ -917,11 +853,17 @@ met_perc_women_cbt <- metagen(TE = percent_women,
                            title = "percentage women across cbt and med studies",
                            subgroup = psy_or_med,
                            tau.common = FALSE)
+
+# Apply the function to the meta-analysis result
+results_met_perc_women_cbt <- extract_stats(met_perc_women_cbt)
+
+knitr:: kable(results_met_perc_women_cbt, caption = "Gender composition in studies with CBT, escitalopram or fluoxetine")
+
 ```
 
 ### Age
 
-Description of results X + table.
+Mean age was `r results_met_age$TE_random[results_met_perc_women_overall$subgroup == 1]` (`r results_met_age$seTE_random[results_met_perc_women_overall$subgroup == 1]`) across psychotherapy trials and `r results_met_age$TE_random[results_met_perc_women_overall$subgroup == 0]` (`r results_met_age$seTE_random[results_met_perc_women_overall$subgroup == 0]`) across medication trials, with no significant between group differences (p = `r results_met_age$pval_between`). There were no significant differences in mean age between modalities on further sensitivity analyses.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Now start looking at age variable
@@ -961,6 +903,9 @@ met_age <- metagen(TE = mean_age,
                            subgroup = psy_or_med,
                            tau.common = FALSE)
 
+results_met_age <- extract_stats(met_age)
+
+knitr:: kable(results_met_age, caption = "Average age in psychotherapy vs medication trials")
 
 # Looking at clinical sample only
 
@@ -983,11 +928,14 @@ met_age_clin <- metagen(TE = mean_age,
                            subgroup = psy_or_med,
                            tau.common = FALSE)
 
+results_met_age_clin <- extract_stats(met_age_clin)
+
+knitr:: kable(results_met_age_clin, caption = "Average age in clinical studies")
+
 # Now cbt + med studies only
 
 df_for_age_metan_cbt <- df_for_age_metan %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
+  filter(new_study_id %in% cbt_meds_study_ids) 
 
 met_age_cbt <- metagen(TE = mean_age,
                            seTE = se_age,
@@ -1001,10 +949,15 @@ met_age_cbt <- metagen(TE = mean_age,
                            title = "age across cbt + med studies",
                            subgroup = psy_or_med,
                            tau.common = FALSE)
+
+results_met_age_cbt <- extract_stats(met_age_cbt)
+
+knitr:: kable(results_met_age_cbt, caption = "Average age in cbt, fluox, escit studies")
+
 ```
 ### Baseline severity
 
-Describe results here
+On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials, for both the overall sample (p = `results_met_sev$pval_between`) and when taking only those studies where the active arm was eiter CBT, fluoxetine or escitalopram (p = `results_met_sev_cbt$pval_between`). When excluding psychotherapy studies that recruited samples with sub-clinical depression, this difference no longer reached statistical significance (p = `results_met_sev_clin$pval_between`). 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Now look at baseline severity for overall psy vs med
@@ -1032,6 +985,10 @@ met_sev <- metagen(TE = perc_baseline_overall,
                            subgroup = psy_or_med,
                            tau.common = FALSE)
 
+results_met_sev <- extract_stats(met_sev)
+
+knitr:: kable(results_met_sev, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials")
+
 # clinical sample
 
 clin_study_ids <-
@@ -1053,11 +1010,14 @@ met_sev_clin <- metagen(TE = perc_baseline_overall,
                            subgroup = psy_or_med,
                            tau.common = FALSE)
 
+results_met_sev_clin <- extract_stats(met_sev_clin)
+
+knitr:: kable(results_met_sev_clin, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials, excluding subclinical studies")
+
 # cbt + med
 
 df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
   filter(new_study_id %in% cbt_meds_study_ids) %>% 
-  filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
 
 met_sev_cbt <- metagen(TE = perc_baseline_overall,
                            seTE = perc_se_baseline,
@@ -1071,6 +1031,21 @@ met_sev_cbt <- metagen(TE = perc_baseline_overall,
                            title = "baseline severity cbt + med studies",
                            subgroup = psy_or_med,
                            tau.common = FALSE)
+
+results_met_sev_cbt <- extract_stats(met_sev_cbt)
+
+knitr:: kable(results_met_sev_cbt, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials with CBT, fluoxetine and escitaloptram as the active intervention")
+
+ggplot(df_for_baseline_severity, aes(x = factor(psy_or_med), y = perc_baseline_mean, color = factor(psy_or_med))) +
+  geom_point(position = position_jitter(width = 0.2), size = 2) +
+  labs(
+    title = "Baseline Depression Severity in Psychotherapy vs Medication trials",
+    x = "Treatment Modality",
+    y = "Baseline Depression Levels (transformed)",
+    color = "Treatment Type"
+  ) +
+  scale_color_discrete(labels = c("Medication", "Psychotherapy"))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
