@@ -265,6 +265,7 @@ library(tidyverse)
 library(truncnorm)
 library(metafor)
 library(meta)
+library(kableExtra)
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -1036,6 +1037,8 @@ results_met_sev_cbt <- extract_stats(met_sev_cbt)
 
 knitr:: kable(results_met_sev_cbt, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials with CBT, fluoxetine and escitaloptram as the active intervention")
 
+# plot for overall severity results
+
 ggplot(df_for_baseline_severity, aes(x = factor(psy_or_med), y = perc_baseline_mean, color = factor(psy_or_med))) +
   geom_point(position = position_jitter(width = 0.2), size = 2) +
   labs(
@@ -1046,12 +1049,44 @@ ggplot(df_for_baseline_severity, aes(x = factor(psy_or_med), y = perc_baseline_m
   ) +
   scale_color_discrete(labels = c("Medication", "Psychotherapy"))
 
+# Now lets make a table that combines across these baseline characteristics variables
+
+df_overall_baseline_results <- rbind(results_met_perc_women_overall, results_met_age, results_met_sev)
+
+# For row names
+df_overall_baseline_results <- df_overall_baseline_results %>%
+  mutate(subgroup = case_when(
+    row_number() == 1 ~ "Gender",
+    row_number() == 4 ~ "Age",
+    row_number() == 7 ~ "Severity",
+    TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
+  )) 
+
+# Rounding
+df_overall_baseline_results <- df_overall_baseline_results %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+df_overall_baseline_results %>%
+  kbl(caption = "Sample characteristics at baseline") %>%
+  kable_styling(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  row_spec(row = 0, background = "#D3D3D3",  extra_css = "border-bottom: 2px solid grey;" ) %>% 
+  row_spec(c(1, 4, 7), bold = T, extra_css = "border-top: 2px solid grey;") %>%
+  column_spec(column = 1, border_right = T) %>% 
+  add_indent(c(2, 3, 5, 6, 8, 9))
+
+df_overall_baseline_results <- options(knitr.kable.NA = "")
+
 ```
+### Number of trial sites
+
+Average number of trial sites was significantly higher across medication studies ( *M* = `r `df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 0]`, *SD* = `r `df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 0]` compared to psychotherapy studies ( *M* = `r `df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 1]`, *SD* = `r `df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 1]`(*t* (`r sites_t_test$parameter`) = `r sites_t_test$statistic`, *p* = `r sites_t_test$p.value`).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
+df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 0]
+
 ### Number of sites
-Write results, tabulate.
+# Write results, tabulate.
 
 ## This data lives in this spreadsheet for psy trials, we need to merge it in
 
@@ -1081,13 +1116,17 @@ df_baseline_demographics <- df_baseline_demographics %>%
 
 # Lets look at results
 
+# summary stats
 df_sites_summary_stats <- df_baseline_demographics %>%
   group_by(psy_or_med) %>%
   summarise(
+    n = n(),
     mean_sites = mean(sites, na.rm = TRUE),
     sd_sites = sd(sites, na.rm = TRUE),
-    n = n()
   )
+
+# t-test
+sites_t_test <- t.test(sites ~ psy_or_med, data = df_baseline_demographics)
 
 # plot
 
@@ -1098,9 +1137,22 @@ ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = 
        y = "Number of Sites") +
   scale_color_discrete(name = "Treatment Type", labels = c("Medication", "Psychotherapy"))
 
+# Tabulate
+# Rounding
+df_sites_summary_stats <- df_sites_summary_stats %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
 
+# Row names
+df_sites_summary_stats <- df_sites_summary_stats %>%
+  mutate(psy_or_med = case_when(
+    psy_or_med == 0 ~ "Medication",
+    psy_or_med == 1 ~ "Psychotherapy",
+    TRUE ~ as.character(psy_or_med)  # Keep other values unchanged
+  ))
 
-
+df_sites_summary_stats %>%
+  kbl(col.names = c("Modality", "N", "Mean", "SD")) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) 
 
 # ### do ALL studies using percentage at baseline
 # all_studies_baseline_metareg <- list_df_simulated_percentage[[1]]
