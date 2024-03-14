@@ -736,7 +736,6 @@ Placebo was the control condition for all medication trials; the active arm rang
 Table 1 summarises the results from each of the meta-analyses examining sample characteristics at baseline. The summary statistics are provided for each subgroup (i.e. for medication and psychotherapy trials) and the p-value derives from the test for subgroup differences. Full results for each of the sensitivity analyses are included in the Supplementary Materials (Table X - Y).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
 # Start by looking at demographics at baseline
 # Currently we have both control and active conditions, we just need each study once
 
@@ -771,8 +770,111 @@ extract_stats <- function(df) {
   
 }
 
-# Now start looking at perc_women variable 
+# Now look at baseline severity for overall psy vs med
+# Need to calculate the variables first
 
+df_for_baseline_severity <- df_long_for_metan %>% 
+  group_by(new_study_id) %>%
+  mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
+  mutate(pooled_perc_sd_baseline = sqrt(sum((perc_baseline_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
+  mutate(perc_se_baseline = pooled_perc_sd_baseline / sqrt(n_overall)) 
+
+df_for_baseline_severity <- df_for_baseline_severity %>% 
+  distinct(new_study_id, .keep_all = TRUE)
+
+met_sev <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+results_met_sev <- extract_stats(met_sev)
+
+# clinical sample
+
+clin_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
+
+df_for_baseline_severity_clin <- df_for_baseline_severity %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_sev_clin <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity clinical",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+results_met_sev_clin <- extract_stats(met_sev_clin)
+
+# cbt + med
+
+cbt_meds_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
+
+df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
+  filter(new_study_id %in% cbt_meds_study_ids) 
+
+met_sev_cbt <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_cbt,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity cbt + med studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+results_met_sev_cbt <- extract_stats(met_sev_cbt)
+
+# no wl
+
+no_wl_ids <- df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
+
+df_for_baseline_severity_no_wl <- df_for_baseline_severity %>%
+  filter(new_study_id %in% no_wl_ids)
+
+met_sev_no_wl <- metagen(TE = perc_baseline_overall,
+                           seTE = perc_se_baseline,
+                           studlab = new_study_id,
+                           data = df_for_baseline_severity_no_wl,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "baseline severity no wl studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+results_met_sev_no_wl <- extract_stats(met_sev_no_wl)
+
+```
+### Baseline severity
+
+On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials for the overall sample (p = `results_met_sev$pval_between`).The statistics provided in Table 1 represent the transformed mean scores at baseline on the 
+
+and when taking only those studies where the active arm was either CBT, fluoxetine or escitalopram (p = `results_met_sev_cbt$pval_between`). When excluding psychotherapy studies that recruited samples with sub-clinical depression, this difference did not reach statistical significance (p = `results_met_sev_clin$pval_between`). 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+# Now start looking at perc_women variable 
 # The metagen function doesn't like when NAs result in the TE vector being a different length to subgroup vector. Need to start by removing NAs.
 
 df_for_gender_metan <- df_baseline_demographics %>% 
@@ -794,14 +896,10 @@ met_perc_women_overall <- update(met_perc_women_overall,
                               tau.common = FALSE)
 
 # Apply the function to the meta-analysis result
+
 results_met_perc_women_overall <- extract_stats(met_perc_women_overall)
 
-knitr:: kable(results_met_perc_women_overall, caption = "Gender composition")
-
 # looking at clinical sample only
-
-clin_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
 
 df_for_gender_metan_clin <- df_for_gender_metan %>%
   filter(new_study_id %in% clin_study_ids)
@@ -824,15 +922,7 @@ met_perc_women_clin <- update(met_perc_women_clin,
 # Apply the function to the meta-analysis result
 results_met_perc_women_clin <- extract_stats(met_perc_women_clin)
 
-knitr:: kable(results_met_perc_women_clin, caption = "Gender composition in clinical studies")
-
 # Now looking at the CBT + med studies only
-
-#  grab ids for those studies
-cbt_meds_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
-
-# Use those ids to subset all dataframes in the list
 
 df_for_gender_metan_cbt <- df_for_gender_metan %>%
   filter(new_study_id %in% cbt_meds_study_ids) 
@@ -853,11 +943,7 @@ met_perc_women_cbt <- metagen(TE = percent_women,
 # Apply the function to the meta-analysis result
 results_met_perc_women_cbt <- extract_stats(met_perc_women_cbt)
 
-knitr:: kable(results_met_perc_women_cbt, caption = "Gender composition in studies with CBT, escitalopram or fluoxetine")
-
 # Now the no waitlist group
-
-no_wl_ids <- df_appl_v_orange[df_appl_v_orange$control_type != "wl",]$new_study_id
 
 df_for_gender_metan_no_wl <- df_for_gender_metan %>%
   filter(new_study_id %in% no_wl_ids) 
@@ -878,13 +964,10 @@ met_perc_women_no_wl <- metagen(TE = percent_women,
 # Apply the function to the meta-analysis result
 results_met_perc_women_no_wl <- extract_stats(met_perc_women_no_wl)
 
-knitr:: kable(results_met_perc_women_no_wl, caption = "Gender composition in studies with CBT, escitalopram or fluoxetine")
-
-
 ```
 ### Gender
 
-Psychotherapy trials featured a significantly higher percentage of women when compared to medication trials (`results_met_perc_women_overall$pval_between`). On average, samples were comprised of `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1]`% (*SE* = `r results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1]` women across psychotherapy trials and `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0]`% (*SE* = `r results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0]`women across medication trials.  Excluding sub-clinical studies yielded very similar results (p = `results_met_perc_women_clin$pval_between`). This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (p = `results_met_perc_women_cbt$pval_between`). 
+Psychotherapy trials featured a significantly higher percentage of women when compared to medication trials (`results_met_perc_women_overall$pval_between`). On average, samples were comprised of `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1]`% (*SE* = `r results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1]` women across psychotherapy trials and `r results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0]`% (*SE* = `r results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0]`women across medication trials. Excluding sub-clinical studies (p = `results_met_perc_women_clin$pval_between`) and studies that used waitlist as their control condition yielded very similar results (p = `results_met_perc_women_no_wl$pval_between`). This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (p = `results_met_perc_women_cbt$pval_between`). 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Now start looking at age variable
@@ -928,8 +1011,6 @@ met_age <- metagen(TE = mean_age,
 
 results_met_age <- extract_stats(met_age)
 
-knitr:: kable(results_met_age, caption = "Average age in psychotherapy vs medication trials")
-
 # Looking at clinical sample only
 
 clin_study_ids <-
@@ -953,8 +1034,6 @@ met_age_clin <- metagen(TE = mean_age,
 
 results_met_age_clin <- extract_stats(met_age_clin)
 
-knitr:: kable(results_met_age_clin, caption = "Average age in clinical studies")
-
 # Now cbt + med studies only
 
 df_for_age_metan_cbt <- df_for_age_metan %>%
@@ -975,109 +1054,36 @@ met_age_cbt <- metagen(TE = mean_age,
 
 results_met_age_cbt <- extract_stats(met_age_cbt)
 
-knitr:: kable(results_met_age_cbt, caption = "Average age in cbt, fluox, escit studies")
+# Now excluding wl
+
+df_for_age_metan_no_wl <- df_for_age_metan %>%
+  filter(new_study_id %in% no_wl_ids) 
+
+met_age_no_wl <- metagen(TE = mean_age,
+                           seTE = se_age,
+                           studlab = new_study_id,
+                           data = df_for_age_metan_no_wl,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "age across no wl studies",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+results_met_age_no_wl <- extract_stats(met_age_no_wl)
 
 ```
-
 ### Age
 
 Mean age was `r results_met_age$TE_random[results_met_perc_women_overall$subgroup == 1]` (*SE* = `r results_met_age$seTE_random[results_met_perc_women_overall$subgroup == 1]`) across psychotherapy trials and `r results_met_age$TE_random[results_met_perc_women_overall$subgroup == 0]` (*SE* = `r results_met_age$seTE_random[results_met_perc_women_overall$subgroup == 0]`) across medication trials, with no significant between group differences (p = `r results_met_age$pval_between`). There were no significant differences in mean age between modalities on further sensitivity analyses.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# Now look at baseline severity for overall psy vs med
-# Need to calculate the variables first
+```{r}
 
-df_for_baseline_severity <- df_long_for_metan %>% 
-  group_by(new_study_id) %>%
-  mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
-  mutate(pooled_perc_sd_baseline = sqrt(sum((perc_baseline_sd^2) * (baseline_n - 1)) / sum(baseline_n - 1))) %>% 
-  mutate(perc_se_baseline = pooled_perc_sd_baseline / sqrt(n_overall)) 
-
-df_for_baseline_severity <- df_for_baseline_severity %>% 
-  distinct(new_study_id, .keep_all = TRUE)
-
-met_sev <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-results_met_sev <- extract_stats(met_sev)
-
-knitr:: kable(results_met_sev, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials")
-
-# clinical sample
-
-clin_study_ids <-
-  df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
-
-df_for_baseline_severity_clin <- df_for_baseline_severity %>%
-  filter(new_study_id %in% clin_study_ids)
-
-met_sev_clin <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity_clin,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity clinical",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-results_met_sev_clin <- extract_stats(met_sev_clin)
-
-knitr:: kable(results_met_sev_clin, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials, excluding subclinical studies")
-
-# cbt + med
-
-df_for_baseline_severity_cbt <- df_for_baseline_severity %>%
-  filter(new_study_id %in% cbt_meds_study_ids) %>% 
-
-met_sev_cbt <- metagen(TE = perc_baseline_overall,
-                           seTE = perc_se_baseline,
-                           studlab = new_study_id,
-                           data = df_for_baseline_severity_cbt,
-                           sm = "",
-                           fixed = FALSE,
-                           random = TRUE,
-                           method.tau = "REML",
-                           hakn = TRUE,
-                           title = "baseline severity cbt + med studies",
-                           subgroup = psy_or_med,
-                           tau.common = FALSE)
-
-results_met_sev_cbt <- extract_stats(met_sev_cbt)
-
-knitr:: kable(results_met_sev_cbt, caption = "Baseline Depression Severity in Psychotherapy vs Medication trials with CBT, fluoxetine and escitaloptram as the active intervention")
-
-# plot for overall severity results
-
-ggplot(df_for_baseline_severity, aes(x = factor(psy_or_med), y = perc_baseline_mean, color = factor(psy_or_med))) +
-  geom_point(position = position_jitter(width = 0.2), size = 2) +
-  labs(
-    title = "Baseline Depression Severity in Psychotherapy vs Medication trials",
-    x = "Treatment Modality",
-    y = "Baseline Depression Levels (transformed)",
-    color = "Treatment Type"
-  ) +
-  scale_color_discrete(labels = c("Medication", "Psychotherapy"))
-
-# Now overall
 # Lets make a table that combines across these baseline characteristics variables
 
 df_overall_baseline_results <- rbind(results_met_perc_women_overall, results_met_age, results_met_sev)
-
-df_overall_baseline_results <- options(knitr.kable.NA = "")
 
 # For row names
 df_overall_baseline_results <- df_overall_baseline_results %>%
@@ -1088,24 +1094,32 @@ df_overall_baseline_results <- df_overall_baseline_results %>%
     TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
   )) 
 
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(df_overall_baseline_results) <- new_column_names
+
 # Rounding
 df_overall_baseline_results <- df_overall_baseline_results %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3))
+
+colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_results)[8], footnote_marker_number(1))
 
 df_overall_baseline_results %>%
-  kbl(caption = "Table X: Sample characteristics at baseline across medication and psychotherapy studies") %>%
+  kbl(align = "l", caption = "Table X: Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
   kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(column = 1, border_right = T) %>% 
+  column_spec(1, border_right = T) %>% 
   add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
-  footnote(alphabet = c("Values for baseline severity represent the percentage transformed depression scores", "pval_between = the p-value from the test for subgroup differences from the relevant meta-analysis"))
-  
-```
-### Baseline severity
+  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
 
-On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials, for both the overall sample (p = `results_met_sev$pval_between`) and when taking only those studies where the active arm was either CBT, fluoxetine or escitalopram (p = `results_met_sev_cbt$pval_between`). When excluding psychotherapy studies that recruited samples with sub-clinical depression, this difference did not reach statistical significance (p = `results_met_sev_clin$pval_between`). 
+df_overall_baseline_results <- options(knitr.kable.NA = "")
+
+```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
@@ -1151,18 +1165,6 @@ df_sites_summary_stats <- df_baseline_demographics %>%
     sd_sites = sd(sites, na.rm = TRUE),
   )
 
-# t-test
-sites_t_test <- t.test(sites ~ psy_or_med, data = df_baseline_demographics)
-
-# plot
-
-ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = factor(psy_or_med))) +
-  geom_point(position = position_jitter(width = 0.2), size = 2) +
-  labs(title = "Number of Sites for Psychotherapy and Medication Trials",
-       x = "Treatment Modality",
-       y = "Number of Sites") +
-  scale_color_discrete(name = "Treatment Type", labels = c("Medication", "Psychotherapy"))
-
 # Tabulate
 # Rounding
 df_sites_summary_stats <- df_sites_summary_stats %>%
@@ -1190,58 +1192,36 @@ df_sites_summary_stats %>%
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
-# ### do ALL studies using percentage at baseline
-# all_studies_baseline_metareg <- list_df_simulated_percentage[[1]]
-# 
-# #turn sds to sec
-# all_studies_baseline_metareg$baseline_stand_error <- all_studies_baseline_metareg$perc_baseline_sd/
-#                                         sqrt(all_studies_baseline_metareg$baseline_n)
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# # also change this for the function to work
-# all_studies_baseline_metareg$baseline_mean <- all_studies_baseline_metareg$perc_baseline_mean
-# results_all_studies_metareg_baseline <- run_metareg_and_extract(all_studies_baseline_metareg,  
-#                                                          model_1, condition)
-# 
-# ### get CDRS studies
-# cdrs_studies_for_baseline_metareg <- list_cdrs_study[[1]] # created this above, you can take any of these, as the means and sds are repeated.
-# 
-# #turn sds to sec
-# cdrs_studies_for_baseline_metareg$baseline_stand_error <- cdrs_studies_for_baseline_metareg$baseline_sd/
-#                                         sqrt(cdrs_studies_for_baseline_metareg$baseline_n)
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# 
-# results_cdrs_metareg_baseline <- run_metareg_and_extract(cdrs_studies_for_baseline_metareg,  
-#                                                          model_1, condition)
-# 
-# ### get HAM-D studies
-# hamd_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
-# 
-# list_hamd_study <- list_df_simulated[[1]][list_df_simulated[[1]]$new_study_id
-#                                                           %in% hamd_study_ids,]
-# 
-# hamd_studies_for_baseline_metareg <- list_hamd_study # 
-# 
-# #turn sds to sec
-# hamd_studies_for_baseline_metareg$baseline_stand_error <- hamd_studies_for_baseline_metareg$baseline_sd/
-#                                         sqrt(hamd_studies_for_baseline_metareg$baseline_n)
-# 
-# model_1 <- as.formula(~ four_level_var)
-# condition <-  levels(list_df_simulated[[1]]$four_level_var) # this is the four level var 
-#                                                               #throughout
-# results_hamd_metareg_baseline <- run_metareg_and_extract(hamd_studies_for_baseline_metareg, 
-#                                                          model_1, condition)
-# 
-# results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_level_var)
+# t-test
+sites_t_test <- t.test(sites ~ psy_or_med, data = df_baseline_demographics)
+
+sites_t_test_stats <- data.frame(
+  statistic = sites_t_test$statistic,
+  df = sites_t_test$parameter,
+  p_value = sites_t_test$p.value,
+  ci_lower = sites_t_test$conf.int[1],
+  ci_upper = sites_t_test$conf.int[2]
+)
+
+sites_t_test_stats <- sites_t_test_stats %>%
+  dplyr:: mutate(across(.cols = c(statistic, df, ci_lower, ci_upper), ~ round(., 2)))
+
+sites_t_test_stats %>%
+  kbl(caption = "Table X: Results for t-test comparing number of sites between medication and psychotherapy studies") %>% 
+  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  row_spec(row = 0, background = "#EBEBEB") %>% 
+  column_spec(column = 1, border_right = T)
+
+# plot
+
+ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = factor(psy_or_med))) +
+  geom_point(position = position_jitter(width = 0.2), size = 2) +
+  labs(title = "Number of Sites for Psychotherapy and Medication Trials",
+       x = "Treatment Modality",
+       y = "Number of Sites") +
+  scale_color_discrete(name = "Treatment Type", labels = c("Medication", "Psychotherapy"))
 
 ```
-
 ### Number of trial sites
 
 Average number of trial sites was significantly higher across medication studies ( *M* = `r `df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 0]`, *SD* = `r `df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 0]` compared to psychotherapy studies ( *M* = `r `df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 1]`, *SD* = `r `df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 1]`(*t* (`r sites_t_test$parameter`) = `r sites_t_test$statistic`, *p* = `r sites_t_test$p.value`).
@@ -1633,9 +1613,6 @@ dev.off()
 
 ![](plot_means_wl.pdf)
 
-### Comparing the nature and intensity of control conditions in psychotherapy trials
-
-Write results here.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
  
@@ -1727,7 +1704,7 @@ group_function <- function(dataframe, my_groups, columns) {
     Column = character(),
     N = numeric(),
     Mean = numeric(),
-    Std_Dev = numeric(),
+    SD = numeric(),
     Median = numeric(),
     IQR = numeric(),
     stringsAsFactors = FALSE
@@ -1739,13 +1716,13 @@ group_function <- function(dataframe, my_groups, columns) {
       col_data <- group_data[[col]]
       n <- sum(!is.na(col_data))
       mean_val <- mean(col_data, na.rm = TRUE)
-      std_dev <- sd(col_data, na.rm = TRUE)
+      SD <- sd(col_data, na.rm = TRUE)
       median_val <- median(col_data, na.rm = TRUE)
       iqr <- IQR(col_data, na.rm = TRUE)
       result_dataframe <- rbind(result_dataframe,
                                 data.frame(Group = group,
                                            Column = col, N = n, Mean = mean_val,
-                                           Std_Dev = std_dev, Median = median_val,
+                                           SD = SD, Median = median_val,
                                            IQR = iqr, stringsAsFactors = FALSE))
     }
   }
@@ -1760,20 +1737,69 @@ total_period_weeks <- group_function(df_descr_psy_conditions,"levels_var","total
 
 control_summary <- rbind(sessions, frequency, length_sessions_mins, total_hours, total_period_weeks)
 
-knitr:: kable(control_summary, caption="Characteristics of the active and control arms of psychotherapy trials")  
+control_summary <- control_summary %>% 
+  select(-c(Column, Median, IQR))
 
+control_summary <- control_summary %>%
+  mutate(Group = case_when(
+    Group == "psychotherapy_active" ~ "Active",
+    Group == "psychotherapy_control" ~ "Control",
+    TRUE ~ as.character(Group)  # Keep other values unchanged
+  ))
 
+control_summary <- control_summary %>% 
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+control_summary %>%
+  kbl(align = "l", caption = "Table X: Comparing the intensity of the intervention between active and control arms of psychotherapy studies", escape = F) %>%
+  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+  column_spec(1, border_right = T) %>% 
+  pack_rows("Number of sessions", 1, 2) %>% 
+  pack_rows("Frequency (weeks)", 3, 4) %>% 
+  pack_rows("Session length (mins)", 5, 6) %>%
+  pack_rows("Total intervention hours", 7, 8) %>%
+  pack_rows("Total intervention period (weeks)", 9, 10)  
+
+# t tests
+
+session_no_t_test <- t.test(no_sessions ~ levels_var, data = df_descr_psy_conditions)
+freq_t_test <- t.test(freq_weeks ~ levels_var, data = df_descr_psy_conditions)
+session_length_t_test <- t.test(length_sessions_mins ~ levels_var, data = df_descr_psy_conditions)
+total_hours_t_test <- t.test(total_hours ~ levels_var, data = df_descr_psy_conditions)
+total_period_t_test <- t.test(total_period_weeks ~ levels_var, data = df_descr_psy_conditions)
+
+extract_t_test_stats <- function(df) {
+
+  t_test_stats <- data.frame(
+  outcome = df$data.name,
+  statistic = df$statistic,
+  df = df$parameter,
+  p_value = df$p.value,
+  ci_lower = df$conf.int[1],
+  ci_upper = df$conf.int[2])
+  
+  return(t_test_stats) 
+  
+}
+
+results_session_no_t_test <- extract_t_test_stats(session_no_t_test)
+results_freq_t_test <- extract_t_test_stats(freq_t_test)
+results_session_length_t_test <- extract_t_test_stats(session_length_t_test)
+results_total_hours_t_test <- extract_t_test_stats(total_hours_t_test)
+results_total_period_t_test <- extract_t_test_stats(total_period_t_test)
+
+control_summary_t_tests <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test, results_total_period_t_test)
 
 ```
+### Comparing the nature and intensity of control conditions in psychotherapy trials
+
+Write results here.
 
 
 #### Addressing Regression to the Mean
 
 We first conducted a meta-analysis to test for differences in means at baseline in the two instruments, CDRS-R and HAM-D on which there was a sufficient number of studies to metanalyse.
-
-
-
-```
 
 As can be seen in Table 3a and 3b, there baseline scores in medication studies were on average substantially higher for the CDRS (10.9 points for the control arms) and the HAM-D (7.3 points for the control arms), respectively. As can be seen in Supplementary Tables XX <!--# Charlotte, please create these out of results_cdrs_metareg_baseline[[1]]  and the same for HAM-D--> the differences were significant at p\<0.05 for CDRS, thought they did not reach statistical significance for the HAM-D (p = 0.0573). <!--# Charlotte, please add the n for each row. Easiest to modify the function so that it appends the baseline n together with the condition. -->
 
@@ -1784,7 +1810,6 @@ knitr:: kable(results_cdrs_metareg_baseline[[2]], caption="Table 3a CDRS baselil
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3b HAM-D baselilne scores")
 ```
-
 
 As can be seen in Table 4, the baseline mean has a very strong association with the SMD.
 
@@ -1856,42 +1881,115 @@ knitr:: kable(hamd_smd_with_cis, caption = "Table 6. HAM-D baseline-mean adjuste
 
 # Tables for baseline comparisons
 
-# Gender first
+# Lets make a table that combines across the sensitivity analyses for severity
 
-# Now overall
-# Lets make a table that combines across these baseline characteristics variables
-
-df_overall_baseline_results <- options(knitr.kable.NA = "")
-
-df_overall_baseline_results <- rbind(results_met_perc_women_overall, results_met_age, results_met_sev)
+df_severity_sens <- rbind(results_met_sev_cbt, results_met_sev_clin, results_met_sev_no_wl)
 
 # For row names
-df_overall_baseline_results <- df_overall_baseline_results %>%
+df_severity_sens <- df_severity_sens %>%
   mutate(subgroup = case_when(
-    row_number() == 1 ~ "Percent Women",
-    row_number() == 4 ~ "Age",
-    row_number() == 7 ~ "Severity",
+    row_number() == 1 ~ "CBT, fluoxetine and escitalopram",
+    row_number() == 4 ~ "Excluding subclinical",
+    row_number() == 7 ~ "Excluding waitlist",
     TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
   )) 
 
-# Rounding
-df_overall_baseline_results <- df_overall_baseline_results %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
+# Define new column names
+new_column_names <- c(" ", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
 
-df_overall_baseline_results %>%
-  kbl(caption = "Table X: Sample characteristics at baseline across medication and psychotherapy studies") %>%
+# Assign new column names to the data frame
+colnames(df_severity_sens) <- new_column_names
+
+# Rounding
+df_severity_sens <- df_severity_sens %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3))
+
+colnames(df_severity_sens)[8] <- paste0(colnames(df_severity_sens)[8], footnote_marker_number(1))
+
+df_severity_sens %>%
+  kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of baseline severity levels between psychotherapy and medication trials", escape = F) %>%
   kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(column = 1, border_right = T) %>% 
+  column_spec(1, border_right = T) %>% 
   add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
-  footnote(alphabet = c("Values for baseline severity represent the percentage transformed depression scores", "pval_between = the p-value from the test for subgroup differences from the relevant meta-analysis"))
-  
+  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
+# Now gender
+
+df_gender_sens <- rbind(results_met_perc_women_cbt, results_met_perc_women_clin, results_met_perc_women_no_wl) 
+
+# For row names
+df_gender_sens <- df_gender_sens %>%
+  mutate(subgroup = case_when(
+    row_number() == 1 ~ "CBT, fluoxetine and escitalopram",
+    row_number() == 4 ~ "Excluding subclinical",
+    row_number() == 7 ~ "Excluding waitlist",
+    TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
+  )) 
+
+# Define new column names
+new_column_names <- c(" ", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(df_gender_sens) <- new_column_names
+
+# Rounding
+df_gender_sens <- df_gender_sens %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3))
+
+colnames(df_gender_sens)[8] <- paste0(colnames(df_gender_sens)[8], footnote_marker_number(1))
+
+df_gender_sens %>%
+  kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of gender composition between psychotherapy and medication trials", escape = F) %>%
+  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+  row_spec(row = 1, bold = T) %>% 
+  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+  column_spec(1, border_right = T) %>% 
+  add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
+  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
+# Now age
+
+df_age_sens <- rbind(results_met_age_cbt, results_met_age_clin, results_met_age_clin) 
+
+# For row names
+df_age_sens <- df_age_sens %>%
+  mutate(subgroup = case_when(
+    row_number() == 1 ~ "CBT, fluoxetine and escitalopram",
+    row_number() == 4 ~ "Excluding subclinical",
+    row_number() == 7 ~ "Excluding waitlist",
+    TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
+  )) 
+
+# Define new column names
+new_column_names <- c(" ", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(df_age_sens) <- new_column_names
+
+# Rounding
+df_age_sens <- df_age_sens %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3))
+
+colnames(df_age_sens)[8] <- paste0(colnames(df_age_sens)[8], footnote_marker_number(1))
+
+df_age_sens %>%
+  kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of age between psychotherapy and medication trials", escape = F) %>%
+  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+  row_spec(row = 1, bold = T) %>% 
+  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+  column_spec(1, border_right = T) %>% 
+  add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
+  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
 
 # Plots  -----------------------
-
-
 
 #define groups
 df_long_for_metan <- df_long_for_metan %>%
