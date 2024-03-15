@@ -1791,6 +1791,35 @@ results_total_period_t_test <- extract_t_test_stats(total_period_t_test)
 
 control_summary_t_tests <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test, results_total_period_t_test)
 
+# For row names
+control_summary_t_tests <- control_summary_t_tests %>%
+  mutate(outcome = case_when(
+    row_number() == 1 ~ "Number of sessions",
+    row_number() == 2 ~ "Frequency (weeks)",
+    row_number() == 3 ~ "Session length (mins)",
+    row_number() == 4 ~ "Total intervention hours",
+    row_number() == 5 ~ "Total intervention period (weeks)"
+  )) 
+
+# Define new column names
+new_column_names <- c("Outcome", "t statistic", "df", "p-value", "Lower CI", "Upper CI")
+
+# Assign new column names to the data frame
+colnames(control_summary_t_tests) <- new_column_names
+
+#Rounding
+control_summary_t_tests <- control_summary_t_tests %>%
+  mutate(across(where(is.numeric) & !matches("p-value"), ~ round(., 2))) %>%
+  mutate(`p-value` = ifelse(`p-value` < 0.001, "< 0.001", sprintf("%.3f", `p-value`)))
+
+colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_results)[8], footnote_marker_number(1))
+
+control_summary_t_tests %>%
+  kbl(align = "l", caption = "Table X: Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials") %>% 
+  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  row_spec(row = 0, background = "#EBEBEB") %>% 
+  column_spec(column = 1, border_right = T)
+
 ```
 ### Comparing the nature and intensity of control conditions in psychotherapy trials
 
@@ -2005,7 +2034,7 @@ df_long_for_metan <- df_long_for_metan %>%
 
 group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
 
-# Plot cohens d per arm
+# Scatter plot cohens d per arm
 
 ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
   geom_point(position = position_jitter(width = 0.2), size = 3) +
@@ -2017,15 +2046,6 @@ ggplot(df_long_for_metan, aes(x = group, y = cohens_d, color = group)) +
   geom_text(x = "Psychotherapy Control", y = -4.5, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
   scale_color_manual(values = group_colors) +
   labs(title = "Scatter plot of Cohen's d by group", x = NULL, y = "Cohen's d") +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-# Plot percentage baseline means
-
-ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
-  geom_point(position = position_jitter(width = 0.2), size = 3) +
-  scale_color_manual(values = group_colors) +
-  labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
   theme_minimal() +
   theme(legend.position = "none")
 
@@ -2045,6 +2065,17 @@ ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
   labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
   theme_minimal() +
   theme(legend.position = "none")
+
+# Plot percentage baseline means
+
+ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
+  geom_point(position = position_jitter(width = 0.2), size = 3) +
+  scale_color_manual(values = group_colors) +
+  labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
 
 ```
 
