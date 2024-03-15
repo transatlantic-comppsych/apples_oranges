@@ -1461,6 +1461,7 @@ ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = 
 Average number of trial sites was significantly higher across medication studies ( *M* = `r df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 0]`, *SD* =`r`df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 0]`compared to psychotherapy studies ( *M* =`r df_sites_summary_stats$mean_sites[df_sites_summary_stats$psy_or_med == 1]`, *SD* =`r df_sites_summary_stats$sd_sites[df_sites_summary_stats$psy_or_med == 1]`(*t* (`r sites_t_test$parameter`) = `r sites_t_test$statistic`, *p* =`r sites_t_test$p.value`).
 
 ```{r, warning=FALSE, message = FALSE}
+
 df_sites_summary_stats %>%
   kbl(caption = "Table X: Number of sites across medication and psychotherapy studies") %>% 
   kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
@@ -1472,6 +1473,7 @@ sites_t_test_stats %>%
   kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
+
 ```
 
 #### Mean efficacy of psychotherapy versus medication control conditions
@@ -1527,21 +1529,25 @@ colnames(aggregate_results_overall) <- new_column_names
 ![Figure 1.](plot_means_all.pdf)
 
 ```{r, warning=FALSE, message = FALSE}
+
 df_mean_coefs_from_sim %>%
   kbl(align = "l", caption = "Table X: Summary statistics of the estimated SMDs") %>% 
   kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
+
 ```
 
 In Table X, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
 ```{r, warning=FALSE, message = FALSE}
+
 aggregate_results_overall %>%
   kbl(caption = "Table X: Meta-regression results") %>% 
   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
+
 ```
 
 
