@@ -1348,7 +1348,7 @@ colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_
 
 df_overall_baseline_results %>%
   kbl(align = "l", caption = "Table 1: Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
@@ -1362,7 +1362,7 @@ df_overall_baseline_results <- options(knitr.kable.NA = "")
 
 df_overall_baseline_results %>%
   kbl(align = "l", caption = "Table 1: Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
@@ -1439,7 +1439,7 @@ df_sites_summary_stats <- df_sites_summary_stats %>%
 
 df_sites_summary_stats %>%
   kbl(caption = "Table X: Number of sites across medication and psychotherapy studies") %>% 
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
@@ -1460,7 +1460,7 @@ sites_t_test_stats <- sites_t_test_stats %>%
 
 sites_t_test_stats %>%
   kbl(align = "l", caption = "Table X: Results for t-test comparing number of sites between medication and psychotherapy studies") %>% 
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
@@ -1511,7 +1511,7 @@ colnames(df_mean_coefs_from_sim) <- new_column_names
 
 df_mean_coefs_from_sim %>%
   kbl(align = "l", caption = "Table X: Summary statistics of the estimated SMDs") %>% 
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
@@ -1534,7 +1534,7 @@ colnames(aggregate_results_overall) <- new_column_names
 
 aggregate_results_overall %>%
   kbl(caption = "Table X: Meta-regression results") %>% 
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
@@ -1773,7 +1773,7 @@ control_summary <- control_summary %>%
 
 control_summary %>%
   kbl(align = "l", caption = "Table X: Comparing the intensity of the intervention between active and control arms of psychotherapy studies", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   column_spec(1, border_right = T) %>% 
   pack_rows("Number of sessions", 1, 2) %>% 
@@ -1837,7 +1837,7 @@ colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_
 
 control_summary_t_tests %>%
   kbl(align = "l", caption = "Table X: Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials") %>% 
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>% 
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
   row_spec(row = 0, background = "#EBEBEB") %>% 
   column_spec(column = 1, border_right = T)
 
@@ -1963,7 +1963,7 @@ colnames(df_severity_sens)[8] <- paste0(colnames(df_severity_sens)[8], footnote_
 
 df_severity_sens %>%
   kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of baseline severity levels between psychotherapy and medication trials", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
@@ -1999,7 +1999,7 @@ colnames(df_gender_sens)[8] <- paste0(colnames(df_gender_sens)[8], footnote_mark
 
 df_gender_sens %>%
   kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of gender composition between psychotherapy and medication trials", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
@@ -2035,7 +2035,7 @@ colnames(df_age_sens)[8] <- paste0(colnames(df_age_sens)[8], footnote_marker_num
 
 df_age_sens %>%
   kbl(align = "l", caption = "Table X: Sensitivity analyses for comparison of age between psychotherapy and medication trials", escape = F) %>%
-  kable_material(bootstrap_options = c("hover", "condensed", "bordered"), full_width = FALSE) %>%
+  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
   row_spec(row = 1, bold = T) %>% 
   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
