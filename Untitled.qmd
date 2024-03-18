@@ -1,92 +1,15 @@
 ---
-title: Fundamental Problems with the Evidence Base of Adolescent Depression Treatments.
-author:
-  - name: Argyris Stringaris
-    email: a.stringaris@ucl.ac.uk
-    affiliations: 
-        - id: ucl_1
-          name: University College London
-          department: Divisions of Psychiatry and Psychology and Language Science
-          address: 1-19 Torrington Place
-          city: London, UK
-          state: 
-          postal-code: WC1E 7HB
-          country: United Kingdom
-    attributes:
-        corresponding: true
-    note: 
-  - name: Charlotte Burman
-    email: charlotte.burman@ucl.ac.uk
-    affiliations:
-        - ref: ucl_1
-    note:
-  - name: Dayna Bhudia
-    email: dayna.bhudia@ucl.ac.uk
-    affiliations:
-        - ref: ucl_1
-  - name: Despina Miliou
-    email: dgmiliou@outlook.com.gr
-    affiliations:
-        - ref: ucl_1
-  - name: Giannis Rokas
-    email: <rokasgiannis93@gmail.com
-    affiliations:
-        - ref: ucl_1
-  - name: Lucy Foulkes
-    email: lucy.foulkes@psych.ox.ac.uk
-    affiliations:
-        - id: OU
-          name: University of Oxford
-          department: Experimental Psychology
-          address: Anna Watts Building, Radcliffe Observatory Quarter, Woodstock Road
-          city: Oxford
-          postal-code: OX2 6GG
-          country: United Kingdom
-    note:
-  - name: Carmen Moreno
-    email: cmoreno@hggm.es
-    affiliations:
-        - id: HGM
-          name: Hospital Gregorio Marañón
-          department: Department of Psychiatry
-          address: 46 C. del Dr. Esquerdo
-          city: Madrid
-          state:
-          postal-code: 28007
-          country: Spain
-  - name: Samuele Cortese
-    email: samuele.cortese@soton.ac.uk
-    affiliations:
-        - id: soton
-          name: University of Southampton
-          department: Centre for Innovation in Mental Health (CIMH), School of Psychology
-          address: Highfield Campus, Building 44
-          city: Southampton
-          state:
-          postal-code: SO17 1BJ
-          country: United Kingdom
-  - name: Georgina Krebs
-    email: g.krebs@ucl.ac.uk
-    affiliations:
-        - ref: ucl_1
-    note: 
-abstract: |
-  To follow
-keywords: 
-  - depression
-  - adolescents
-  - antidepressants
-  - psychotherapy
-date: last-modified
-bibliography: emotion_concepts_paper.bib
-format: 
-  elsevier-pdf:
-    keep-tex: true
-    journal:
-      name: Journal Name
-      formatting: preprint
-      model: 3p
-      cite-style: super
+title: "Fundamental Problems with the Evidence Base of Adolescent Depression Treatments"
+author: "Stringaris et al"
+prefer-html: true
+format: docx
+editor: visual
+---
+
+## 
+
+---
+
 ---
 
 # Introduction
@@ -107,7 +30,7 @@ $$
 \tau_{psy} =  E(Y_{1} - Y_{0} \,|\, S, psy)
 $$ $$
 \tau_{med} =  E(Y_{1} - Y_{0} \,|\, S, med)\ 
-$$ {#eq-1}
+$$
 
 where the operator E denotes the expectation over the differences in outcomes between those who received the intervention (T = 1) and those who received the control condition (T = 0), for each sample, $S$, where psy and med stand for psychotherapy and medication respectively.
 
@@ -115,7 +38,7 @@ Obviously, this comparison rests on the assumption that trials in both modalitie
 
 $$E(Y_{1} \,|\, \text{S, psy}) = E(Y_{1} \,|\, P, \text{psy})$$
 
-$$E(Y_{1} \,|\, \text{S, med}) = E(Y_{1} \,|\, P, \text{med})$$ {#eq-2}
+$$E(Y_{1} \,|\, \text{S, med}) = E(Y_{1} \,|\, P, \text{med})$$
 
 signifying that the effect found in the population would be expected to be found in the same population for each treatment.
 
@@ -153,13 +76,13 @@ In order to compare depression severity across different instruments, we perform
 
 $$
 \text{outcome}_{percent} = \frac{\bar{X} - \text{scale}_{min}}{\text{scale}_{max} - \text{scale}_{min}}
-$$ {#eq-3}
+$$
 
 where, $$\bar{X}$$ is the mean score for each study arm on the primary outcome questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible values of the scale in question, respectively. The standard deviation is calculated thus:
 
 $$
 \text{SD}_{Xpercent} = \frac{\text{SD}_{X}}{\text{scale}_{max} - \text{scale}_{min}}
-$$ {#eq-4}
+$$
 
 where $\text{SD}_{X}$ is the original standard deviation of the mean at baseline.
 
@@ -175,13 +98,13 @@ where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome 
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the SMD. This is calculated according to:
 
-$$ SE_{SMD} = \sqrt{\frac{2(1 -r_{t_{1}t_{2}})}{n} + \frac{SMD^2}{2n}}$$ {#eq-5}
+$$ SE_{SMD} = \sqrt{\frac{2(1 -r_{t_{1}t_{2}})}{n} + \frac{SMD^2}{2n}}$$
 
 where $n$ refers to the study sample size and $r_{t_{1}t_{2}}$ refers to the correlation between the outcome score obtained at baseline and at the end point. This correlation is typically not reported in studies and is often imputed using previously reported correlations for the instruments used. However, this practice has given rise to concerns about misestimation. Whilst such misestimation is possible, there is no reason to expect that it would be systematic, i.e. bias estimation of the effects for the control group of medication compared to those of psychotherapy. Still, to alleviate such concerns we have used a simulations.
 
 In particular, we simulated one thousand truncated distribution of standard errors with the following general characteristics:
 
-$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$ {#eq-6}
+$$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
@@ -190,24 +113,24 @@ for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ 
 We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$. Therefore, we can estimate a two stage model with:
 
 $$Y_i \sim \mathcal{N}(\theta_i, \sigma_i^2)
-$$ {#eq-7}
+$$
 
 $$\theta_i \sim \mathcal{N}(x_i\beta, \tau_i^2)
-$$ {#eq-8}
+$$
 
 where $Y_i$ is the estimated effect size for study i, has a normal distribution with $\theta_i$ as its true mean effect and sampling error $\sigma^2$. Whereas $\theta_i$ is a study-specific instantiation of the distribution of effect sizes, with $\tau^2$ representing heterogeneity.
 
 This then gives rise to:
 
-$$Y_i = x_i\beta_i + u_i + \epsilon_i$$ {#eq-9}
+$$Y_i = x_i\beta_i + u_i + \epsilon_i$$
 
 where,
 
-$$u_i \sim N(0, \tau^2) $$ {#eq-10}
+$$u_i \sim N(0, \tau^2) $$
 
 describes the deviation of each study from the mean of the distribution, and,
 
-$$\epsilon_i \sim N(0, \sigma^2)$$ {#eq-11}
+$$\epsilon_i \sim N(0, \sigma^2)$$
 
 describes the sampling error.
 
@@ -221,13 +144,13 @@ $$ \begin{aligned}
         2 & PsyActive:   b_0 + b_{2_{i}}  +  u_i + \epsilon_i \\
         3 & PsyControl:  b_0 + b_{3_{i}}  +  u_i + \epsilon_i \\
     \end{cases}
-\end{aligned}$$ {#eq-12}
+\end{aligned}$$
 
 where to obtain the mean of each level is the sum of $b_0$, the intercept for the reference category of medication control, with the coefficient of each level, e.g. for level 3, $b_{3_{i}}$ the psychotherapy controls. The confidence intervals of the means are constructed in the standard way using the standard errors of the mean. Similarly, each coefficient represents the contrast between the reference category and each level, for an example and of main interest to us $b_{3_{i}}$ represents the contrast between psychotherapy and medication control arms. Inference on the contrasts is done as follows:
 
 $$
 z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
-$$ {#eq-13}
+$$
 
 We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
 
@@ -1540,7 +1463,7 @@ colnames(aggregate_results_overall) <- new_column_names
 
 ```
 
-![Figure 1.](plot_means_all.pdf)
+![Figure 1.](plot_means_all.pdf){alt="Figure 1."}
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # df_mean_coefs_from_sim
