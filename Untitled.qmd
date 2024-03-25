@@ -4,6 +4,8 @@ author: "Stringaris et al"
 prefer-html: true
 format: docx
 editor: visual
+font:
+  family: "Calibri"
 ---
 
 ## 
@@ -195,6 +197,9 @@ library(truncnorm)
 library(metafor)
 library(meta)
 library(kableExtra)
+library(flextable)
+library(magrittr)
+library(officer)
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -663,31 +668,6 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 #summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
 ```
 
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
-df_long_for_metan <- df_long_for_metan %>%
-  rowwise() %>%
-  mutate(responders = sum(rnorm(baseline_n, post_mean, 
-                                post_sd) < (baseline_mean/ 2)))
-
-df_long_for_metan <- df_long_for_metan %>%
-  rowwise() %>%
-  mutate(resp_rate = responders/baseline_n)
-
-summary_resp_rate <- df_long_for_metan %>%
-  group_by(group) %>%
-  summarise(mean_resp_rate = mean(resp_rate, na.rm = TRUE),
-            sd_resp_rate = sd(resp_rate, na.rm = TRUE))
-
-test_summary <- df_with_distinct_instruments %>% 
-  group_by(psy_or_med) %>% 
-  summarise(rr_active = mean(resp_rate_active, na.rm = TRUE),
-            rr_control = mean(resp_rate_control, na.rm = TRUE),
-            n = n())
-
-```
-
 # Results
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -1072,16 +1052,6 @@ met_sev_no_wl <- metagen(TE = perc_baseline_overall,
 
 results_met_sev_no_wl <- extract_stats(met_sev_no_wl)
 
-```
-
-### Baseline severity
-
-On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials. The statistics provided in Table 1 are baseline depression scores transformed to reflect percentage of a scale range. To take an example, the CDRS gives a possible total score from 17 to 113 (i.e. range of 96). From Table 1, mean severity was `r round(results_met_sev$TE_random[results_met_sev$subgroup == 1][[2]], 2)` for psychotherapy studies and `r round(results_met_sev$TE_random[results_met_sev$subgroup == 0][[2]], 2)` for medication studies, which would translate to 51.56 (17 + 0.36 x 96) and 57.32 (17 + 0.42 x 96), respectively, as equivalent scores on the CDRS.
-
-When taking only those studies where the active arm was either CBT, fluoxetine or escitalopram, there was a significant difference between psychotherapy and medication studies. This difference did not reach statistical significance when excluding psychotherapy studies that recruited samples with sub-clinical depression or when excluding studies that used wait list as their control. Please refer to Table S1 for these results.
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
 # Now start looking at perc_women variable 
 # The metagen function doesn't like when NAs result in the TE vector being a different length to subgroup vector. Need to start by removing NAs.
 
@@ -1172,13 +1142,6 @@ met_perc_women_no_wl <- metagen(TE = percent_women,
 # Apply the function to the meta-analysis result
 results_met_perc_women_no_wl <- extract_stats(met_perc_women_no_wl)
 
-```
-
-### Gender
-
-As can be seen in Table 1, psychotherapy trials featured a significantly higher percentage of women when compared to medication trials. On average, samples were comprised of `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`) women across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`) women across medication trials. Excluding sub-clinical and waitlist control studies yielded very similar results. This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (see Table S2).
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Now start looking at age variable
 
 # We have several studies for which we are missing SE for age. I am going to perform an imputation by taking an average
@@ -1283,13 +1246,6 @@ met_age_no_wl <- metagen(TE = mean_age,
 
 results_met_age_no_wl <- extract_stats(met_age_no_wl)
 
-```
-
-### Age
-
-As can be seen in Table 1, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses (see Table S3).
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
 # Lets make a table that combines across these baseline characteristics variables
 
@@ -1313,31 +1269,58 @@ colnames(df_overall_baseline_results) <- new_column_names
 # Rounding
 df_overall_baseline_results <- df_overall_baseline_results %>%
   mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
-  mutate_at(vars(ncol(.)), ~ round(., 3))
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) 
 
-colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_results)[8], footnote_marker_number(1))
+big_border = fp_border(color="black", width = 1)
+small_border = fp_border(color="lightgray", width = 1)
 
-#df_overall_baseline_results <- options(knitr.kable.NA = "") # CHARLOTTE THIS IS PROBABLY OFFENDING
+# Create a flextable object
+flextable(df_overall_baseline_results) %>%
+  set_caption (autonum = TRUE, "Sample characteristics at baseline across medication and psychotherapy studies") %>%
+  bold(part = "header") %>%  # Bold the header row
+  bold(i = c(1, 4, 7), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
+  border_outer(border = small_border) %>%  # Add outer borders
+  hline(i = c(1, 2, 4, 5, 7, 8), border = small_border) %>%  # Add light grey horizontal lines all  rows
+  hline(i = c(3, 6), border = big_border) %>%  # Add darker horizontal lines after specific rows %>% 
+  hline(part = "header", border = big_border) %>% 
+  vline(j = 1, border = big_border) %>% 
+  set_table_properties(width = .75) %>%  # Set table width
+  bg(bg = "#F2F2F2", part = "header") %>%  # Add light grey background to header row
+  autofit() %>%  # Autofit column widths
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri 
+  padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>% 
+  align(j = 2:ncol(df_overall_baseline_results), align = "center", part = "all")
 
-#df_overall_baseline_results 
+# This doesn't work when rendering to word doc
+#   kbl(align = "l", caption = "Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>%
+#   row_spec(row = 1, bold = T) %>%
+#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+#   column_spec(1, border_right = T) %>%
+#   add_indent(c(2, 3, 5, 6, 8, 9)) 
+
+
 ```
 
-```{r, warning=FALSE, message = FALSE, echo = FALSE}
+### Baseline severity
 
-df_overall_baseline_results %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
-  kbl(align = "l", caption = "Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>%
-  row_spec(row = 1, bold = T) %>%
-  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(1, border_right = T) %>%
-  add_indent(c(2, 3, 5, 6, 8, 9)) %>%
-  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials. The statistics provided in Table 1 are baseline depression scores transformed to reflect percentage of a scale range. To take an example, the CDRS gives a possible total score from 17 to 113 (i.e. range of 96). From Table 1, mean severity was `r round(results_met_sev$TE_random[results_met_sev$subgroup == 1][[2]], 2)` for psychotherapy studies and `r round(results_met_sev$TE_random[results_met_sev$subgroup == 0][[2]], 2)` for medication studies, which would translate to 51.56 (17 + 0.36 x 96) and 57.32 (17 + 0.42 x 96), respectively, as equivalent scores on the CDRS.
 
-```
+When taking only those studies where the active arm was either CBT, fluoxetine or escitalopram, there was a significant difference between psychotherapy and medication studies. This difference did not reach statistical significance when excluding psychotherapy studies that recruited samples with sub-clinical depression or when excluding studies that used wait list as their control. Please refer to Table S1 for these results.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE, results='hide'}
+### Gender
+
+As can be seen in Table 1, psychotherapy trials featured a significantly higher percentage of women when compared to medication trials. On average, samples were comprised of `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`) women across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`) women across medication trials. Excluding sub-clinical and waitlist control studies yielded very similar results. This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (see Table S2).
+
+### Age
+
+As can be seen in Table 1, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses (see Table S3).
+
+### Number of trial sites
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
 ### Number of sites
 # Write results, tabulate.
@@ -1415,6 +1398,8 @@ sites_t_test_stats <- sites_t_test_stats %>%
   mutate(across(.cols = c(statistic, df, ci_lower, ci_upper), ~ round(., 2))) %>% 
   mutate(p_value = ifelse(p_value < 0.001, "< 0.001", as.character(round(p_value, 3))))
 
+colnames(sites_t_test_stats) <- c("Statistic", "df", "p-value", "Lower CI", "Upper CI")
+
 # scatter plot
 
 # ggplot(df_baseline_demographics, aes(x = factor(psy_or_med), y = sites, color = factor(psy_or_med))) +
@@ -1424,26 +1409,49 @@ sites_t_test_stats <- sites_t_test_stats %>%
 #        y = "Number of Sites") +
 #   scale_color_discrete(name = "Treatment Type", labels = c("Medication", "Psychotherapy"))
 
-```
-### Number of trial sites
+# Create a flextable object
 
+flextable(df_sites_summary_stats) %>%
+  set_caption (autonum = TRUE, "Number of sites across medication and psychotherapy studies", style = "Table Caption") %>%
+  bold(part = "header") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "all", border = small_border) %>% 
+  hline(part = "header", border = big_border) %>% 
+  vline(j = 1, border = big_border) %>% 
+  set_table_properties(width = .75) %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  autofit() %>% 
+  font(fontname = "Calibri", part = "all") %>%   
+  padding(i = c(1, 2), j = 1, padding.left = 10) %>% 
+  align(j = 2:ncol(df_sites_summary_stats), align = "center", part = "all")
+
+flextable(sites_t_test_stats) %>%
+  set_caption (autonum = TRUE, "Results for t-test comparing number of sites between medication and psychotherapy studies", style = "Table Caption") %>%
+  bold(part = "header") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "header", border = big_border) %>% 
+  set_table_properties(width = .75) %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  autofit() %>% 
+  font(fontname = "Calibri", part = "all") %>%   
+  align(align = "center", part = "all")
+
+# This is for if we want to render to pdf 
+
+# df_sites_summary_stats <- df_sites_summary_stats %>%
+#   kbl(caption = "Number of sites across medication and psychotherapy studies") %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB") %>%
+#   column_spec(column = 1, border_right = T)
+
+# sites_t_test_stats %>%
+#   kbl(align = "l", caption = "Results for t-test comparing number of sites between medication and psychotherapy studies") %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB") %>%
+#   column_spec(column = 1, border_right = T)
+
+```
 There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies ( *M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies ( *M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test$p.value`).
-
-```{r, warning=FALSE, message = FALSE, echo = FALSE, asis = TRUE }
-
-df_sites_summary_stats <- df_sites_summary_stats %>%
-  kbl(caption = "Number of sites across medication and psychotherapy studies") %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB") %>%
-  column_spec(column = 1, border_right = T)
-
-sites_t_test_stats %>%
-  kbl(align = "l", caption = "Results for t-test comparing number of sites between medication and psychotherapy studies") %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB") %>%
-  column_spec(column = 1, border_right = T)
-
-```
 
 #### Mean efficacy of psychotherapy versus medication control conditions
 
@@ -1493,31 +1501,36 @@ new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "
 # Assign new column names to the data frame
 colnames(aggregate_results_overall) <- new_column_names
 
+flextable(df_mean_coefs_from_sim) %>%
+  set_caption (autonum = TRUE, "Summary statistics of the estimated SMDs") %>%
+  bold(part = "header") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "header", border = big_border) %>% 
+  set_table_properties(width = .75) %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  autofit() %>% 
+  font(fontname = "Calibri", part = "all") %>%   
+  align(j = 2:ncol(df_mean_coefs_from_sim), align = "center")
+
 ```
 
 ![Figure 1.](plot_means_all.pdf)
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-# df_mean_coefs_from_sim
-
-df_mean_coefs_from_sim %>%
-  kbl(align = "l", caption = "Summary statistics of the estimated SMDs") %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB") %>%
-  column_spec(column = 1, border_right = T)
-
-```
 
 In Table 5, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
 ```{r, warning=FALSE, message = FALSE, echo = FALSE}
 
 #aggregate_results_overall
-aggregate_results_overall %>%
-  kbl(caption = "Meta-regression results") %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB") %>%
-  column_spec(column = 1, border_right = T)
+flextable(aggregate_results_overall) %>%
+  set_caption (autonum = TRUE, "Metaregression results") %>%
+  bold(part = "header") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "header", border = big_border) %>% 
+  set_table_properties(width = .75) %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  autofit() %>% 
+  font(fontname = "Calibri", part = "all") %>%   
+  align(j = 2:ncol(aggregate_results_overall), align = "center")
 
 ```
 
@@ -1715,8 +1728,7 @@ group_function <- function(dataframe, my_groups, columns) {
       median_val <- median(col_data, na.rm = TRUE)
       iqr <- IQR(col_data, na.rm = TRUE)
       result_dataframe <- rbind(result_dataframe,
-                                data.frame(Group = group,
-                                           Column = col, N = n, Mean = mean_val,
+                                data.frame(Column = col, Group = group, N = n, Mean = mean_val,
                                            SD = SD, Median = median_val,
                                            IQR = iqr, stringsAsFactors = FALSE))
     }
@@ -1747,7 +1759,7 @@ total_period_weeks <- group_function(df_descr_psy_conditions,"levels_var","total
 control_summary <- rbind(sessions, frequency, length_sessions_mins, total_hours, total_period_weeks)
 
 control_summary <- control_summary %>% 
-  select(-c(Column, Median, IQR))
+  select(-c(Median, IQR))
 
 control_summary <- control_summary %>%
   mutate(Group = case_when(
@@ -1756,19 +1768,31 @@ control_summary <- control_summary %>%
     TRUE ~ as.character(Group)  # Keep other values unchanged
   ))
 
+control_summary <- control_summary %>%
+  mutate(Column = case_when(
+    Column == "no_sessions" ~ "Number of sessions",
+    Column == "freq_weeks" ~ "Frequency (weeks)",
+    Column == "length_sessions_mins" ~ "Session length (mins)",
+    Column == "total_hours" ~ "Total intervention hours",
+    Column == "total_period_weeks" ~ "Total intervention period (weeks)",
+    TRUE ~ as.character(Column)  # Keep original value if no match
+  ))
+
 control_summary <- control_summary %>% 
   mutate(across(where(is.numeric), ~round(., 2)))
 
-control_summary %>%
-  kbl(align = "l", caption = "Comparing the intensity of the intervention between active and control arms of psychotherapy studies", escape = F) %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
-  column_spec(1, border_right = T) %>% 
-  pack_rows("Number of sessions", 1, 2) %>% 
-  pack_rows("Frequency (weeks)", 3, 4) %>% 
-  pack_rows("Session length (mins)", 5, 6) %>%
-  pack_rows("Total intervention hours", 7, 8) %>%
-  pack_rows("Total intervention period (weeks)", 9, 10)  
+as_grouped_data(control_summary, groups = "Column") %>% 
+  as_flextable(hide_grouplabel = TRUE ) %>% 
+  set_caption (autonum = TRUE, "Comparing the intensity of the intervention between active and control arms of psychotherapy studies") %>%
+  bold(part = "header") %>%
+  bold(i = c(1, 4, 7, 10, 13), j = NULL, bold = TRUE, part = "body") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "all", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  hline(i = c(3, 6, 9, 12), border = big_border) %>%  # Add darker horizontal lines after specific rows %>% 
+  hline(part = "header", border = big_border) %>% 
+  set_table_properties(width = 1) %>%  
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  font(fontname = "Calibri", part = "all") 
 
 # t tests
 
@@ -1821,17 +1845,16 @@ control_summary_t_tests <- control_summary_t_tests %>%
   mutate(across(where(is.numeric) & !matches("p-value"), ~ round(., 2))) %>%
   mutate(`p-value` = ifelse(`p-value` < 0.001, "< 0.001", sprintf("%.3f", `p-value`)))
 
-colnames(df_overall_baseline_results)[8] <- paste0(colnames(df_overall_baseline_results)[8], footnote_marker_number(1))
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
-control_summary_t_tests %>%
-  kbl(align = "l", caption = "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials") %>% 
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>% 
-  row_spec(row = 0, background = "#EBEBEB") %>% 
-  column_spec(column = 1, border_right = T)
+flextable(control_summary_t_tests) %>%
+  set_caption (autonum = TRUE, "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials", style = "Table Caption") %>%
+  bold(part = "header") %>%  
+  border_outer(border = small_border) %>%  
+  hline(part = "header", border = big_border) %>% 
+  set_table_properties(width = .75) %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%  
+  autofit() %>% 
+  font(fontname = "Calibri", part = "all") %>%   
+  align(j = 2:ncol(control_summary_t_tests), align = "center", part = "all")
 
 ```
 
@@ -1840,11 +1863,6 @@ Overall, the active arms of psychotherapy studies were considerably more intensi
 #######END HERE########
 
 *Write up results for sensitivity analyses*
-
-
-
-
-
 
 #### Addressing Regression to the Mean
 
@@ -1956,22 +1974,26 @@ df_severity_sens <- df_severity_sens %>%
   mutate_at(vars(ncol(.)), ~ round(., 3))
 
 colnames(df_severity_sens)[8] <- paste0(colnames(df_severity_sens)[8], footnote_marker_number(1))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-df_severity_sens %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
-  kbl(align = "l", caption = "Table S1: Sensitivity analyses for comparison of baseline severity levels between psychotherapy and medication trials", escape = F) %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
-  row_spec(row = 1, bold = T) %>% 
-  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(1, border_right = T) %>% 
-  add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
-  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
+# df_severity_sens %>%
+#   mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
+#   kbl(align = "l", caption = "Table S1: Sensitivity analyses for comparison of baseline severity levels between psychotherapy and medication trials", escape = F) %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+#   row_spec(row = 1, bold = T) %>% 
+#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+#   column_spec(1, border_right = T) %>% 
+#   add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
+#   footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
 # Now gender
 
 df_gender_sens <- rbind(results_met_perc_women_cbt, results_met_perc_women_clin, results_met_perc_women_no_wl) 
@@ -1997,19 +2019,22 @@ df_gender_sens <- df_gender_sens %>%
   mutate_at(vars(ncol(.)), ~ round(., 3))
 
 colnames(df_gender_sens)[8] <- paste0(colnames(df_gender_sens)[8], footnote_marker_number(1))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-df_gender_sens %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
-  kbl(align = "l", caption = "Table S2: Sensitivity analyses for comparison of gender composition between psychotherapy and medication trials", escape = F) %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
-  row_spec(row = 1, bold = T) %>% 
-  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(1, border_right = T) %>% 
-  add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
-  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
+# df_gender_sens %>%
+#   mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
+#   kbl(align = "l", caption = "Table S2: Sensitivity analyses for comparison of gender composition between psychotherapy and medication trials", escape = F) %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+#   row_spec(row = 1, bold = T) %>% 
+#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+#   column_spec(1, border_right = T) %>% 
+#   add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
+#   footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -2038,19 +2063,22 @@ df_age_sens <- df_age_sens %>%
   mutate_at(vars(ncol(.)), ~ round(., 3))
 
 colnames(df_age_sens)[8] <- paste0(colnames(df_age_sens)[8], footnote_marker_number(1))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-df_age_sens %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
-  kbl(align = "l", caption = "Table S3: Sensitivity analyses for comparison of age between psychotherapy and medication trials", escape = F) %>%
-  kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-  row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
-  row_spec(row = 1, bold = T) %>% 
-  row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-  column_spec(1, border_right = T) %>% 
-  add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
-  footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
+# df_age_sens %>%
+#   mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
+#   kbl(align = "l", caption = "Table S3: Sensitivity analyses for comparison of age between psychotherapy and medication trials", escape = F) %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>% 
+#   row_spec(row = 1, bold = T) %>% 
+#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+#   column_spec(1, border_right = T) %>% 
+#   add_indent(c(2, 3, 5, 6, 8, 9)) %>% 
+#   footnote(number = c("Statistic derived from the test for subgroup differences in the relevant meta-analysis"))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
