@@ -1,9 +1,9 @@
 ---
 title: "Fundamental Problems with the Evidence Base of Adolescent Depression Treatments"
 author: "Stringaris et al"
-output:
-  quarto::pdf_document:
-    pandoc_args: --pdf-engine=pdflatex
+prefer-html: true
+format: docx
+editor: visual
 ---
 
 ## 
@@ -615,6 +615,22 @@ df_long_for_metan <- df_long_for_metan %>%
 # # also check one which is single to make sure it is kept
 # df_long_for_metan[df_long_for_metan$new_study_id == "Ackerson, 1998",]
 
+# For response rate, recalculating after turning long and doing all the imputations
+
+# df_long_for_metan <- df_long_for_metan %>%
+#   rowwise() %>%
+#   mutate(responders = sum(rnorm(baseline_n, post_mean, 
+#                                 post_sd) < (baseline_mean/ 2)))
+# 
+# df_long_for_metan <- df_long_for_metan %>%
+#   rowwise() %>%
+#   mutate(resp_rate = responders/baseline_n)
+# 
+# summary_resp_rate <- df_long_for_metan %>%
+#   group_by(group) %>%
+#   summarise(mean_resp_rate = mean(resp_rate, na.rm = TRUE),
+#             sd_resp_rate = sd(resp_rate, na.rm = TRUE), 
+#             n = n())
 
 # save this as the master dataframe  --------------------------------------
 # use this dataframe to perform all operations below
@@ -645,6 +661,30 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 
 #list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
 #summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
+```
+
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+df_long_for_metan <- df_long_for_metan %>%
+  rowwise() %>%
+  mutate(responders = sum(rnorm(baseline_n, post_mean, 
+                                post_sd) < (baseline_mean/ 2)))
+
+df_long_for_metan <- df_long_for_metan %>%
+  rowwise() %>%
+  mutate(resp_rate = responders/baseline_n)
+
+summary_resp_rate <- df_long_for_metan %>%
+  group_by(group) %>%
+  summarise(mean_resp_rate = mean(resp_rate, na.rm = TRUE),
+            sd_resp_rate = sd(resp_rate, na.rm = TRUE))
+
+test_summary <- df_with_distinct_instruments %>% 
+  group_by(psy_or_med) %>% 
+  summarise(rr_active = mean(resp_rate_active, na.rm = TRUE),
+            rr_control = mean(resp_rate_control, na.rm = TRUE),
+            n = n())
 
 ```
 
@@ -1683,6 +1723,20 @@ group_function <- function(dataframe, my_groups, columns) {
   }
   return(result_dataframe)
 }
+
+# Filter out wl conditions
+df_descr_psy_conditions <- df_descr_psy_conditions %>% 
+  filter(new_study_id %in% no_wl_ids) 
+
+# count_wl <- df_long_for_metan %>% 
+#   filter(treatment == "wlc") %>% 
+#   distinct(new_study_id) %>% 
+#   nrow()
+# 
+# count_cau <- df_long_for_metan %>% 
+#   filter(treatment == "cau") %>% 
+#   distinct(new_study_id) %>% 
+#   nrow()
 
 sessions <- group_function(df_descr_psy_conditions,"levels_var","no_sessions")
 frequency <- group_function(df_descr_psy_conditions,"levels_var","freq_weeks")
