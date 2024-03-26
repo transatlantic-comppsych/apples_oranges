@@ -4,6 +4,7 @@ author: "Stringaris et al"
 prefer-html: true
 format: docx
 editor: visual
+bibliography: "emotion_concepts_paper.bib"
 font:
   family: "Calibri"
 ---
@@ -14,11 +15,29 @@ font:
 
 ------------------------------------------------------------------------
 
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+###########Libraries needed
+library(tidyverse)
+library(truncnorm)
+library(metafor)
+library(meta)
+library(kableExtra)
+library(flextable)
+library(magrittr)
+library(officer)
+library(RefManageR)
+
+# For referencing
+bib_data <- ReadBib("emotion_concepts_paper.bib")
+
+```
 # Introduction
 
-There are two principal treatment modalities for adolescent depression: psychotherapy, medication, or both. Where does one turn to find the evidence that will inform their treatment options? This question is relevant for patients and their carers, for clinicians and for policy makers when they plan services. However, the question is particularly difficult to answer for adolescent depression, where there are limited data from head-to-head trials of medication and psychotherapy, and where recommendations must therefore be derived from indirect comparisons of treatment efficacy.
+There are two principal treatment modalities for adolescent depression: psychotherapy, medication, or both. Where does one turn to find the evidence that will inform their treatment options? This question is relevant for patients and their carers, for clinicians and for policy makers when they plan services. However, the question is particularly difficult to answer for adolescent depression, where there are limited data from head-to-head trials of medication and psychotherapy, and where recommendations must therefore be derived from indirect comparisons of treatment efficacy. 
 
-Guidelines, such as the ones that the internationally influential UK National Institute of Clinical Excellence (NICE) have produced for adolescent depression, are a principal source of such information. NICE recommend that youth be first offered psychological therapy (specifically cognitive behaviour therapy and interpersonal therapy) over medication for most presentations of depression. This conclusion is in keeping with two sources of evidence. On the one hand, medication meta-analyses that cast doubt on the efficacy of most antidepressants, with the exception of fluoxetine (ref); and on the other hand, psychotherapy meta-analyses that conclude psychotherapy to be effective for adolescent depression (ref). However, such conclusions seem at odds with those of a recent network meta-analysis (ref), an established method of comparing treatments with each other using both direct (head-to-head) and indirect (indirectly treatment A with treatment C, via studies that directly compare treatments A with B and B with C) evidence. Indeed, the network meta-analysis concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than pill placebo or psychological controls. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make decisions on treatment options for adolescent depression?
+Guidelines, such as the ones that the internationally influential UK National Institute of Clinical Excellence (NICE) have produced for adolescent depression, are a principal source of such information. NICE recommend that youth be first offered psychological therapy (specifically cognitive behaviour therapy and interpersonal therapy) over medication for most presentations of depression [@niceDepressionChildrenYoung2023]. This conclusion is in keeping with two sources of evidence. On the one hand, medication meta-analyses that cast doubt on the efficacy of most antidepressants, with the exception of fluoxetine [@ciprianiComparativeEfficacyTolerability2016]; and on the other hand, psychotherapy meta-analyses that conclude psychotherapy to be effective for adolescent depression [@cuijpersEffectsPsychologicalTreatments2021]. However, such conclusions seem at odds with those of a recent network meta-analysis [@zhouComparativeEfficacyAcceptability2020], an established method of comparing treatments with each other using both direct (head-to-head) and indirect (indirectly treatment A with treatment C, via studies that directly compare treatments A with B and B with C) evidence. Indeed, the network meta-analysis concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than pill placebo or psychological controls. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make decisions on treatment options for adolescent depression?
 
 In this paper, we examine whether the existing evidence base for adolescent depression treatment can offer valid answers to such questions. Below, we provide a conceptual framework for answering such questions and state our hypotheses that we will test using data from existing trials. Two points are relevant to indirect comparisons of treatment modalities with each other.
 
@@ -48,7 +67,7 @@ This assumption may be hard to meet. Clinical experience and empirical evidence 
 
 Here we will compare between four key sample characteristics, namely baseline severity in the outcome, number of sites, gender and age in each sample.
 
-In terms of the second point, differences in trial design may impact outcomes in a differential way between antidepressant and psychotherapy trials. Perhaps the most obvious way in which this happens is the fact that participants in psychotherapy trials are unblinded in terms of treatment allocation; by contrast, in new antidepressant trials, patients (and raters) were found to be unlikely to be able to judge treatment allocation (cite: Assessment of blinding in randomized controlled trials of antidepressants for depressive disorders 2000−2020: A systematic review and meta-analysis, Lancet). This creates differential expectations between medication and psychotherapy trials. Importantly, the placebo control has been developed in order to match as closely as possible the intervention condition, so as to minimise differences in expectancy between conditions. By contrast, psychotherapy control arms vary across waitlist controls, treatment as usual and active controls. These differences in expectation essentially favour the psychotherapy active condition and disadvantage the psychotherapy control (thus potentially the difference between them), because participants in the active condition could be content for receiving the "cutting edge treatment" whilst those in the control will be dissatisfied for having missed out on "proper treatment". And this is important because expectancy is associated with treatment outcomes. This also poses problems when trying to infer indirect comparisons in network metanalyses where, for example, CBT is compared to placebo control and medication --- given the likely differential expectation effects, comparisons to the unblinded psychotherapy controls may be biased.
+In terms of the second point, differences in trial design may impact outcomes in a differential way between antidepressant and psychotherapy trials. Perhaps the most obvious way in which this happens is the fact that participants in psychotherapy trials are unblinded in terms of treatment allocation; by contrast, in new antidepressant trials, patients (and raters) were found to be unlikely to be able to judge treatment allocation [@linAssessmentBlindingRandomized2022]. This creates differential expectations between medication and psychotherapy trials. Importantly, the placebo control has been developed in order to match as closely as possible the intervention condition, so as to minimise differences in expectancy between conditions. By contrast, psychotherapy control arms vary across waitlist controls, treatment as usual and active controls. These differences in expectation essentially favour the psychotherapy active condition and disadvantage the psychotherapy control (thus potentially the difference between them), because participants in the active condition could be content for receiving the "cutting edge treatment" whilst those in the control will be dissatisfied for having missed out on "proper treatment". And this is important because expectancy is associated with treatment outcomes. This also poses problems when trying to infer indirect comparisons in network metanalyses where, for example, CBT is compared to placebo control and medication --- given the likely differential expectation effects, comparisons to the unblinded psychotherapy controls may be biased.
 
 Another difference in design that has potential implications for which patients are selected into the trial is the number of sites in a trial. Previous research has shown that in medication trials the number of sites is positively related to the magnitude of the placebo response. This phenomenon is hard to explain fully with the data available, but may be due to lower quality of phenotyping in such studies, with higher measurement (and therefore diagnostic classification) errors, leading to issues such as spontaneous remission or regression to the mean. In contrast to medication trials, psychotherapy trials typically involve one or fewer sites.
 
@@ -64,15 +83,17 @@ In this paper, we examine psychotherapy and medication trials in the following w
 
 ## Studies included
 
-For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from Cuijpers' (2023) systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions. Cuijpers made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to Cuijpers' (2023) meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers' (2023) literature search.
+For this review, we primarily drew upon studies included in two recent meta-analyses. Please refer to these original meta-analyses for a detailed description of study selection criteria. Psychotherapy studies were drawn from a systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021]. Cuijpers et al. made available a full dataset of psychotherapy trials (via https://www.metapsy.org/), which we used for the current study. Whilst Cuijpers et al. (2023) excluded those studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below; hence we have more psychotherapy studies included in this review compared to the first meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuipers et al.'s (2023) literature search.
 
-Medication studies were drawn from Cipriani's (2016) network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive any responses. We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers' (2023) review to ensure we analysed an equivalently up-to-date database of medication trials. We used the same search terms outlined in Cipriani (2016).
+Medication studies were drawn from a network meta-analysis examining the efficacy and tolerability of a range of antidepressants and placebo for major depressive disorder in young people [@ciprianiComparativeEfficacyTolerability2016]. The study dataset was made available online though did not include means or standard deviations at baseline or post-test. We emailed the study authors requesting a full dataset with this data, though did not receive a reply, and hence conducted data extraction for medication studies. We excluded three studies because they did not include a control arm. We were unable to locate and therefore complete extraction for two papers. Many studies did not report complete data, and so we emailed all corresponding authors to request missing data, though did not receive any responses. 
+
+We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers et al's (2023) review (May 31 2015 up to Jan 1 2021) to ensure we analysed an equivalently up-to-date database of medication trials. We searched PubMed, the Cochrane Central Register of Controlled Trials, Embase, Web of Science, CINAHL, PsycINFO and LiLACS for randomised controlled trials (RCTs) comparing any antidepressant with placebo in the treatment of children and adolescents with a primary diagnosis of major depressive disorder. We also searched trial registers for published and unpublished studies. We used the same search strategy as Cipriani (2016) with an additional search term to include only placebo-controlled trials (see Supplement X for further details). We used Covidence, an online software tool, to manage our systematic review. In total, our search produced 538 studies, 85 of which were duplicates and subsequently removed. Two study authors independently completed title and abstract screenings for 453 studies, and full text screening for 41 studies. X studies met inclusion criteria and data extraction was completed for these papers. 
 
 ## Statistical Analysis
 
 ### Trial and sample characteristics
 
-We conducted a series of random effects meta-analyses and tested for subgroup differences between psychotherapy versus medication trials in sample characteristics including gender, age, and severity of depressive symptoms at baseline. Meta-analyses were implemented using R's meta package.
+We conducted a series of random effects meta-analyses and tested for subgroup differences between psychotherapy versus medication trials in sample characteristics including gender, age, and severity of depressive symptoms at baseline. Meta-analyses were implemented using R's Meta package.
 
 In order to compare depression severity across different instruments, we performed a min-max normalisation to turn each study arm mean score at baseline into a percentage using the following formalism:
 
@@ -92,11 +113,11 @@ We also conducted a t-test to compare mean number of trial sites between psychot
 
 ### Measures of Effect
 
-As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following NOTE: Charlotte cite Lakens 2013 and in there Cummings 2012, as:
+As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following [@lakensCalculatingReportingEffect2013, @cummingUnderstandingNewStatistics2013] as:
 
 $$SMD_{change} = \frac{Mean_{t_{2}} - Mean_{t_{1}}}{\frac{SD_{t{2}} + SD_{t{1}}}2}\ $$
 
-where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised by X (citation), in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis (citation).
+where, $Mean_{t_{2}}$ and $Mean_{t_{1}}$ refer to the means of the main outcome score at the end and beginning of the intervention respectively and $SD_{t_{2}}$ and $SD_{t_{1}}$ to the respective standard deviations. Where individual studies did not report all data required to calculate the SMD, we imputed missing data according to the methods summarised in this Cochrane Handbook [@higginsChapterChoosingEffect2023], in the following order. If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani's meta-analysis.
 
 For the purposes of metanalysis, it is necessary to estimate a standard error of the SMD. This is calculated according to:
 
@@ -154,7 +175,7 @@ $$
 z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
 $$
 
-We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives (NOTE: **Charlotte**cite Ioannides on this).
+We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives [@inthoutHartungKnappSidikJonkmanMethodRandom2014].
 
 We present our main results as means of the estimates across simulated datasets, for example, the SMDs of each level of the dummy variable above are means across the simulations.
 
@@ -189,18 +210,6 @@ cat("critical value of z =", x, "corresponding to an alpha = 0.05." , "\n")
 ### Comparing the control versus active arms of psychotherapy trials
 
 We ran t-tests to compare the active versus control arms of psychotherapy trials on key variables of interest regarding the nature and intensity of the interventions. We extracted data pertaining to the number, duration and intensity of sessions, and the total cumulative hours and period of the intervention. Where a range was provided, the maximum was encoded (e.g. if a paper reported that an intervention involved 8-10 sessions lasting 50-60 minutes, we encoded the number and duration of sessions as 10 and 60, respectively). If sessions varied in frequency across an intervention, we calculated an average by dividing total number of sessions by length of intervention period. Similarly, if the length of sessions varied across the course of the intervention, we calculated a weighted average. Phone call, web-chat and online sessions were encoded as sessions, however guided self-help components were not.
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-###########Libraries needed
-library(tidyverse)
-library(truncnorm)
-library(metafor)
-library(meta)
-library(kableExtra)
-library(flextable)
-library(magrittr)
-library(officer)
-```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #############Some custom made functions#############
@@ -1944,7 +1953,7 @@ Tables 6a and 6b show the baeline-mean adjusted SMDs for the CDRS at outcome whe
 # knitr:: kable(hamd_smd_with_cis, caption = "Table 6. HAM-D baseline-mean adjusted SMDs")
 ```
 
-### Supplement
+# Supplement
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # Tables for baseline comparisons
@@ -2138,5 +2147,6 @@ ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group))
   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
   theme_minimal() +
   theme(legend.position = "none")
-
 ```
+
+
