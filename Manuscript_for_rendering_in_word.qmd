@@ -1140,6 +1140,9 @@ results_met_sev_no_wl <- extract_stats(met_sev_no_wl)
 df_for_gender_metan <- df_baseline_demographics %>% 
   filter(!is.na(percent_women))
 
+df_for_gender_metan <- df_for_gender_metan %>% 
+  filter(percent_women != 100)
+
 met_perc_women_overall <- metagen(TE = percent_women,
                            seTE = percent_women_std_error,
                            studlab = new_study_id,
@@ -1395,7 +1398,7 @@ When taking only those studies where the active arm was either CBT, fluoxetine o
 
 ### Gender
 
-As can be seen in Table 1, psychotherapy trials featured a significantly higher percentage of women when compared to medication trials. On average, samples were comprised of `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`) women across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`) women across medication trials. Excluding sub-clinical and waitlist control studies yielded very similar results. This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (see Table S2).
+For this analysis, we excluded the two psychotherapy trials which included entirely female samples. As can be seen in Table 1, psychotherapy trials featured a significantly higher percentage of women when compared to medication trials. On average, samples were comprised of `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],1)`) women across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],1)`) women across medication trials. Excluding sub-clinical and waitlist control studies yielded very similar results. This difference in gender composition however did not reach statistical significance when only CBT, fluoxetine and escitalopram trials were included (see Table S2).
 
 ### Age
 
@@ -1433,6 +1436,17 @@ df_baseline_demographics <- df_baseline_demographics %>%
 
 df_baseline_demographics <- df_baseline_demographics %>% 
   filter(!(new_study_id %in% c("Kitchen, 2021", "McCarty, 2013", "Wright, 2020")))
+
+# Now create binary variable, single or multi site trial 
+
+df_baseline_demographics <- df_baseline_demographics %>% 
+  mutate(site_binary = case_when(sites == 1 ~ "single", 
+                                 sites > 1 ~ "multi",
+                                 TRUE ~ NA_character_))
+
+df_baseline_demographics %>%
+  group_by(psy_or_med, site_binary) %>%
+  summarize(num_trials = n())
 
 # Lets look at results
 
@@ -1535,7 +1549,7 @@ flextable(sites_t_test_stats) %>%
 
 ```
 
-There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r round(sites_t_test$p.value, 3`).
+There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r round(sites_t_test$p.value, 3`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies. 
 
 ## Mean efficacy of psychotherapy versus medication control conditions
 
