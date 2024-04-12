@@ -76,7 +76,7 @@ keywords:
   - antidepressants
   - psychotherapy
 date: last-modified
-prefer-html: true
+
 format: docx
 editor: visual
 bibliography: "emotion_concepts_paper.bib"
@@ -102,9 +102,6 @@ library(flextable)
 library(magrittr)
 library(officer)
 library(RefManageR)
-library(gt)
-library(officer)
-library(officedown)
 
 # For referencing
 bib_data <- ReadBib("emotion_concepts_paper.bib")
@@ -1362,46 +1359,71 @@ df_overall_baseline_results <- df_overall_baseline_results %>%
 big_border = fp_border(color="black", width = 1)
 small_border = fp_border(color="lightgray", width = 1)
 
+# Too basic, limited formatting options
+# 
 # knitr:: kable(df_overall_baseline_results, caption="Sample characteristics at baseline across medication and psychotherapy studies")
 # 
-# gt(df_overall_baseline_results) %>% 
+# gt(df_overall_baseline_results) %>%
 #   tab_header(
 #     title = md("Test this"),
-#     subtitle = md("And this")) 
-
+#     subtitle = md("And this"))
+# 
 # This doesn't work when rendering to word doc
+# 
 #   kbl(align = "l", caption = "Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
 #   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
 #   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>%
 #   row_spec(row = 1, bold = T) %>%
 #   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
 #   column_spec(1, border_right = T) %>%
-#   add_indent(c(2, 3, 5, 6, 8, 9)) 
+#   add_indent(c(2, 3, 5, 6, 8, 9))
+# 
+# this doesn't have a caption when rendering to word
 
-
-```
-
-
-```{r, echo=FALSE}
-
-#| label: tbl-flextable
-#| tbl-cap: Caption **strong**
-flextable:: flextable(df_overall_baseline_results) %>%
+flextable(df_overall_baseline_results) %>%
   set_caption("Sample characteristics at baseline across medication and psychotherapy studies") %>%
   bold(part = "header") %>%  # Bold the header row
   bold(i = c(1, 4, 7), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
   border_outer(border = small_border) %>%  # Add outer borders
   hline(i = c(1, 2, 4, 5, 7, 8), border = small_border) %>%  # Add light grey horizontal lines all  rows
-  hline(i = c(3, 6), border = big_border) %>%  # Add darker horizontal lines after specific rows %>% 
-  hline(part = "header", border = big_border) %>% 
-  vline(j = 1, border = big_border) %>% 
+  hline(i = c(3, 6), border = big_border) %>%  # Add darker horizontal lines after specific rows %>%
+  hline(part = "header", border = big_border) %>%
+  vline(j = 1, border = big_border) %>%
   set_table_properties(width = .75) %>%  # Set table width
   bg(bg = "#F2F2F2", part = "header") %>%  # Add light grey background to header row
   autofit() %>%  # Autofit column widths
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri 
-  padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>% 
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>%
   align(j = 2:ncol(df_overall_baseline_results), align = "center", part = "all")
 
+# this doesn't work either
+#
+# table_sample_result <- flextable(df_overall_baseline_results) %>%
+#   bold(part = "header") %>%  # Bold the header row
+#   bold(i = c(1, 4, 7), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
+#   border_outer(border = small_border) %>%  # Add outer borders
+#   hline(i = c(1, 2, 4, 5, 7, 8), border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   hline(i = c(3, 6), border = big_border) %>%  # Add darker horizontal lines after specific rows %>%
+#   hline(part = "header", border = big_border) %>%
+#   vline(j = 1, border = big_border) %>%
+#   set_table_properties(width = .75) %>%  # Set table width
+#   bg(bg = "#F2F2F2", part = "header") %>%  # Add light grey background to header row
+#   autofit() %>%  # Autofit column widths
+#   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+#   padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>%
+#   align(j = 2:ncol(df_overall_baseline_results), align = "center", part = "all")
+# 
+# table_sample_result <- set_caption(table_sample_result, caption = "Testing")
+# 
+# table_sample_result
+
+```
+
+```{r}
+#| label: tbl-flextable
+#| tbl-cap: "Testing"
+flextable::flextable(df_overall_baseline_results)
+# the caption isn't working here either
 ```
 
 ### Baseline severity
@@ -1563,7 +1585,7 @@ flextable(sites_t_test_stats) %>%
 
 ```
 
-There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test$p.value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies. 
+There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test$p.value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies.
 
 ## Mean efficacy of control conditions in psychotherapy versus medication studies
 
@@ -1577,7 +1599,9 @@ subtitle_text_all <- "Metanalytic estimates of within-group changes: all studies
 plot_means_all <- plot_means_function(df_mean_coefs_from_sim, subtitle_text_all)
 #print(plot_means_all)
 pdf(file = "plot_means_all.pdf")
-plot_means_all
+# Instead of PDF
+png(file = "plot_means_all.png")
+dev.off()  
 
 # Prepare to tabulate
 
@@ -1626,7 +1650,7 @@ flextable(df_mean_coefs_from_sim) %>%
 
 ```
 
-![Figure 1.](plot_means_all.pdf)
+![Figure 1.](plot_means_all.png)
 
 In Table 5, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
@@ -1993,7 +2017,7 @@ As can be seen in Table 3a and 3b, there baseline scores in medication studies w
 # knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3b HAM-D baselilne scores")
 ```
 
-```{r, eval=FALSE} 
+```{r, echo = FALSE}
 #### Let's start from the beginning and regress cohens on the baseline dataframe.
 
 # create a new list with dfs for the sims
@@ -2074,7 +2098,6 @@ results_adjusted_cohens_d
 
 ```
 
-
 As can be seen in Table 4, the baseline mean has a very strong association with the SMD.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -2141,33 +2164,33 @@ Tables 6a and 6b show the baseline-mean adjusted SMDs for the CDRS at outcome wh
 
 # Discussion
 
-This paper took as its starting point the question of how anyone, be it a patient, parent, or clinician, should decide whether to opt for medication or psychotherapy for the treatment of adolescent depression. In order to address this question, we asked whether the two treatment modalities — medication and psychotherapy — are comparable on the basis of the existing evidence. Specifically, our paper answered two questions that are fundamental to any attempts at comparing the two treatment modalities.
+This paper took as its starting point the question of how anyone, be it a patient, parent, or clinician, should decide whether to opt for medication or psychotherapy for the treatment of adolescent depression. In order to address this question, we asked whether the two treatment modalities --- medication and psychotherapy --- are comparable on the basis of the existing evidence. Specifically, our paper answered two questions that are fundamental to any attempts at comparing the two treatment modalities.
 
 First, whether the participants of trials in one modality are comparable to those in another modality. Second, whether key conditions of the trial, such as the effects of control conditions or the number of sites involved in a trial, are comparable.
 
 Starting with the first question, we find evidence that participants in the two treatment modalities differ in the following key aspects: those enrolled in medication trials are more likely to be male and have more severe depression compared to those in psychotherapy trials. By contrast, there were no significant differences in age.
 
-Severity is important as it may moderate treatment response, with some evidence suggesting that those with higher baseline scores respond more to antidepressant therapy [@stoneResponseAcuteMonotherapy2022] or that their response to placebo response is lower [@bridgePlaceboResponseRandomized2009]. Some studies argue against severity as a treatment moderator [@trogerBaselineDepressionSeverity2024; @weitzBaselineDepressionSeverity2015], however, these are within modality (e.g. within CBT studies),  i.e. within those people who have chosen to be in the particular trial and modality. Moreover, there is evidence that severity may represent different subtypes in terms of course of depression and its outcomes in real life settings [@lamersSixyearLongitudinalCourse2016; @simmonds-buckleyDepressionSubtypesTheir2021].
+Severity is important as it may moderate treatment response, with some evidence suggesting that those with higher baseline scores respond more to antidepressant therapy [@stoneResponseAcuteMonotherapy2022] or that their response to placebo response is lower [@bridgePlaceboResponseRandomized2009]. Some studies argue against severity as a treatment moderator [@trogerBaselineDepressionSeverity2024; @weitzBaselineDepressionSeverity2015], however, these are within modality (e.g. within CBT studies), i.e. within those people who have chosen to be in the particular trial and modality. Moreover, there is evidence that severity may represent different subtypes in terms of course of depression and its outcomes in real life settings [@lamersSixyearLongitudinalCourse2016; @simmonds-buckleyDepressionSubtypesTheir2021].
 
-Similarly, we found that on average there were about 7% more women in psychotherapy trials. Whilst there is little evidence that sex or gender moderate treatment response within modality in adult trials of depression [@cuijpersGENDERPREDICTORMODERATOR2014], this is yet another indicator that different people enter trials of each modality type, which would violate basic assumptions of comparability between trials. 
+Similarly, we found that on average there were about 7% more women in psychotherapy trials. Whilst there is little evidence that sex or gender moderate treatment response within modality in adult trials of depression [@cuijpersGENDERPREDICTORMODERATOR2014], this is yet another indicator that different people enter trials of each modality type, which would violate basic assumptions of comparability between trials.
 
-We then turned to our second basic question, about whether key conditions of the trial design were comparable between modalities. We find a series of critical differences between the two modalities. 
+We then turned to our second basic question, about whether key conditions of the trial design were comparable between modalities. We find a series of critical differences between the two modalities.
 
-First, medication trials are vastly more likely to be multi-site than their psychotherapy counterparts—CITE PROBABILITIES. Multisite trials are associated with higher placebo response [@bridgePlaceboResponseRandomized2009], and are less common in NIH-funded (i.e. non industry trials) which are also more likely to show higher placebo efficacy. Also, in single-site trials, principal investigators are often intellectually invested in the treatment (in psychotherapy these are often treatments developed or modified by the PI); this is in stark contrast to the incentive structure in multi-site trials where primacy is given to the number of recruited participants which is the primary unit of reimbursement. 
+First, medication trials are vastly more likely to be multi-site than their psychotherapy counterparts---CITE PROBABILITIES. Multisite trials are associated with higher placebo response [@bridgePlaceboResponseRandomized2009], and are less common in NIH-funded (i.e. non industry trials) which are also more likely to show higher placebo efficacy. Also, in single-site trials, principal investigators are often intellectually invested in the treatment (in psychotherapy these are often treatments developed or modified by the PI); this is in stark contrast to the incentive structure in multi-site trials where primacy is given to the number of recruited participants which is the primary unit of reimbursement.
 
-Second, the control conditions of psychotherapy trials are much weaker than those of their medication counterparts. Our analysis could be critiqued as it relies on comparing the within arm symptom change of each trial taken out of randomization, which is generally advised against (CITE). This criticism would apply if our aim were to draw inferences about the efficacy of each arm — in which case preserving the randomization (in order to balance confounders) is critical. However, we note that, our findings are largely in keeping with those of the network metanalysis, which is designed to preserve the randomization structure. More importantly, we do not make the claim with our analyses that these differences are genuinely due to efficacy differences; they may well be because of the fact that the people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences concerning the comparison between the two modalities. This is all the more so as clinicians as well as policy makers often resort to effect sizes to summarise findings, with SMD being the one used as per standard. Our findings make obvious that comparing treatment modalities based on the effect size of each modality is misleading. 
+Second, the control conditions of psychotherapy trials are much weaker than those of their medication counterparts. Our analysis could be critiqued as it relies on comparing the within arm symptom change of each trial taken out of randomization, which is generally advised against (CITE). This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving the randomization (in order to balance confounders) is critical. However, we note that, our findings are largely in keeping with those of the network metanalysis, which is designed to preserve the randomization structure. More importantly, we do not make the claim with our analyses that these differences are genuinely due to efficacy differences; they may well be because of the fact that the people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences concerning the comparison between the two modalities. This is all the more so as clinicians as well as policy makers often resort to effect sizes to summarise findings, with SMD being the one used as per standard. Our findings make obvious that comparing treatment modalities based on the effect size of each modality is misleading.
 
-Moving beyond the comparison of the controls between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An optimal control condition is one where the treatment differs (e.g. treatment vs no treatment), but everything else is equal (in technical terms, the ceteris paribus assumption). An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other very basic conditions of the “all else is equal” assumption. Most (XXX %) of psychotherapy RCT control conditions are either waitlist control or treatment as usual, both of which are very likely to create negative expectations for participants not randomized to treatment; thus, the comparison is not between treatment and no treatment, but rather treatment and the poor luck of being randomized to waiting. But we also find that even psychological controls were unreasonable counterfactuals. In order to test that a psychological treatment is effective per se (e.g. because of the cognitive techniques the therapist deploys) rather than because of generic effects (e.g. pleasant human contact), aspects such as human contact time should be matched. We find that there are vast differences between treatment and control arms in psychotherapy trials (CITE NUMBER) which may lead to an inflation of the true efficacy of psychological treatments. 
+Moving beyond the comparison of the controls between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An optimal control condition is one where the treatment differs (e.g. treatment vs no treatment), but everything else is equal (in technical terms, the ceteris paribus assumption). An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other very basic conditions of the "all else is equal" assumption. Most (XXX %) of psychotherapy RCT control conditions are either waitlist control or treatment as usual, both of which are very likely to create negative expectations for participants not randomized to treatment; thus, the comparison is not between treatment and no treatment, but rather treatment and the poor luck of being randomized to waiting. But we also find that even psychological controls were unreasonable counterfactuals. In order to test that a psychological treatment is effective per se (e.g. because of the cognitive techniques the therapist deploys) rather than because of generic effects (e.g. pleasant human contact), aspects such as human contact time should be matched. We find that there are vast differences between treatment and control arms in psychotherapy trials (CITE NUMBER) which may lead to an inflation of the true efficacy of psychological treatments.
 
-Given all of the above, the certainty with which guidelines, including UK’s NICE recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have a number of profound implications for patients, their families, clinicians and policy makers and we list these below.
+Given all of the above, the certainty with which guidelines, including UK's NICE recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have a number of profound implications for patients, their families, clinicians and policy makers and we list these below.
 
-First, the grounds for a comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is an urgent need to revisit guidelines and public information in light of the limitations. 
+First, the grounds for a comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is an urgent need to revisit guidelines and public information in light of the limitations.
 
-Second, the low quality of control conditions of psychotherapy trials for adolescent depression should prompt a rethinking of how these studies are appraised and what needs to be done to create fair and realistic comparators. Indeed, investment of effort and funds should be directed into providing rigorous evidence that established depression psychotherapies are more efficacious than fair controls. There are examples of such psychotherapy RCTS, e.g. in social anxiety [@clarkCognitiveTherapyExposure2006a] where such rigor has been applied. 
+Second, the low quality of control conditions of psychotherapy trials for adolescent depression should prompt a rethinking of how these studies are appraised and what needs to be done to create fair and realistic comparators. Indeed, investment of effort and funds should be directed into providing rigorous evidence that established depression psychotherapies are more efficacious than fair controls. There are examples of such psychotherapy RCTS, e.g. in social anxiety [@clarkCognitiveTherapyExposure2006a] where such rigor has been applied.
 
-Third, our findings make clear the inherent difficulties of comparing psychotherapy with medication trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. The first obstacle is the comparability of the populations taking part. Even if a trial were designed to conduct a head-to-head comparison of psychotherapy with medication (as has been done in [@FluoxetineCognitiveBehavioralTherapy2004]), it might sample the population of those who are indifferent to which one they would receive. And even in such a design, difficulties with blinding of the psychotherapy control would have to be overcome to draw valid inferences. 
+Third, our findings make clear the inherent difficulties of comparing psychotherapy with medication trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. The first obstacle is the comparability of the populations taking part. Even if a trial were designed to conduct a head-to-head comparison of psychotherapy with medication (as has been done in [@FluoxetineCognitiveBehavioralTherapy2004]), it might sample the population of those who are indifferent to which one they would receive. And even in such a design, difficulties with blinding of the psychotherapy control would have to be overcome to draw valid inferences.
 
-In summary, our data give cause for consternation about the state of the evidence of youth depression, one of the most common and debilitating disorders in young people. Our data question the state of knowledge about the efficacy of youth psychotherapies and, in particular, the extent to which giving them primacy in the treatment of depression is justified and beneficial for young people. Returning to our motivating question, the stakeholders, including patients and clinicians, deserve better evidence on which to base their choice than currently exists. 
+In summary, our data give cause for consternation about the state of the evidence of youth depression, one of the most common and debilitating disorders in young people. Our data question the state of knowledge about the efficacy of youth psychotherapies and, in particular, the extent to which giving them primacy in the treatment of depression is justified and beneficial for young people. Returning to our motivating question, the stakeholders, including patients and clinicians, deserve better evidence on which to base their choice than currently exists.
 
 # Supplement
 
