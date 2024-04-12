@@ -102,6 +102,9 @@ library(flextable)
 library(magrittr)
 library(officer)
 library(RefManageR)
+library(gt)
+library(officer)
+library(officedown)
 
 # For referencing
 bib_data <- ReadBib("emotion_concepts_paper.bib")
@@ -552,7 +555,7 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-library(tidyverse)
+
 # Transforming data ------------------------------------------------------
 # import master dataset 
 
@@ -757,8 +760,7 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 # This chunk of code needs to be here because some of the data needed for the included studies summary lives here
 
 # Get Ns, run metareg, prepare graphing ------------------------------------------------------
-library(tidyverse)
-library(metafor)
+
 
 # add a new multilevel variable to the simulated data for the regression
 
@@ -1360,9 +1362,31 @@ df_overall_baseline_results <- df_overall_baseline_results %>%
 big_border = fp_border(color="black", width = 1)
 small_border = fp_border(color="lightgray", width = 1)
 
-# Create a flextable object
+# knitr:: kable(df_overall_baseline_results, caption="Sample characteristics at baseline across medication and psychotherapy studies")
+# 
+# gt(df_overall_baseline_results) %>% 
+#   tab_header(
+#     title = md("Test this"),
+#     subtitle = md("And this")) 
 
-flextable(df_overall_baseline_results) %>%
+# This doesn't work when rendering to word doc
+#   kbl(align = "l", caption = "Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
+#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>%
+#   row_spec(row = 1, bold = T) %>%
+#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
+#   column_spec(1, border_right = T) %>%
+#   add_indent(c(2, 3, 5, 6, 8, 9)) 
+
+
+```
+
+
+```{r, echo=FALSE}
+
+#| label: tbl-flextable
+#| tbl-cap: Caption **strong**
+flextable:: flextable(df_overall_baseline_results) %>%
   set_caption("Sample characteristics at baseline across medication and psychotherapy studies") %>%
   bold(part = "header") %>%  # Bold the header row
   bold(i = c(1, 4, 7), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
@@ -1377,16 +1401,6 @@ flextable(df_overall_baseline_results) %>%
   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri 
   padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>% 
   align(j = 2:ncol(df_overall_baseline_results), align = "center", part = "all")
-
-# This doesn't work when rendering to word doc
-#   kbl(align = "l", caption = "Sample characteristics at baseline across medication and psychotherapy studies", escape = F) %>%
-#   kable_material(lightable_options = c("hover"), full_width = FALSE) %>%
-#   row_spec(row = 0, background = "#EBEBEB", extra_css = "border-bottom: 1px black;" ) %>%
-#   row_spec(row = 1, bold = T) %>%
-#   row_spec(c(4, 7), bold = T, extra_css = "border-top: 1px solid black;") %>%
-#   column_spec(1, border_right = T) %>%
-#   add_indent(c(2, 3, 5, 6, 8, 9)) 
-
 
 ```
 
@@ -1404,7 +1418,7 @@ For this analysis, we excluded the two psychotherapy trials which included entir
 
 As can be seen in Table 1, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses (see Table S3).
 
-### Number of trial sites
+## Number of trial sites
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
@@ -1444,9 +1458,9 @@ df_baseline_demographics <- df_baseline_demographics %>%
                                  sites > 1 ~ "multi",
                                  TRUE ~ NA_character_))
 
-df_baseline_demographics %>%
-  group_by(psy_or_med, site_binary) %>%
-  summarize(num_trials = n())
+# df_baseline_demographics %>%
+#   group_by(psy_or_med, site_binary) %>%
+#   summarize(num_trials = n())
 
 # Lets look at results
 
@@ -1509,17 +1523,17 @@ colnames(sites_t_test_stats) <- c("Statistic", "df", "p-value", "Lower CI", "Upp
 # Create a flextable object
 
 flextable(df_sites_summary_stats) %>%
-  set_caption ("Number of sites across medication and psychotherapy studies", style = "Table Caption") %>%
-  bold(part = "header") %>%  
-  border_outer(border = small_border) %>%  
-  hline(part = "all", border = small_border) %>% 
-  hline(part = "header", border = big_border) %>% 
-  vline(j = 1, border = big_border) %>% 
-  set_table_properties(width = .75) %>% 
-  bg(bg = "#F2F2F2", part = "header") %>%  
-  autofit() %>% 
-  font(fontname = "Calibri", part = "all") %>%   
-  padding(i = c(1, 2), j = 1, padding.left = 10) %>% 
+  set_caption ("Number of sites across medication and psychotherapy studies") %>%
+  bold(part = "header") %>%
+  border_outer(border = small_border) %>%
+  hline(part = "all", border = small_border) %>%
+  hline(part = "header", border = big_border) %>%
+  vline(j = 1, border = big_border) %>%
+  set_table_properties(width = .75) %>%
+  bg(bg = "#F2F2F2", part = "header") %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>%
+  padding(i = c(1, 2), j = 1, padding.left = 10) %>%
   align(j = 2:ncol(df_sites_summary_stats), align = "center", part = "all")
 
 flextable(sites_t_test_stats) %>%
@@ -1549,9 +1563,9 @@ flextable(sites_t_test_stats) %>%
 
 ```
 
-There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r round(sites_t_test$p.value, 3`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies. 
+There was a significant difference between the number of sites in medication versus psychotherapy trials, as can be seen in Tables 2 and 3. Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test$p.value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies. 
 
-## Mean efficacy of psychotherapy versus medication control conditions
+## Mean efficacy of control conditions in psychotherapy versus medication studies
 
 We applied metaregression to obtain the SMDs and confidence intervals of each of the four arms.
 
@@ -1979,6 +1993,88 @@ As can be seen in Table 3a and 3b, there baseline scores in medication studies w
 # knitr:: kable(results_hamd_metareg_baseline[[2]], caption="Table 3b HAM-D baselilne scores")
 ```
 
+```{r, eval=FALSE} 
+#### Let's start from the beginning and regress cohens on the baseline dataframe.
+
+# create a new list with dfs for the sims
+df_long_for_metan_adj_cohens_d <- df_long_for_metan
+# rename the cohens_d value to make space for the new cohen's d
+df_long_for_metan_adj_cohens_d <-
+  df_long_for_metan_adj_cohens_d %>%
+rename(unadjusted_cohens_d = cohens_d,
+)
+# estimate the cohen's d from the residuals
+model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$perc_baseline_mean, na.action=na.exclude)
+
+# there is a great effect of the baseline means, as shown here
+results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
+
+# extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
+df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
+
+# apply function to simulate standard errors
+list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d,
+                                   num_repetitions = 1000,
+                                   seed  = 1974,
+                                   n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)),
+                                   a = 0.45,
+                                   b = .9,
+                                   mean = 0.65,
+                                   sd = 0.2)
+
+
+# add the four level variable and re-level
+for(i in 1: length(list_df_simulated_adj_cohens_d)){
+
+  list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
+  list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>%
+    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+    )
+
+  list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
+
+  # relevel so that medication control becomes the reference category for the regression
+  #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+  list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
+                                                         "medication_control",
+                                                         "medication_active",
+                                                         "psychotherapy_control",
+                                                         "psychotherapy_active")
+}
+
+
+
+
+
+# Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
+# specify model
+model_1 <- as.formula(~ four_level_var)
+
+# run metareg function
+# here you can use the simulated results directly
+list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
+aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
+aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
+
+# extract SMDs from the  list
+list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
+
+df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
+
+results_adjusted_cohens_d
+
+```
+
+
 As can be seen in Table 4, the baseline mean has a very strong association with the SMD.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -2033,7 +2129,7 @@ Finally, we tested whether the simulated correlation values we used for simulati
 
 ```
 
-Tables 6a and 6b show the baeline-mean adjusted SMDs for the CDRS at outcome when the baseline measurement has been taken into account. <!--# Here Intercept refers to teh psychotherapy control. Sorry about the labelling of the rows, will improve. -->
+Tables 6a and 6b show the baseline-mean adjusted SMDs for the CDRS at outcome when the baseline measurement has been taken into account. <!--# Here Intercept refers to teh psychotherapy control. Sorry about the labelling of the rows, will improve. -->
 
 ```{r}
 # knitr:: kable(cdrs_smd_with_cis, caption = "Table 6a. CDRS baseline mean adjsuted SMDs")
