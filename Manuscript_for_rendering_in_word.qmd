@@ -1954,7 +1954,7 @@ df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_
 
 ```
 
-Table X shows the adjusted SMDs with their confidence intervals that we estimated in metaregression. As can be inferred from the non-overlapping confidence intervals, there were significant differences between the medication control and psychotherapy control arms.
+Table X shows the adjusted SMDs with their confidence intervals that we estimated in metaregression. As can be inferred from the non-overlapping confidence intervals, there were significant differences between the medication control and psychotherapy control arms. 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # knitr:: kable (df_mean_coefs_from_sim_adjusted_cohens_d, caption = "Table 5. SMDs Adjusted by baseline score" )
@@ -2286,7 +2286,9 @@ In summary, our data give cause for consternation about the state of the evidenc
 
 # Supplement
 
-PRISMA chart summarising the screening process for the systematic review.
+Table S1: Included studies. 
+
+Figure S1: PRISMA chart summarising the screening process for the systematic review.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # # Tables for baseline comparisons
