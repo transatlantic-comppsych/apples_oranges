@@ -80,10 +80,18 @@ date: last-modified
 format:
   docx:
     reference-doc: custom-reference-doc.docx
+    fig-width: 9
+    fig-height: 7
+    fig_caption: yes
+    tbl_caption: yes
 editor: visual
 bibliography: "emotion_concepts_paper.bib"
 font:
   family: "Calibri"
+prefer-html: true
+fig-format: png
+fig-cap-location: top
+
 ---
 
 ## 
@@ -485,19 +493,20 @@ plot_means_function <- function(dataframe, subtitle) {
   
   
   # Encode colours
-  redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
-  blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+  redish_palette <- c("Medication Control" = "deeppink4", "Medication Active" = "deeppink")
+  blueish_palette <- c("Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
   
   # Plotting
   plot_means <- ggplot(dataframe, aes(x = coef_means, y = 1:nrow(dataframe),
                                       colour = condition, label = text_label)) +
+    geom_point(label=dataframe$k) +
     geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
     geom_text(vjust = +1.5, size = 4) +
     scale_size_continuous(guide = "none") +
     guides(colour = FALSE) + 
     scale_color_manual(values = c(redish_palette, blueish_palette)) +
     theme_minimal() +
-    labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Arm",
+    labs(x = "TE-random", y = NULL, title = "Trial Efficacy by Treatment Arm",
          subtitle = subtitle) +
     xlab("Standardized Mean Difference (SMD) with 95% CIs") +
     ylab("") +
@@ -508,11 +517,11 @@ plot_means_function <- function(dataframe, subtitle) {
     geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
     geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
     geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
-    theme(axis.title.x = element_text(size = 12), 
-          axis.text.x  = element_text(size = 12),
+    theme(axis.title.x = element_text(size = 12, family  = "Calibri"), 
+          axis.text.x  = element_text(size = 12, family = "Calibri"),
           axis.text.y = (element_blank()),
-          plot.title = element_text(size = 12),
-          plot.subtitle = element_text(size = 12)) +
+          plot.title = element_text(size = 12, family =  "Calibri", face= "italic"),
+          plot.subtitle = element_text(size = 12, family =  "Calibri", face= "italic")) +
     geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
     geom_text(x = 0.2, y = 4.75, label = "No Effect", color = "grey", vjust = 0.5, hjust = 0)
   
@@ -1476,6 +1485,7 @@ df_overall_baseline_results %>%
 
 ```
 
+
 ### Baseline severity
 
 On average, severity of depressive symptoms at baseline was significantly higher in medication trials when compared to psychotherapy trials. The statistics provided in Table 1 are baseline depression scores transformed to reflect percentage of a scale range. To take an example, the CDRS gives a possible total score from 17 to 113 (i.e. range of 96). From Table 1, mean severity was `r round(results_met_sev$TE_random[results_met_sev$subgroup == 1][[2]], 2)` for psychotherapy studies and `r round(results_met_sev$TE_random[results_met_sev$subgroup == 0][[2]], 2)` for medication studies, which would translate to 51.56 (17 + 0.36 x 96) and 57.32 (17 + 0.42 x 96), respectively, as equivalent scores on the CDRS.
@@ -1628,24 +1638,40 @@ There was a significant difference between the number of sites in medication ver
 
 We applied metaregression to obtain the SMDs and confidence intervals of each of the four arms.
 
-As can be seen in Figure 1, there were substantial differences between the four arms of the metanalysis with striking differences between the medication and the psychotherapy control arms. In particular, pill placebo had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$upper_ci, 2)`) whereas psychotherapy controls had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$upper_ci, 2)` ) (see Table 3 below).
+As can be seen in @fig-plot-means-all there were substantial differences between the four arms of the metanalysis with striking differences between the medication and the psychotherapy control arms. In particular, pill placebo had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$upper_ci, 2)`) whereas psychotherapy controls had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$upper_ci, 2)` ) (see Table 3 below).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#| label: fig-plot-means-all
+#| fig-cap: "Metanalytic estimates of within-group changes: all studies"
+#| fig-cap-location: top
 
-subtitle_text_all <- "Metanalytic estimates of within-group changes: all studies"
-plot_means_all <- plot_means_function(df_mean_coefs_from_sim, subtitle_text_all)
-pdf(file = "plot_means_all.pdf")
-
-# Prepare to tabulate
-
-table_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
+df_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
   mutate(condition = case_when(
     condition == "medication_control" ~ "Medication Control",
     condition == "medication_active" ~ "Medication Active",
     condition == "psychotherapy_control" ~ "Psychotherapy Control",
     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>% 
+    TRUE ~ as.character(condition)))
+
+subtitle_text_all <- "Metanalytic estimates of within-group changes: all studies"
+plot_means_all <- plot_means_function(df_mean_coefs_from_sim, subtitle_text_all)
+print(plot_means_all)
+
+# png("plot_means_all.png")
+# plot_means_all
+# dev.off()
+
+```
+@tbl-coefs
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#| label: tbl-coefs
+#| tbl-cap: "Summary statistics of the estimated SMDs"
+#| tbl-cap-location: top
+
+# Prepare to tabulate
+
+table_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
+  mutate(across(where(is.numeric), ~round(., 2))) %>%
   relocate("n", .after = "condition") 
 
 new_column_names <- c("Condition", "N", "Coefficient", "SE", "Lower CI", "Upper CI")
@@ -1692,10 +1718,6 @@ flextable(table_mean_coefs_from_sim) %>%
 
 ```
 
-![Figure 1.](plot_means_all.pdf)
-
-![](plot_means_all.pdf)
-
 In Table 4, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
 ```{r, warning=FALSE, message = FALSE, echo = FALSE}
@@ -1734,46 +1756,71 @@ We then conducted a series of sensitivity analyses of our results. First, we ana
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
+coef_and_se_means_no_wl <- coef_and_se_means_no_wl %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition)))
+
 subtitle_text_no_wl <- "Metanalytic estimates of within-group changes: wl excluded"
-plot_means_wl <- plot_means_function(coef_and_se_means_no_wl, subtitle_text_no_wl)
-#print(plot_means_wl)
-pdf(file = "plot_means_wl.pdf")
-plot_means_wl
-dev.off()
+plot_means_no_wl <- plot_means_function(coef_and_se_means_no_wl, subtitle_text_no_wl)
+print(plot_means_no_wl)
+
+# png("plot_means_no_wl.png")
+# plot_means_no_wl
+# dev.off()
 
 ```
-
-![](plot_means_wl.pdf)
 
 We next analysed the data after excluding sub-clinical studies. Again, the pattern of results was very similar to that of the overall analyses.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
+coef_and_se_means_clin_study <- coef_and_se_means_clin_study %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition)))
+
 subtitle_text_clin <- "Metanalytic estimates of within-group changes: subclinical studies excluded"
 plot_means_clin <- plot_means_function(coef_and_se_means_clin_study, subtitle_text_clin)
-pdf(file = "plot_means_clin.pdf")
-plot_means_clin
-dev.off()
+print(plot_means_clin)
+
+# png("plot_means_clin.png")
+# plot_means_clin
+# dev.off()
 
 ```
-
-![](plot_means_clin.pdf)
 
 Finally, we examined the data including only those studies that used the CDRS, which yielded a very similar pattern of results.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
+coef_and_se_means_cdrs_study <- coef_and_se_means_cdrs_study %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition)))
+
 subtitle_text_cdrs <- "Metanalytic estimates of within-group changes: CDRS studies only"
 plot_means_cdrs <- plot_means_function(coef_and_se_means_cdrs_study, subtitle_text_cdrs)
-pdf(file = "plot_means_cdrs.pdf")
-plot_means_cdrs
-dev.off()
+print(plot_means_cdrs)
+
+# png("plot_means_cdrs.png")
+# plot_means_cdrs
+# dev.off()
 
 ```
 
-![](plot_means_cdrs.pdf)
+#### Effect of standard errors of the SMDs 
 
-#### Effect of standard errors of the SMDs .
+It could be argued that the choice of standard errors of the changes for the calculation of the confidence intervals could have affect the results in one or the other direction. To address such concerns we have simulated 1000 different datasets with SMDs coming from a broad distribution. If standard error distributions were influential, this should show up as substantial variability across simulations. We test this idea in the Figure X which displays across the 1000 simulations the z-value of the contrast between medication and psychotherapy control arms (the mean of which we presented in Table X). As can be seen, the variability in the z-score is minimal and consistently far away from the threshold for significance, i.e. the value of z = 1.645.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # examine the stability of the simulations
@@ -1807,14 +1854,9 @@ stab_sims <- stability_sims %>%
     subtitle = "Results from 1000 simulations with within-group standard errors"
   )
 
-pdf(file = "stab_sims.pdf")
-stab_sims
-dev.off()
+print(stab_sims)
+
 ```
-
-It could be argued that the choice of standard errors of the changes for the calculation of the confidence intervals could have affect the results in one or the other direction. To address such concerns we have simulated 1000 different datasets with SMDs coming from a broad distribution. If standard error distributions were influential, this should show up as substantial variability across simulations. We test this idea in the Figure X which displays across the 1000 simulations the z-value of the contrast between medication and psychotherapy control arms (the mean of which we presented in Table X). As can be seen, the variability in the z-score is minimal and consistently far away from the threshold for significance, i.e. the value of z = 1.645.
-
-![](stab_sims.pdf)
 
 #### Addressing Regression to the Mean
 
@@ -2289,6 +2331,8 @@ In summary, our data give cause for consternation about the state of the evidenc
 Table S1: Included studies. 
 
 Figure S1: PRISMA chart summarising the screening process for the systematic review.
+
+![Figure S1](PRISMA.png)
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # # Tables for baseline comparisons
