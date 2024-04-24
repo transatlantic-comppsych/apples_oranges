@@ -1474,7 +1474,7 @@ df_overall_baseline_results %>%
   as_flextable(hide_grouplabel = TRUE) %>% 
   paginate(group = "category") %>% 
   bold(i = c(1, 2, 5, 8, 11, 12, 15, 18, 21, 22, 25, 28), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
-  autofit() %>%  # Autofit column widths
+  set_table_properties(layout = "autofit") %>%  # Autofit column widths
   bg(i = c(1, 11, 21), bg  = "#F2F2F2", part = "body") %>% # identify category sections
   padding(i = c(3, 4, 6, 7, 9, 10, 13, 14, 16, 17, 19, 20, 23, 24, 26, 27, 29, 30), j = 1, padding.left = 10) %>% # indent some rows
   align(j = 2:ncol(df_overall_baseline_results), align = "center", part = "all") %>% 
@@ -1605,7 +1605,7 @@ sites_t_test_stats <- sites_t_test_stats %>%
 #| tbl-cap-location: top
 
 flextable(df_sites_summary_stats) %>%
-  # set_table_properties(width = 1, layout = "autofit") %>%
+  set_table_properties(width = 1, layout = "fixed") %>%
   add_footer_row(values = as_paragraph(as_i("t"), "(", sites_t_test_stats$df, ") = ", sites_t_test_stats$statistic,
                       "; ", as_i("p "), sites_t_test_stats$p_value, 
                       "; 95% CI: ", sites_t_test_stats$ci_lower,
@@ -1811,7 +1811,7 @@ results_hamd_metareg_baseline$condition <-  levels(list_df_simulated[[1]]$four_l
 
 ```
 
-As can be seen in @tbl-cdrs-baseline and @tbl-hamd-baseline (see Supplementary Materials), the baseline scores in medication studies were on average substantially higher for the CDRS and the HAM-D. The differences between medication control and psychotherapy control arms were significant at p\<0.05 for the CDRS, though they did not reach statistical significance for the HAM-D (p = `r round(results_hamd_metareg_baseline[[1]][results_hamd_metareg_baseline[[1]]$condition == "psychotherapy_control", "p.value"], 3)`).
+As can be seen in @tbl-cdrs-baseline and @tbl-hamd-baseline (see Supplementary Materials), the baseline scores in medication studies were on average substantially higher than psychotherapy studies for the CDRS and the HAM-D. The differences between medication control and psychotherapy control arms were significant at p\<0.05 for the CDRS, though they did not reach statistical significance for the HAM-D (p = `r round(results_hamd_metareg_baseline[[1]][results_hamd_metareg_baseline[[1]]$condition == "psychotherapy_control", "p.value"], 3)`).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #### Let's start from the beginning and regress cohens on the baseline dataframe.
@@ -2437,14 +2437,71 @@ stab_sims <- stability_sims %>%
 print(stab_sims)
 
 ```
+The following tables still need some work including adding n
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #| label: tbl-cdrs-baseline
 #| tbl-cap: "CDRS Baseline Scores"
 #| tbl-cap-location: top
 
-flextable(results_cdrs_metareg_baseline[[1]])
-flextable(results_cdrs_metareg_baseline[[2]])
+# Prepare to tabulate
+
+# Regression results
+
+table_1_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[1]] %>%
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition))) %>% 
+  relocate("condition", .before = "term") %>% 
+  select(-c("term", "type"))
+
+flextable(table_1_cdrs_metareg_baseline) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  align(j = 2:ncol(table_1_cdrs_metareg_baseline), align = "center", part = "all") %>% 
+  align(j = 1, align = "left", part = "all") %>% 
+  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  line_spacing(space = .7, part = "all")
+
+table_2_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[2]] %>%
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition))) %>% 
+  relocate("condition", .before = "baseline_smds") 
+
+flextable(table_2_cdrs_metareg_baseline) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  align(j = 2:ncol(table_2_cdrs_metareg_baseline), align = "center", part = "all") %>% 
+  align(j = 1, align = "left", part = "all") %>% 
+  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  line_spacing(space = .7, part = "all")
 
 ```
 
@@ -2453,8 +2510,60 @@ flextable(results_cdrs_metareg_baseline[[2]])
 #| tbl-cap: "HAM-D Baseline Scores"
 #| tbl-cap-location: top
 
-flextable(results_hamd_metareg_baseline[[1]])
-flextable(results_hamd_metareg_baseline[[2]])
+table_1_hamd_metareg_baseline <- results_hamd_metareg_baseline[[1]] %>%
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition))) %>% 
+  relocate("condition", .before = "term") %>% 
+  select(-c("term", "type"))
+
+flextable(table_1_hamd_metareg_baseline) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  align(j = 2:ncol(table_1_hamd_metareg_baseline), align = "center", part = "all") %>% 
+  align(j = 1, align = "left", part = "all") %>% 
+  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  line_spacing(space = .7, part = "all")
+
+table_2_hamd_metareg_baseline <- results_hamd_metareg_baseline[[2]] %>%
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition))) %>% 
+  relocate("condition", .before = "baseline_smds") 
+
+flextable(table_2_hamd_metareg_baseline) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  align(j = 2:ncol(table_2_hamd_metareg_baseline), align = "center", part = "all") %>% 
+  align(j = 1, align = "left", part = "all") %>% 
+  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  line_spacing(space = .7, part = "all")
 
 ```
 
@@ -2463,7 +2572,31 @@ flextable(results_hamd_metareg_baseline[[2]])
 #| tbl-cap: "SMDs adjusted by baseline scores"
 #| tbl-cap-location: top
 
-flextable(df_mean_coefs_from_sim_adjusted_cohens_d)
+table_mean_coefs_from_sim_adjusted_cohens_d <- df_mean_coefs_from_sim_adjusted_cohens_d %>%
+  mutate(across(where(is.numeric), ~round(., 3))) %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition))) 
+
+flextable(table_mean_coefs_from_sim_adjusted_cohens_d) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  font(fontname = "Calibri", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  align(j = 2:ncol(table_mean_coefs_from_sim_adjusted_cohens_d), align = "center", part = "all") %>% 
+  align(j = 1, align = "left", part = "all") %>% 
+  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  line_spacing(space = .7, part = "all")
 
 ```
 
@@ -2650,14 +2783,6 @@ ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
   theme_minimal() +
   theme(legend.position = "none")
 
-# # Plot percentage baseline means
-# 
-# ggplot(df_long_for_metan, aes(x = group, y = perc_baseline_mean, color = group)) +
-#   geom_point(position = position_jitter(width = 0.2), size = 3) +
-#   scale_color_manual(values = group_colors) +
-#   labs(title = "Scatter plot of % baseline mean by group", x = NULL, y = "Percentage Baseline Mean") +
-#   theme_minimal() +
-#   theme(legend.position = "none")
 
 ```
 
