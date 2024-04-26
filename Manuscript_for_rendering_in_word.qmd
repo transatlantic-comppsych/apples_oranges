@@ -96,6 +96,8 @@ format:
     fig-height: 7
     fig_caption: yes
     tbl_caption: yes
+    numer-sections: true
+    tbl_align: left
 editor: visual
 bibliography: "emotion_concepts_paper.bib"
 font:
@@ -103,6 +105,7 @@ font:
 prefer-html: true
 fig-format: png
 fig-cap-location: top
+
 ---
 
 ## 
@@ -122,6 +125,7 @@ library(kableExtra)
 library(flextable)
 library(magrittr)
 library(officer)
+library(officedown)
 library(RefManageR)
 library(ftExtra)
 library(dplyr)
@@ -129,6 +133,8 @@ library(broom)
 
 # For referencing
 bib_data <- ReadBib("emotion_concepts_paper.bib")
+
+knitr::opts_chunk$set(tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bold = TRUE))
 
 ```
 
@@ -178,7 +184,7 @@ An inter-related issue concerns the nature of control interventions being used. 
 
 Understanding the nature of controls for each treatment modality is important for a similar reason. Often, in the public domain, psychotherapy and medication are compared to each other on the basis of their respective effect sizes. However, these effect sizes represent differences between the active intervention and the control condition (placebo or psychotherapy control). For these effect sizes to be comparable, placebo and psychotherapy controls ought to be the equal. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100% - 60% and another arose from a difference of 40% - 0%.
 
-In this paper, we examine randomised controlled trials (RCTs) of psychotherapy and medication for child and adolescent depression in the following ways. First, we compare key baseline characteristics of medication and psychotherapy trials, specifically the extent to which they are comparable in a) baseline severity of depression; b) percentage females vs males; c) mean age; and d) number of sites involved. Second, we determine the standardised mean differences of psychotherapy controls and medication controls using random effects metanalysis. Third, we examine the quality of psychotherapy control conditions by scrutinising the extent to which they are matched to the active intervention in ways such as number and frequency of sessions, and therefore, whether they represent fair pairings from which to draw valid efficacy inferences.
+In this paper, we examine randomised controlled trials (RCTs) of psychotherapy and medication for child and adolescent (mean age = 14.05, SE = 0.26) depression in the following ways. First, we compare key baseline characteristics of medication and psychotherapy trials, specifically the extent to which they are comparable in a) baseline severity of depression; b) percentage females vs males; c) mean age; and d) number of sites involved. Second, we determine the standardised mean differences of psychotherapy controls and medication controls using random effects metanalysis. Third, we examine the quality of psychotherapy control conditions by scrutinising the extent to which they are matched to the active intervention in ways such as number and frequency of sessions, and therefore, whether they represent fair pairings from which to draw valid efficacy inferences.
 
 # Method
 
@@ -216,7 +222,9 @@ We conducted a series of random effects meta-analyses and tested for subgroup di
 
 We also conducted a t-test to compare mean number of trial sites between psychotherapy and medication trials.
 
-### Measures of Effect
+### Trial efficacy
+
+#### Measures of Effect
 
 As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD).
 
@@ -244,7 +252,7 @@ For the purposes of metanalysis, it is necessary to estimate a standard error of
 
 <!-- for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses. -->
 
-### Random Effects Metaregression
+#### Random Effects Metaregression
 
 We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. 
 
@@ -1094,7 +1102,7 @@ coef_and_se_means_hamd_study <- left_join(coef_and_se_means_hamd_study, study_co
 
 The data for the studies included in this metanalysis are summarised in Supplementary Table 1 and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\].
 
-In total, there were `r length(unique(df_long_for_metan$new_study_id))` RCTs which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of antidepressant trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy RCTs Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. There were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD were missing and could not be imputed by any of the methods outlined above.
+In total, there were `r length(unique(df_long_for_metan$new_study_id))` RCTs which included `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == FALSE,]$n` control arms of medication trials; and `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == FALSE,]$n` active arms and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == FALSE,]$n` control arms from psychotherapy RCTs. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. For the meta-regression examining trial efficacy, there were also missing data for `r df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "medication_control"& df_count_studies$is_missing == TRUE,]$n`, `r df_count_studies[df_count_studies$condition == "psychotherapy_active"& df_count_studies$is_missing == TRUE,]$n`, and `r df_count_studies[df_count_studies$condition == "psychotherapy_control"& df_count_studies$is_missing == TRUE,]$n` trial arms for medication active, medication control, psychotherapy active, and psychotherapy control conditions respectively, as the data needed to calculate the SMD were missing and could not be imputed by any of the methods outlined above.
 
 Placebo pill was the control condition for all medication trials. In psychotherapy trials, the control arm included 14 WL controls, 25 care as usual and several other conditions such as 4 attention control conditions. All included trials and the types of treatment controls can be found in Table X in the Supplementary Materials.
 
@@ -1369,6 +1377,8 @@ met_age <- metagen(TE = mean_age,
 
 results_met_age <- extract_stats(met_age)
 
+met_age$seTE.random
+
 # Looking at clinical sample only
 
 clin_study_ids <-
@@ -1466,7 +1476,7 @@ small_border = fp_border(color="lightgray", width = 1)
 #| label: tbl-baseline_results
 #| tbl-cap: "Sample characteristics at baseline across medication and psychotherapy studies"
 #| tbl-cap-location: top
-knitr::opts_chunk$set(fp_text_default(bold = TRUE))
+
 df_overall_baseline_results %>% 
   mutate(category = case_when(
     row_number() %in% 1:9 ~ "Baseline Severity",
@@ -1495,7 +1505,6 @@ df_overall_baseline_results %>%
   hline(part = "header", border = big_border) %>% 
   # padding(i = 2, padding.bottom = 15, part = "header") %>% 
   line_spacing(space = .7, part = "all") %>% 
-  # set_table_properties(width = 1, layout = "autofit") %>% 
   autofit()
 
 ```
@@ -1605,7 +1614,7 @@ sites_t_test_stats <- sites_t_test_stats %>%
   mutate(p_value = ifelse(p_value < 0.001, "< 0.001", as.character(round(p_value, 3))))
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-sites-summary
 #| tbl-cap: "Number of sites across medication and psychotherapy studies"
 #| tbl-cap-location: top
@@ -1668,7 +1677,7 @@ print(plot_means_all)
 
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-coefs-overall
 #| tbl-cap: "Summary statistics of the estimated SMDs"
 #| tbl-cap-location: top
@@ -1725,11 +1734,11 @@ flextable(table_mean_coefs_from_sim) %>%
 
 In @tbl-results-overall, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. In particular, in this metaregression model, medication control is the reference category (termed intercept) to which all other categories of the dummy variable are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value ( `r sprintf("%.3e",(1-(pnorm(8.949921))))` ).
 
-```{r, warning=FALSE, message = FALSE, echo = FALSE}
+```{r, warning=FALSE, message = FALSE, echo = FALSE, ft.align="left"}
 #| label: tbl-results-overall
 #| tbl-cap: "Results from metaregression with overall sample"
 #| tbl-cap-location: top
-
+fp_text
 table_aggregate_results_overall <- aggregate_results_overall[, 1:6]
 
 flextable(table_aggregate_results_overall) %>%
@@ -2066,7 +2075,7 @@ control_summary <- control_summary %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-intensity-of-int
 #| tbl-cap: "Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
 #| tbl-cap-location: top
@@ -2149,7 +2158,7 @@ control_summary_t_tests <- control_summary_t_tests %>%
 
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-t-tests-intensity
 #| tbl-cap: "Results for t-tests Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
 #| tbl-cap-location: top
@@ -2224,7 +2233,7 @@ In summary, our data give cause for consternation about the state of the evidenc
 
 # Supplementary Materials
 
-## Systematic review
+## Systematic review search terms and PRISMA chart
 
 We conducted a systematic search for medication studies published from 31 May 2015 up to 1 Jan 2021 (i.e. after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers et al's (2023) review). We searched PubMed, the Cochrane Central Register of Controlled Trials, Embase, Web of Science, CINAHL, PsycINFO and LiLACS for randomised controlled trials (RCTs) comparing any antidepressant with placebo in the treatment of children and adolescents with a primary diagnosis of major depressive disorder. We used the same search terms as Cipriani (2016) with one additional search term to include only placebo-controlled trials (see below). We additionally applied filters to specify our date range, and to exclude reviews and non-human studies. We also searched clinical trial registers for published and unpublished studies however all RCTs meeting inclusion criteria had already been identified from the database search outlined above. Please see @fig-prisma for the PRISMA flow diagram. We used Covidence, an online software tool, to manage our systematic review.
 
@@ -2239,7 +2248,7 @@ Explicit search strategy: title/abstract = (depress* or dysthymi\* or "mood diso
 knitr::include_graphics("PRISMA.png")
 ```
 
-## Statistical Analysis (including formalisms)
+## Full description of statistical analysis (including formalisms)
 
 ### Trial and sample characteristics
 
@@ -2261,7 +2270,9 @@ where $\text{SD}_{X}$ is the original standard deviation of the mean at baseline
 
 We also conducted a t-test to compare mean number of trial sites between psychotherapy and medication trials.
 
-### Measures of Effect
+### Trial efficacy
+
+#### Measures of Effect
 
 As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD), which we defined following [@lakensCalculatingReportingEffect2013, @cummingUnderstandingNewStatistics2013] as:
 
@@ -2281,7 +2292,7 @@ $$r_{t_{1}t_{2}} \sim \mathcal{TN}(\mu, \sigma, a, b)$$
 
 for which we chose the mean to be $\mu = 0.65$, the standard deviation to be $\ sigma = 0.2$, and the upper and lower bounds to be $a = 0.45$ and $b = 0.9$, respectively. We then used these simulated datasets in the subsequent metanalyses.
 
-### Random Effects Metaregression
+#### Random Effects Metaregression
 
 We estimated the pooled standardised mean difference for each arm by using a random effects metanalysis implemented in R's metafor package. The main underlying assumption of random effects metanalysis is that each study's true effect size $\theta_{k}$ is affected not only by sampling error $\epsilon_{k}$, but also by $\zeta$ which represents heterogeneity between studies, allowing each study's estimate to vary along a distribution of effects, and the distribution of true effect sizes termed $\tau^2$. Therefore, we can estimate a two stage model with:
 
@@ -2335,6 +2346,7 @@ We present the SMDs of each level of the dummy variable of the four treatment ar
 #| label: fig-plot-means-no-wl
 #| fig-cap: "Metanalytic estimates of within-group changes: wl excluded"
 #| fig-cap-location: top
+#| fig-title: Figure S
 
 coef_and_se_means_no_wl <- coef_and_se_means_no_wl %>%
   mutate(condition = case_when(
@@ -2376,7 +2388,6 @@ print(plot_means_clin)
 # dev.off()
 
 ```
-
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #| label: fig-plot-means-cdrs
 #| fig-cap: "Metanalytic estimates of within-group changes: CDRS studies only"
@@ -2468,7 +2479,7 @@ print(stab_sims)
 ```
 The following tables still need some work including adding n
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-cdrs-baseline
 #| tbl-cap: "CDRS Baseline Scores"
 #| tbl-cap-location: top
@@ -2546,7 +2557,7 @@ flextable(table_1_cdrs_metareg_baseline) %>%
 
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-hamd-baseline
 #| tbl-cap: "HAM-D Baseline Scores"
 #| tbl-cap-location: top
@@ -2624,7 +2635,7 @@ flextable(table_1_hamd_metareg_baseline) %>%
 
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-adj-smds
 #| tbl-cap: "SMDs adjusted by baseline scores"
 #| tbl-cap-location: top
