@@ -97,7 +97,6 @@ format:
     fig_caption: yes
     tbl_caption: yes
     numer-sections: true
-    tbl_align: left
 editor: visual
 bibliography: "emotion_concepts_paper.bib"
 font:
@@ -125,7 +124,6 @@ library(kableExtra)
 library(flextable)
 library(magrittr)
 library(officer)
-library(officedown)
 library(RefManageR)
 library(ftExtra)
 library(dplyr)
@@ -134,8 +132,9 @@ library(broom)
 # For referencing
 bib_data <- ReadBib("emotion_concepts_paper.bib")
 
+```
+```{r global_options, include=FALSE}
 knitr::opts_chunk$set(tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bold = TRUE))
-
 ```
 
 # Introduction
@@ -1377,8 +1376,6 @@ met_age <- metagen(TE = mean_age,
 
 results_met_age <- extract_stats(met_age)
 
-met_age$seTE.random
-
 # Looking at clinical sample only
 
 clin_study_ids <-
@@ -1472,7 +1469,7 @@ small_border = fp_border(color="lightgray", width = 1)
 
 ```
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-baseline_results
 #| tbl-cap: "Sample characteristics at baseline across medication and psychotherapy studies"
 #| tbl-cap-location: top
@@ -1738,7 +1735,7 @@ In @tbl-results-overall, we present the regression that tests our hypothesis abo
 #| label: tbl-results-overall
 #| tbl-cap: "Results from metaregression with overall sample"
 #| tbl-cap-location: top
-fp_text
+
 table_aggregate_results_overall <- aggregate_results_overall[, 1:6]
 
 flextable(table_aggregate_results_overall) %>%
@@ -2477,7 +2474,7 @@ stab_sims <- stability_sims %>%
 print(stab_sims)
 
 ```
-The following tables still need some work including adding n
+
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 #| label: tbl-cdrs-baseline
@@ -2678,18 +2675,18 @@ flextable(table_mean_coefs_from_sim_adjusted_cohens_d) %>%
 # Plots  -----------------------
 
 #define groups
-df_long_for_metan <- df_long_for_metan %>%
-  mutate(
-    group = case_when(
-      psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
-      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
-      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
-      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
-      TRUE ~ NA_character_
-    )
-  )
-
-group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
+# df_long_for_metan <- df_long_for_metan %>%
+#   mutate(
+#     group = case_when(
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "Medication Active",
+#       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "Medication Control",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "Psychotherapy Active",
+#       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "Psychotherapy Control",
+#       TRUE ~ NA_character_
+#     )
+#   )
+# 
+# group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "deeppink4", "Psychotherapy Active" = "steelblue1", "Psychotherapy Control" = "steelblue3")
 
 # # Scatter plot cohens d per arm
 # 
@@ -2707,21 +2704,21 @@ group_colors <- c("Medication Active" = "deeppink1", "Medication Control" = "dee
 #   theme(legend.position = "none")
 
 # Box plot Cohens d by group
-
-ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
-  geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
-  scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
-  geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2,
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
-  geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5,
-               arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
-  scale_fill_manual(values = group_colors) +
-  labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# 
+# ggplot(df_long_for_metan, aes(x = group, y = cohens_d, fill = group)) +
+#   geom_boxplot(outlier.shape = NA, position = position_dodge(0.8), color = "black", alpha = 0.5) +
+#   scale_y_continuous(limits = c(-3.5, 1), breaks = seq(-4, 1, by = 1)) +
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey", size = 1) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -2.5, yend = -2,
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -2.2, label = "Less Effective", color = "grey", vjust = 0, hjust = .2) +
+#   geom_segment(x = 4.5, xend = 4.5, y = -3, yend = -3.5,
+#                arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = "Psychotherapy Control", y = -3.2, label = "More Effective", color = "grey", vjust = 0, hjust = .2) +
+#   scale_fill_manual(values = group_colors) +
+#   labs(title = "Box plot of cohens_d by group", x = "Group", y = "Cohen's d") +
+#   theme_minimal() +
+#   theme(legend.position = "none")
 
 
 ```
