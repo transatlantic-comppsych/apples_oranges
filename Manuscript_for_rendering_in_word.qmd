@@ -1,6 +1,6 @@
 ---
-title: "Fundamental Problems with Child and Adolescent Depression Treatments"
-subtitle: "A Quantitative Reappraisal of the Evidence Base"
+title: "Revisiting Child and Adolescent Depression Treatments"
+subtitle: "A Quantitative Critique of the Evidence Base"
 author:
   - name: Argyris Stringaris
     email: a.stringaris@ucl.ac.uk
@@ -139,13 +139,13 @@ knitr::opts_chunk$set(tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bo
 
 # Introduction
 
-Should a child or an adolescent receive psychotherapy or medication for their depression, and what information should patients, carers and clinicians use to decide? 
+Should a child or an adolescent receive psychotherapy or medication for their depression, and what information should be used to guide decision-making? 
 
-This question is particularly difficult to answer as there are limited data from head-to-head trials of medication and psychotherapy for adolescent depression, and hence recommendations must be derived from indirect comparisons of treatment efficacy. The internationally influential UK National Institute of Health and Care Excellence (NICE) guidelines for adolescent depression recommend that youth are first offered psychological therapy (specifically cognitive behaviour therapy (CBT) or interpersonal therapy (IPT)) over medication for most presentations of depression [@niceDepressionChildrenYoung2023]. This conclusion is in keeping with two sources of evidence: meta-analyses of medication trials that cast doubt on the efficacy of most antidepressants, with the exception of fluoxetine, for child and adolescent depression [@ciprianiComparativeEfficacyTolerability2016]; and meta-analyses of psychotherapy trials that conclude psychotherapy to be efficacious for child and adolescent depression [@cuijpersEffectsPsychologicalTreatments2021]. However, such conclusions seem at odds with those of a recent network meta-analysis (NMA) [@zhouComparativeEfficacyAcceptability2020], an established method of comparing treatments using both direct and indirect (i.e. treatment A with treatment C, via studies that directly compare A with B and B with C) evidence. Indeed, this NMA concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than medication control (i.e. pill placebo) or psychotherapy controls. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make treatment decisions?
+For adolescent depression, there are limited data from head-to-head trials of medication and psychotherapy, and hence recommendations must be derived from indirect comparisons of treatment efficacy. The UK National Institute of Health and Care Excellence (NICE) guidelines for adolescent depression recommend that youth are first offered psychological therapy (specifically cognitive behaviour therapy (CBT) or interpersonal therapy (IPT)) over medication in most cases [@niceDepressionChildrenYoung2023]. This is in keeping with two sources of evidence relating to child and adolescent depression: meta-analyses of medication randomised controlled trials (RCTs) that cast doubt on the efficacy of antidepressants, with the exception of fluoxetine [@ciprianiComparativeEfficacyTolerability2016]; and meta-analyses of psychotherapy RCTs that conclude psychotherapy to be efficacious [@cuijpersEffectsPsychologicalTreatments2021]. However, a recent network meta-analysis (NMA) [@zhouComparativeEfficacyAcceptability2020], an established method of comparing treatments using both direct and indirect (i.e. treatment A with treatment C, via studies that directly compare A with B and B with C) evidence, concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than medication control (i.e. pill placebo) or psychotherapy controls. The only head-to-head RCT comparing modalities found that fluoxetine, alone and in combination with CBT, was superior to pill placebo, though CBT alone was not [@marchFluoxetineCognitiveBehavioralTherapy2004]. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make treatment decisions?
 
-In this paper, we examine whether the existing evidence base for adolescent depression treatment can offer valid answers to this question. We provide a conceptual framework for answering such questions and test a series of hypotheses using data from existing trials. Two points are crucial to indirect comparisons of treatment modalities with each other. First, whether the participants of trials in one modality are comparable to those in another modality. Second, whether key conditions of the trial, such as the effects of control conditions or the number of sites involved, are comparable.
+In this paper, we examine whether the existing evidence for adolescent depression treatment can offer valid answers to this question. We provide a conceptual framework and test a series of hypotheses using data from existing trials. Two points are crucial to indirect comparisons of treatment modalities. First, whether the participants of trials in one modality are comparable to those in another modality. Second, whether key conditions of the trial, such as the effects of control conditions or the number of sites involved, are comparable.
 
-Starting with the first point, to compare between different trials one must assume that these trials sample from the same population. If they do not, then the validity of any comparisons, including those conducted through NMA (which rests on the principal of transitivity, i.e. the requirement that the different sets of randomized trials are similar on average [@chaimaniChapter11Undertaking2023]) are questionable. We provide a more formal account of this in the Supplement.
+Starting with the first point, comparison between different trials assumes that they sample from the same population. If not, the validity of any comparisons, including those conducted through NMA (which rests on the principal of transitivity, i.e. the requirement that the different sets of randomized trials are similar on average [@chaimaniChapter11Undertaking2023]) are questionable (see Supplement for further details). 
 
 <!-- Indeed, comparing outcomes (Y) between psychotherapy and medication trials requires us to contrast what is called the sample average treatment effect $\tau$ of each, defined in the following way: -->
 
@@ -169,17 +169,17 @@ Starting with the first point, to compare between different trials one must assu
 
 <!-- signifying that the effect found in the population would be expected to be found in the same population for each treatment. -->
 
-This assumption that medication and psychotherapy trials sample from the same population may be hard to meet. Clinical experience and empirical evidence indicate that patients and parents often have preferences between psychotherapy and medication [@jaycoxAdolescentPrimaryCare2006; @langerParentYouthPreferences2021; @mchughPatientPreferencePsychological2013], meaning that there is likely to be a self-selection bias in who participates in psychotherapy and medication trials. Moreover, these treatment preferences correlate with clinically-relevant characteristics of the participants, including severity and sex. Some of these characteristics, particularly baseline severity, may moderate treatment response [@courtneyPredictorsModeratorsMediators2022; @lorenzo-luacesDoubleTroubleSymptom2020] and therefore, if they differ across psychotherapy and medication trials, they may confound comparisons.
+The assumption that medication and psychotherapy trials sample from the same population may not be valid as patients and parents often have treatment preferences [@jaycoxAdolescentPrimaryCare2006; @langerParentYouthPreferences2021; @mchughPatientPreferencePsychological2013], meaning that there is likely to be a self-selection bias in who participates in psychotherapy and medication trials. Moreover, treatment preferences correlate with clinically-relevant characteristics of the participants, including severity and sex. Some of these characteristics, such as severity, may moderate treatment response [@courtneyPredictorsModeratorsMediators2022; @lorenzo-luacesDoubleTroubleSymptom2020] and therefore, if they differ across psychotherapy and medication trials, they may confound comparisons.
 
-In terms of the second point, differences in trial design may impact outcomes in a differential way between medication and psychotherapy trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. Most obviously, participants in psychotherapy trials are unblinded to treatment allocation, with the exception perhaps of trials that compare two equally plausible treatment arms [@calvoInterventionAdolescentsEarlyOnset2014]. By contrast, in new antidepressant trials, patients (and raters) were largely unable to judge treatment allocation [@linAssessmentBlindingRandomized2022]. This creates differential expectations between medication and psychotherapy trials. Importantly, pill-placebo has been developed as the standard medication control in order to match as closely as possible the intervention condition, so as to minimise differences in expectancy between conditions. By contrast, psychotherapy control arms vary across waitlist controls (WL), treatment as usual (TAU), and active controls. Differences in expectation may favour the psychotherapy active condition and disadvantage the psychotherapy control (thus potentially magnifying the difference between them). This is because of what has been aptly described as "disappointment bias" [@reltonEthicsTrialsCohorts2017], where participants in the active condition are content for receiving the "cutting edge treatment" whilst those in the control are dissatisfied for having missed out on "proper treatment". Expectancy is substantially associated with treatment outcomes [@constantinoExpectations2011]. If expectancy effects are different for psychotherapy controls and pill placebo, comparisons between them, including in NMA, become questionable.
+In terms of the second point, differences in trial design may impact outcomes in a differential way between medication and psychotherapy trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. Most obviously, participants in psychotherapy trials are unblinded to treatment allocation, with the exception perhaps of trials that compare two equally plausible treatment arms [@calvoInterventionAdolescentsEarlyOnset2014]. This creates differential expectations which may favour the psychotherapy active condition and disadvantage the psychotherapy control; participants in the active condition are content to be receiving the “cutting edge” treatment whilst those in the control are dissatisfied for having missed out (i.e. “disappointment bias” [@reltonEthicsTrialsCohorts2017]. By contrast, in new antidepressant trials, patients (and raters) were largely unable to judge treatment allocation [@linAssessmentBlindingRandomized2022], suggesting that expectancy effects are well-matched across conditions. Since expectancy is substantially associated with treatment outcomes [@constantinoExpectations2011], if expectancy differs between medication and psychotherapy trials, comparisons between them, including in NMA, become questionable.
 
-Another difference in design is the number of trial sites. Previous research has shown that in medication trials the number of sites is positively related to the magnitude of the placebo response [@bridgePlaceboResponseRandomized2009; @dechartresSingleCenterTrialsShow2011]. This phenomenon may be due to lower quality of assessments in trials with more sites, with higher rates of classification errors, entailing higher rates of spontaneous remission or regression to the mean. It is therefore important to examine whether this basic trial design feature differs between medication and psychotherapy trials.
+Another difference in design is the number of trial sites. Previous research has shown that the number of sites in medication trials is positively related to the magnitude of placebo response [@bridgePlaceboResponseRandomized2009; @dechartresSingleCenterTrialsShow2011]. This phenomenon may be due to lower quality of assessments in trials with more sites, with higher rates of classification errors, entailing higher rates of apparent spontaneous remission or regression to the mean. 
 
-An inter-related issue concerns the nature of control interventions being used. Control conditions in trials are meant to generate counterfactual conditions [@guoChapterCounterfactualFramework2014] to the intervention: what would have been the outcome in an individual had they not received the intervention, with all else being equal. A pill placebo condition, where the appearance of the drug is faithfully emulated, is an effort for all else to be equal. The question is whether psychotherapy trials make a similar effort: are for example the number of hours of contact with a human comparable between active and control arms in psychotherapy trials?
+An inter-related issue concerns the effect of control conditions. Often, in the public domain, psychotherapy and medication are compared to each other on the basis of their respective effect sizes. However, these effect sizes represent differences between the active intervention and the control condition for each modality. For these effect sizes to be comparable, placebo and psychotherapy controls ought to be equal in their effects. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100%-60% and another arose from a difference of 40%-0%.
 
-Understanding the nature of controls for each treatment modality is important for a similar reason. Often, in the public domain, psychotherapy and medication are compared to each other on the basis of their respective effect sizes. However, these effect sizes represent differences between the active intervention and the control condition for each modality. For these effect sizes to be comparable, placebo and psychotherapy controls ought to be equal in their effects. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100%-60% and another arose from a difference of 40%-0%.
+Additionally, control conditions in RCTs should generate counterfactual conditions to the intervention [@guoChapterCounterfactualFramework2014]: what would have been the outcome had an individual not received the intervention, with all else being equal. A pill placebo condition, where the appearance of the drug is faithfully emulated, is an effort for all else to be equal. In psychotherapy trials, control conditions may not be so well matched to the intervention (e.g. with respect to number of hours of therapist contact).
 
-In this study we examine randomised controlled trials (RCTs) of psychotherapy and medication for child and adolescent depression (mean age 4-18 years). We hypothesise that there are substantial differences between these modalities, which we examine in the following ways. First, we conduct meta-analyses to compare sample characteristics of medication and psychotherapy trials including a) baseline severity of depression; b) percentage females; and c) mean age. Second, we examine trial characteristics including the efficacy of the control arms, where we determine the standardised mean differences of psychotherapy controls and medication controls using random effects meta-regression, and the number of trial sites. Third, we examine the quality of psychotherapy control conditions by scrutinising the extent to which they are matched to the active intervention in ways such as number and frequency of sessions, and hence whether they represent fair pairings from which to draw valid efficacy inferences.
+In this study we examine RCTs of psychotherapy and medication for child and adolescent depression (mean age 4-18 years). We hypothesise that there are substantial methodological differences between psychotherapy and medication RCTs, making comparisons problematic, and we examine this in the following ways. First, we conduct meta-analyses to compare sample characteristics of medication and psychotherapy trials including: a) baseline severity of depression; b) percentage females; and c) mean age. Second, we examine trial characteristics including the efficacy of the control arms, using random effects meta-regression, and the number of trial sites. Third, we examine the quality of psychotherapy control conditions by scrutinising the extent to which they are matched to the active intervention in ways such as number and frequency of sessions, and hence whether they represent fair pairings from which to draw valid efficacy inferences.
 
 # Method
 
@@ -189,15 +189,15 @@ A more detailed description of our methods, including the formalisms on which an
 
 ## Included studies
 
-We drew upon RCTs included in two recent comprehensive meta-analyses for each medication and psychotherapy with open data available, and supplemented them with an updated systematic review. Psychotherapy studies were drawn from a meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021] (dataset available [here](https://www.metapsy.org/)). Medication studies were drawn from a NMA examining the efficacy of antidepressants and placebo for major depressive disorder in children and adolescents [@ciprianiComparativeEfficacyTolerability2016]. We were unable to access the full dataset used in this NMA and hence completed extraction from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and complete extraction for one RCT (Almeida-Montes et al., 2005). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
+We included RCTs identified in a recent meta-analysis of psychotherapy versus control [@cuijpersEffectsPsychologicalTreatments2021] and an NMA examining the efficacy of antidepressants [@ciprianiComparativeEfficacyTolerability2016] for depression in children and adolescents. For the psychotherapy trials, we utilised open data from the previous meta-analysis (see [here](https://www.metapsy.org/)). For medication trials, we were unable to access the full dataset used in the NMA and hence extracted data from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and complete extraction for one RCT (Almeida-Montes et al., 2005). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
 
-We conducted a systematic search for medication studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers et al's (2021) review to ensure we analysed an equivalently up-to-date database of medication trials. Please see the Supplement for further details. Seven studies met inclusion criteria and data extraction was completed for these papers.
+For medication trials, we also conducted a systematic search for studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers et al's (2021) review to ensure we analysed an equivalently up-to-date database of medication trials. Two authors screened 450 titles and abstracts, and 38 full text records. Seven studies met inclusion criteria and one author completed data extraction for these papers. See @fig-prisma in the Supplement for PRISMA diagram.
 
 ## Statistical Analysis
 
 ### Sample characteristics
 
-We conducted a series of random effects meta-analyses and tested for subgroup differences between psychotherapy and medication trials in sample characteristics including severity of depressive symptoms at baseline, sex and age. Meta-analyses were implemented using R's meta package (version 7.0-0).
+We conducted a series of random effects meta-analyses and tested subgroup differences (psychotherapy vs medication trials) in severity of depressive symptoms at baseline, sex and age. Meta-analyses were implemented using R's meta package (version 7.0-0).
 
 <!-- In order to compare depression severity across the variety of instruments the studies used, we performed a min-max normalisation to turn each study arm mean score at baseline into a percentage using the following formalism: -->
 
@@ -328,7 +328,7 @@ Finally, we examined whether differential regression to the mean may account for
 
 ### Comparing the control and active arms of psychotherapy trials
 
-We ran t-tests to compare the active and control arms of psychotherapy trials on key variables of interest regarding the intensity of the interventions. We extracted data pertaining to the number, duration and intensity of sessions, and the total cumulative hours and duration of the intervention. 
+We ran t-tests to compare the active and control arms of psychotherapy trials on key variables of interest regarding the intensity of the interventions: the number, duration and intensity of sessions, and the total cumulative hours and duration of the intervention. 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #############Some custom made functions#############
@@ -1093,7 +1093,7 @@ The data for the studies included in this meta-analysis are summarised in @tbl-a
 
 In total, there were `r length(unique(df_long_for_metan$new_study_id))` RCTs which included `r sum(df_count_studies[df_count_studies$condition == "medication_active", "n"])` active arms and `r sum(df_count_studies[df_count_studies$condition == "medication_control", "n"])` control arms of medication trials; and `r sum(df_count_studies[df_count_studies$condition == "psychotherapy_active", "n"])` active arms and `r sum(df_count_studies[df_count_studies$condition == "psychotherapy_control", "n"])` control arms from psychotherapy RCTs. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm. 
 
-Placebo pill was the control condition for all medication trials. In psychotherapy trials, the control arm included 14 WL, 25 TAU, and 19 other control conditions. 
+Placebo pill was the control condition for all medication trials. In psychotherapy trials, the control arm included 14 waitlist, 25 treatment-as-usual (TAU), and 19 other control conditions (e.g. relaxation training, attention control, counselling). 
 
 ## Sample characteristics at baseline in medication and psychotherapy trials
 
@@ -1492,14 +1492,14 @@ df_overall_baseline_results %>%
   hline(part = "header", border = big_border) %>% 
   # padding(i = 2, padding.bottom = 15, part = "header") %>% 
   line_spacing(space = .7, part = "all") %>% 
-  add_footer_row(values = as_paragraph("*To take an example, the CDRS gives a possible total score from 17 to 113 (i.e. range of 96). Mean severity was 0.36 for psychotherapy studies and 0.42 for medication studies, which would translate to 51.56 (17 + 0.36 x 96) and 57.32 (17 + 0.42 x 96), respectively, as equivalent scores on the CDRS."), colwidths = 8) %>%
+  add_footer_row(values = as_paragraph("*These are baseline depression scores transformed to reflect percentage of a scale range (see Supplement for detailed description).To take an example, the CDRS gives a possible total score from 17 to 113 (i.e. range of 96). Mean severity was 0.36 for psychotherapy studies and 0.42 for medication studies, which would translate to 51.56 (17 + 0.36 x 96) and 57.32 (17 + 0.42 x 96), respectively, as equivalent scores on the CDRS."), colwidths = 8) %>%
   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
   autofit()
 
 ```
 ### Baseline severity
 
-On average, severity of depressive symptoms at baseline was significantly higher in medication trials compared to psychotherapy trials. The statistics provided in @tbl-baseline_results are baseline depression scores transformed to reflect percentage of a scale range (see Supplement for detailed description). When excluding RCTs that used waitlist as their control, baseline severity remained significantly higher in medication trials compared to psychotherapy trials. This difference did not reach statistical significance when excluding studies that recruited samples with sub-clinical depression.
+On average, severity of depressive symptoms at baseline was significantly higher in medication trials compared to psychotherapy trials (see @tbl-baseline_results). When excluding RCTs that used waitlist as their control, baseline severity remained significantly higher in medication trials compared to psychotherapy trials. This difference did not reach statistical significance when excluding studies that recruited samples with sub-clinical depression.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # looking at CDRS studies only, this is with only 2 levels 
@@ -1541,72 +1541,7 @@ met_sev_hamd <- metagen(TE = baseline_overall,
                            tau.common = FALSE)
 
 results_met_sev_hamd <- extract_stats(met_sev_hamd)
-
-# tabulate 
-
-# For row names
-results_met_sev_cdrs <- results_met_sev_cdrs %>%
-  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
-
-# Define new column names
-new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
-
-# Assign new column names to the data frame
-colnames(results_met_sev_cdrs) <- new_column_names
-
-# Rounding
-results_met_sev_cdrs <- results_met_sev_cdrs %>%
-  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
-  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) 
-
-results_met_sev_cdrs %>% 
-  as_flextable() %>% 
-  align(j = 2:ncol(results_met_sev_cdrs), align = "center", part = "all") %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
-  border_remove() %>% # this is to remove borders that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  line_spacing(space = .7, part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  autofit()
-
-# now for the ham-d
-# For row names
-results_met_sev_hamd <- results_met_sev_hamd %>%
-  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
-
-# Define new column names
-new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
-
-# Assign new column names to the data frame
-colnames(results_met_sev_hamd) <- new_column_names
-
-# Rounding
-results_met_sev_hamd <- results_met_sev_hamd %>%
-  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
-  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) 
-
-results_met_sev_hamd %>% 
-  as_flextable() %>% 
-  align(j = 2:ncol(results_met_sev_hamd), align = "center", part = "all") %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
-  border_remove() %>% # this is to remove borders that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  line_spacing(space = .7, part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  autofit()
-
 ```
-
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 ## this is for four levels
@@ -1659,9 +1594,7 @@ results_hamd_metareg_baseline[[2]] <- left_join(results_hamd_metareg_baseline[[2
 
 ```
 
-To ensure that this was not an artefact of variable transformation, we also compared means at baseline in the two instruments, CDRS-R and HAM-D, on which there was a sufficient number of studies to metanalyse. As can be seen in @tbl-cdrs-baseline and @tbl-hamd-baseline (see Supplementary Materials), the baseline scores in medication studies were on average substantially higher than psychotherapy studies for the CDRS and the HAM-D. The differences between medication control and psychotherapy control arms were significant at p\<0.05 for the CDRS and HAM-D.
-
-**still working on the 2 v 4 level analysis**
+To ensure that this was not an artefact of variable transformation, we also compared means at baseline in the two instruments, CDRS-R and HAM-D, on which there was a sufficient number of studies to metanalyse. As can be seen in @tbl-hamd-baseline and @tbl-cdrs-baseline (see Supplementary Materials), the number of studies is much smaller, but the pattern of differences is the same for the HAM-D and the CDRS, though it does not reach statistical significance for the latter.
 
 ### Sex
 
@@ -1734,7 +1667,7 @@ print(plot_means_all)
 
 ```
 
-In @tbl-results-overall, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. Here, medication control is the reference category (termed intercept) to which all other categories are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value` , which yields a very low p-value (<0.0001).
+In @tbl-results-overall, we present the regression that tests our hypothesis about differences between medication and psychotherapy controls. Here, medication control is the reference category to which all others are compared. The strongest difference between arms, as judged by the z-value, is between the psychotherapy and medication controls with a z-value `r round(aggregate_results_overall[aggregate_results_overall$condition == "psychotherapy_control", ]$z_value, 2)` (p<0.0001).
 
 ```{r, warning=FALSE, message = FALSE, echo = FALSE, ft.align="left"}
 #| label: tbl-results-overall
@@ -1789,7 +1722,7 @@ flextable(table_aggregate_results_overall) %>%
 
 ##### Sensitivity analyses
 
-We then conducted a series of sensitivity analyses of our results (all figures can be found in the Supplementary Materials). First, we analysed the data after excluding WL control studies, which yielded a pattern of results is very similar to that of the overall analyses (see @fig-plot-means-no-wl). Secondly, we analysed the data after excluding sub-clinical studies, which again yielded a similar pattern of results (see @fig-plot-means-clin). Thirdly, we examined the data including only those studies that used the CDRS (see @fig-plot-means-cdrs) or the HAM-D (see @fig-plot-means-hamd). Medication control and psychotherapy control conditions remained significantly different, however the small number of studies using each of these instruments resulted in less precise meta-analytic estimates of the SMDs. Finally, we showed different values for the pre-post measure correlation had minimal effect on the estimated outcomes (see @fig-stab-sims).
+We  conducted a series of sensitivity analyses (all figures can be found in the Supplementary Materials). First, we analysed the data after excluding waitlist control studies, which yielded a pattern of results is very similar to that of the overall analyses (see @fig-plot-means-no-wl). Second, we analysed the data after excluding sub-clinical studies, which again yielded a similar pattern of results (see @fig-plot-means-clin). Third, we examined the data including only those studies that used the CDRS (see @fig-plot-means-cdrs) or the HAM-D (see @fig-plot-means-hamd). Medication control and psychotherapy control conditions remained significantly different, however the small number of studies using each of these instruments resulted in less precise meta-analytic estimates of the SMDs. Finally, we showed different values for the pre-post measure correlation had minimal effect on the estimated outcomes (see @fig-stab-sims).
 
 ##### Addressing Regression to the Mean
 
@@ -1996,7 +1929,7 @@ sites_t_test_stats <- sites_t_test_stats %>%
 
 ```
 
-Average number of trial sites was significantly higher across medication studies (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test_stats$p_value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies.
+Average number of trial sites was significantly higher in medication trials (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test_stats$p_value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies.
 
 ## Comparing the nature and intensity of control conditions in psychotherapy trials
 
@@ -2298,7 +2231,7 @@ First, medication trials are vastly more likely to be multi-site than their psyc
 
 Second, psychotherapy controls have moderate effect size (-0.5) whereas pill-placebo has very large effect size (-1.9). Our analysis could be critiqued as it relies on comparing the within arm symptom change of each trial taken out of randomization, which is generally ill advised. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving the randomization (in order to balance confounders) is critical. However, we note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomization structure. More importantly, we do not make the claim with our analyses that these differences are genuinely due to efficacy differences; they may well be because of the fact that the people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences concerning the comparison of the two modalities. This is all the more so as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings. Our results make obvious that comparing treatments based on the effect sizes of each modality (relative to their respective control arms) is misleading.
 
-Moving beyond comparison between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An optimal control condition is one where the treatment differs but everything else is equal. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other very basic conditions of the "all else is equal" assumption. Most (`r round(type_counts$wl_cau_percentage[1], 2)`%) of psychotherapy RCT control conditions are either WL or TAU, both of which are very likely to create negative expectations for participants not randomized to treatment. Thus, the comparison is not between treatment and no treatment, but rather treatment and the poor luck of being randomized to waiting. But we also find that even psychological controls were unreasonable counterfactuals. In order to test that a psychological treatment is effective per se (e.g. because of the cognitive techniques the therapist deploys) rather than because of generic effects (e.g. pleasant human contact), aspects such as human contact time should be matched. We find that there are vast differences between treatment and control arms in psychotherapy trials which may lead to an inflation of the true efficacy of psychological treatments.
+Moving beyond comparison between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An optimal control condition is one where the treatment differs but everything else is equal. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other very basic conditions of the "all else is equal" assumption. Most (`r round(type_counts$wl_cau_percentage[1], 2)`%) of psychotherapy RCT control conditions are either waitlist or TAU, both of which are very likely to create negative expectations for participants not randomized to treatment. Thus, the comparison is not between treatment and no treatment, but rather treatment and the poor luck of being randomized to waiting. But we also find that even psychological controls were unreasonable counterfactuals. In order to test that a psychological treatment is effective per se (e.g. because of the cognitive techniques the therapist deploys) rather than because of generic effects (e.g. pleasant human contact), aspects such as human contact time should be matched. We find that there are vast differences between treatment and control arms in psychotherapy trials which may lead to an inflation of the true efficacy of psychological treatments.
 
 Given all of the above, the certainty with which guidelines recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have a number of profound implications for patients, their families, clinicians and policy makers and we list these below.
 
@@ -2646,160 +2579,223 @@ print(stab_sims)
 
 ```
 
-
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-cdrs-baseline
-#| tbl-cap: "CDRS Baseline Scores"
+#| label: tbl-hamd-baseline
+#| tbl-cap: "HAM-D Baseline Scores across Psychotherapy and Medication RCTs"
 #| tbl-cap-location: top
 
-# Prepare to tabulate
+# now for the ham-d
+# For row names
+results_met_sev_hamd <- results_met_sev_hamd %>%
+  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
 
-table_2_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[2]] %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>%
-  relocate("condition", .before = "baseline_smds") %>%
-  relocate("n", .before = "baseline_smds") %>%
-  relocate("lower_cis_smds", .before = "upper_cis_smds")
-
-new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
 
 # Assign new column names to the data frame
-colnames(table_2_cdrs_metareg_baseline) <- new_column_names
+colnames(results_met_sev_hamd) <- new_column_names
 
-flextable(table_2_cdrs_metareg_baseline) %>%
-  set_table_properties(width = 1) %>%
-  autofit() %>%
-  font(fontname = "Calibri", part = "all") %>%
+# Rounding
+results_met_sev_hamd <- results_met_sev_hamd %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) 
+
+results_met_sev_hamd %>% 
+  as_flextable() %>% 
+  align(j = 2:ncol(results_met_sev_hamd), align = "center", part = "all") %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-  border_remove() %>% # this is to remove borders around the caption that look strange
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
+  border_remove() %>% # this is to remove borders that look strange
   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>%
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>%
-  # padding(i = 2, padding.bottom = 15, part = "header") %>%
-  align(j = 2:ncol(table_2_cdrs_metareg_baseline), align = "center", part = "all") %>%
-  align(j = 1, align = "left", part = "all") %>%
-  paginate(init = TRUE, hdr_ftr = TRUE) %>%
-  line_spacing(space = .7, part = "all")
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  line_spacing(space = .7, part = "all") %>% 
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  autofit()
 
-# Regression results
-
-table_1_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[1]] %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>%
-  relocate("condition", .before = "term") %>%
-  select(-c("term", "type"))
-
-new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
-
-# Assign new column names to the data frame
-colnames(table_1_cdrs_metareg_baseline) <- new_column_names
-
-flextable(table_1_cdrs_metareg_baseline) %>%
-  set_table_properties(width = 1) %>%
-  autofit() %>%
-  font(fontname = "Calibri", part = "all") %>%
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-  border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>%
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>%
-  # padding(i = 2, padding.bottom = 15, part = "header") %>%
-  align(j = 2:ncol(table_1_cdrs_metareg_baseline), align = "center", part = "all") %>%
-  align(j = 1, align = "left", part = "all") %>%
-  paginate(init = TRUE, hdr_ftr = TRUE) %>%
-  line_spacing(space = .7, part = "all")
+# # All of the below is for the HAMD baseline meta-analysis when we have 4 levels
+# # Prepare to tabulate
+# 
+# table_2_hamd_metareg_baseline <- results_hamd_metareg_baseline[[2]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "baseline_smds") %>%
+#   relocate("n", .before = "baseline_smds") %>%
+#   relocate("lower_cis_smds", .before = "upper_cis_smds")
+# 
+# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# 
+# # Assign new column names to the data frame
+# colnames(table_2_hamd_metareg_baseline) <- new_column_names
+# 
+# flextable(table_2_hamd_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_2_hamd_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+# 
+# # Regression results
+# 
+# table_1_hamd_metareg_baseline <- results_hamd_metareg_baseline[[1]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "term") %>%
+#   select(-c("term", "type"))
+# 
+# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
+# 
+# # Assign new column names to the data frame
+# colnames(table_1_hamd_metareg_baseline) <- new_column_names
+# 
+# flextable(table_1_hamd_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_1_hamd_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
 
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-hamd-baseline
-#| tbl-cap: "HAM-D Baseline Scores"
+#| label: tbl-cdrs-baseline
+#| tbl-cap: "CDRS Baseline Scores across Psychotherapy and Medication RCTs"
 #| tbl-cap-location: top
 
-# Prepare to tabulate
+# For row names
+results_met_sev_cdrs <- results_met_sev_cdrs %>%
+  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
 
-table_2_hamd_metareg_baseline <- results_hamd_metareg_baseline[[2]] %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>%
-  relocate("condition", .before = "baseline_smds") %>%
-  relocate("n", .before = "baseline_smds") %>%
-  relocate("lower_cis_smds", .before = "upper_cis_smds")
-
-new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
 
 # Assign new column names to the data frame
-colnames(table_2_hamd_metareg_baseline) <- new_column_names
+colnames(results_met_sev_cdrs) <- new_column_names
 
-flextable(table_2_hamd_metareg_baseline) %>%
-  set_table_properties(width = 1) %>%
-  autofit() %>%
-  font(fontname = "Calibri", part = "all") %>%
+# Rounding
+results_met_sev_cdrs <- results_met_sev_cdrs %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
+  slice(1, 3, 2)
+
+results_met_sev_cdrs %>% 
+  as_flextable() %>% 
+  align(j = 2:ncol(results_met_sev_cdrs), align = "center", part = "all") %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-  border_remove() %>% # this is to remove borders around the caption that look strange
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
+  border_remove() %>% # this is to remove borders that look strange
   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>%
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>%
-  # padding(i = 2, padding.bottom = 15, part = "header") %>%
-  align(j = 2:ncol(table_2_hamd_metareg_baseline), align = "center", part = "all") %>%
-  align(j = 1, align = "left", part = "all") %>%
-  paginate(init = TRUE, hdr_ftr = TRUE) %>%
-  line_spacing(space = .7, part = "all")
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  line_spacing(space = .7, part = "all") %>% 
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  autofit()
 
-# Regression results
-
-table_1_hamd_metareg_baseline <- results_hamd_metareg_baseline[[1]] %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>%
-  relocate("condition", .before = "term") %>%
-  select(-c("term", "type"))
-
-new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
-
-# Assign new column names to the data frame
-colnames(table_1_hamd_metareg_baseline) <- new_column_names
-
-flextable(table_1_hamd_metareg_baseline) %>%
-  set_table_properties(width = 1) %>%
-  autofit() %>%
-  font(fontname = "Calibri", part = "all") %>%
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-  border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>%
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>%
-  # padding(i = 2, padding.bottom = 15, part = "header") %>%
-  align(j = 2:ncol(table_1_hamd_metareg_baseline), align = "center", part = "all") %>%
-  align(j = 1, align = "left", part = "all") %>%
-  paginate(init = TRUE, hdr_ftr = TRUE) %>%
-  line_spacing(space = .7, part = "all")
+# # All of the below is for the CDRS baseline meta-analysis when we have 4 levels
+# # Prepare to tabulate
+# 
+# table_2_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[2]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "baseline_smds") %>%
+#   relocate("n", .before = "baseline_smds") %>%
+#   relocate("lower_cis_smds", .before = "upper_cis_smds")
+# 
+# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# 
+# # Assign new column names to the data frame
+# colnames(table_2_cdrs_metareg_baseline) <- new_column_names
+# 
+# flextable(table_2_cdrs_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_2_cdrs_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+# 
+# # Regression results
+# 
+# table_1_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[1]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "term") %>%
+#   select(-c("term", "type"))
+# 
+# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
+# 
+# # Assign new column names to the data frame
+# colnames(table_1_cdrs_metareg_baseline) <- new_column_names
+# 
+# flextable(table_1_cdrs_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_1_cdrs_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
 
 ```
 
