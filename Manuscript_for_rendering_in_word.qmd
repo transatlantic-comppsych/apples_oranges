@@ -189,7 +189,7 @@ A more detailed description of our methods, including the formalisms on which an
 
 ## Included studies
 
-We included RCTs identified in a recent meta-analysis of psychotherapy versus control [@cuijpersEffectsPsychologicalTreatments2021] and an NMA examining the efficacy of antidepressants [@ciprianiComparativeEfficacyTolerability2016] for depression in children and adolescents. For the psychotherapy trials, we utilised open data from the previous meta-analysis (see [here](https://www.metapsy.org/)). For medication trials, we were unable to access the full dataset used in the NMA and hence extracted data from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and complete extraction for two RCTs (Almeida-Montes, 2005; Eli Lilly, 1986). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
+We included RCTs identified in a recent meta-analysis of psychotherapy versus control [@cuijpersEffectsPsychologicalTreatments2021] and an NMA examining the efficacy of antidepressants [@ciprianiComparativeEfficacyTolerability2016] for depression in children and adolescents. For the psychotherapy trials, we utilised open data from the previous meta-analysis (see [here](https://docs.metapsy.org/databases/depression-childadol-psyctr/)). For medication trials, we were unable to access the full dataset used in the NMA and hence extracted data from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and complete extraction for two RCTs (Almeida-Montes, 2005; Eli Lilly, 1986). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
 
 For medication trials, we also conducted a systematic search for studies published after the final search date of Cipriani's (2016) review up to the final search date of Cuijpers et al's (2021) review to ensure we analysed an equivalently up-to-date database of medication trials. Two authors screened 450 titles and abstracts, and 38 full text records. Seven studies met inclusion criteria and one author completed data extraction for these papers (see @fig-prisma for PRISMA diagram).
 
@@ -217,7 +217,7 @@ We conducted a series of random effects meta-analyses and tested subgroup differ
 
 #### Measures of Effect
 
-As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD).
+As the measure of effect of each individual study, we used the within-group Standardised Mean Difference (SMD) for the primary depression symptom scale used (selected according to the hierarchy defined in the Supplement). 
 
 <!-- which we defined following [@lakensCalculatingReportingEffect2013, @cummingUnderstandingNewStatistics2013] as: -->
 
@@ -1154,7 +1154,8 @@ df_for_baseline_severity <- df_long_for_metan %>%
   mutate(se_baseline = pooled_sd_baseline / sqrt(n_overall))
 
 df_for_baseline_severity <- df_for_baseline_severity %>% 
-  distinct(new_study_id, .keep_all = TRUE) 
+  distinct(new_study_id, .keep_all = TRUE) %>% 
+  filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 met_sev <- metagen(TE = perc_baseline_overall,
                            seTE = perc_se_baseline,
@@ -1246,7 +1247,8 @@ df_for_sex_metan <- df_baseline_demographics %>%
   filter(!is.na(percent_women))
 
 df_for_sex_metan <- df_for_sex_metan %>% 
-  filter(percent_women != 100)
+  filter(percent_women != 100) # filter out studies with only women %>% 
+  filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 met_perc_women_overall <- metagen(TE = percent_women,
                            seTE = percent_women_std_error,
@@ -1352,10 +1354,9 @@ df_baseline_demographics <- df_baseline_demographics %>%
                          ifelse(psy_or_med == 1, mean_se_age_psy, mean_se_age_med)))
 
 df_for_age_metan <- df_baseline_demographics %>% 
-  filter(!is.na(mean_age))
+  filter(!is.na(mean_age)) %>% 
+  filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
-weighted_average_age <- sum(df_baseline_demographics$mean_age * df_baseline_demographics$baseline_n, na.rm = TRUE) / sum(df_baseline_demographics$baseline_n, na.rm = TRUE)
-tst <- mean(df_baseline_demographics$mean_age, na.rm = TRUE)
 
 # Age meta analysis 
 
@@ -1811,6 +1812,7 @@ df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_
 df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
 
 ```
+
 We addressed potential regression to the mean by residualising SMDs by the percentage adjusted baseline scores in one regression model (see @tbl-adj-smds in the Supplementary Materials for the adjusted SMDs with their confidence intervals). The difference between the medication control and psychotherapy control arms remained similar to the overall analyses.
 
 ### Number of trial sites
@@ -1829,7 +1831,8 @@ df_no_sites <- df_no_sites %>%
   distinct(new_study_id, .keep_all = TRUE) %>% 
   mutate(number_of_sites = as.numeric(number_of_sites))
 
-df_baseline_demographics <- full_join(df_baseline_demographics, df_no_sites, by = "new_study_id")
+df_baseline_demographics <- full_join(df_baseline_demographics, df_no_sites, by = "new_study_id") %>% 
+  filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 # we have different vectors for psy and med trials, lets coalesce
 
@@ -1902,6 +1905,7 @@ sites_t_test_stats <- data.frame(
 sites_t_test_stats <- sites_t_test_stats %>%
   mutate(across(.cols = c(statistic, df, ci_lower, ci_upper), ~ round(., 2))) %>% 
   mutate(p_value = ifelse(p_value < 0.001, "< 0.001", as.character(round(p_value, 3))))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
@@ -1936,7 +1940,7 @@ sites_t_test_stats <- sites_t_test_stats %>%
 
 ```
 
-As shown in Average number of trial sites was significantly higher in medication trials (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test_stats$p_value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies.
+Average number of trial sites was significantly higher in medication trials (*M* = `r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Medication"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Medication"]`) compared to psychotherapy studies (*M* =`r df_sites_summary_stats$Mean[df_sites_summary_stats$Modality == "Psychotherapy"]`, *SD* =`r df_sites_summary_stats$SD[df_sites_summary_stats$Modality == "Psychotherapy"]`)(*t* (`r round (sites_t_test$parameter, 2)`) = `r round(sites_t_test$statistic,2)`, *p* =`r sites_t_test_stats$p_value`). Of those studies for which we had data on number of sites, 26 of 28 (93%) medication trials were multisite, compared to 24 of 45 (54%) psychotherapy studies.
 
 ## Comparing the nature and intensity of control conditions in psychotherapy trials
 
@@ -2095,6 +2099,30 @@ control_summary <- control_summary %>%
 
 control_summary <- control_summary %>% 
   mutate(across(where(is.numeric), ~round(., 2)))
+
+#function for between group effect sizes (cohens d)
+
+effect_btwn <- function(df) {
+  pooled_sd <- sqrt(((df$N[1]-1)*df$SD[1]^2 + (df$N[2]-1)*df$SD[2]^2) / (df$N[1] + df$N[2] - 2))
+  mean_diff <- df$Mean[1] - df$Mean[2]
+  effect_btwn <- mean_diff / pooled_sd
+  return(effect_btwn)
+}
+
+session_es <- effect_btwn(sessions)
+frequency_es <- effect_btwn(frequency)
+length_sessions_mins_es <- effect_btwn(length_sessions_mins)
+total_hours_es <- effect_btwn(total_hours)
+total_period_weeks_es <- effect_btwn(total_period_weeks)
+
+view(df_descr_psy_conditions)
+testing <- df_descr_psy_conditions %>% 
+  filter()
+
+other_ctr_ids <- df_long_for_metan[df_long_for_metan$type == "other ctr",]$new_study_id
+testing <- df_descr_psy_conditions %>% 
+  filter(new_study_id %in% other_ctr_ids)
+view(testing)
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
@@ -2260,11 +2288,51 @@ We used Covidence, an online software tool, to manage our systematic review. Our
 
 Explicit search strategy: title/abstract = (depress* or dysthymi\* or "mood disorder\*" or "affective disorder*") AND (adolesc\* or child\* or boy\* or girl\* or juvenil\* or minors or paediatri\* or pediatri\* or pubescen\* or school\* or student\* or teen\* or young or youth\*) AND (selective serotonin reuptake inhibitor or SSRI or citalopram or fluoxetine or paroxetine or sertraline or escitalopram or fluvoxamine or serotonin norepinephrine reuptake inhibitor\* or SNRI or venlafaxine or duloxetine or milnacipran or reboxetine or bupropion or noradrenergic and specific serotonergic antidepressants or NaSSA or mirtazapine or TCA or tricyclic or amersergide or amineptine or amitriptyline or amoxapine or butriptyline or chlorpoxiten or clomipramine or clorimipramine or demexiptiline or desipramine or dibenzipin or dothiepin or doxepin or imipramine or lofepramine or melitracen or metapramine or nortriptyline or noxiptiline or opipramol or protriptyline or quinupramine or tianeptine or trimipramine) AND (placebo)
 
+**References for included trials**
+
+References for trials included in the existing meta-analyses drawn upon for this study can be found [here](https://docs.metapsy.org/databases/depression-childadol-psyctr/) for psychotherapy RCTs and [here](https://ora.ox.ac.uk/objects/uuid:e0b5ae23-d562-4348-94b8-84f70b7812c5) for medication RCTs. Below are references for the seven additional RCTs identified in the original systematic review conducted for the current study. 
+
+*Publications*
+
+Atkinson, S., Lubaczewski, S., Ramaker, S., England, R. D., Wajsbrot, D. B., Abbas, R., & Findling, R. L. (2018). Desvenlafaxine versus placebo in the treatment of children and adolescents with major depressive disorder. *Journal of Child and Adolescent Psychopharmacology, 28(1),* 55-65. DOI: 10.1089/cap.2017.0099
+
+Durgam, S., Chen, C. Z., Migliore, R., Prakash, C., Edwards, J., & Findling, R. L. (2018). A phase 3, double-blind, randomized, placebo-controlled study of vilazodone in adolescents with major depressive disorder. *Pediatric Drugs, 20(4),* 353-363. DOI: 10.1007/s40272-018-0290-4
+
+Findling, R. L., McCusker, E., & Strawn, J. R. (2020). A randomized, double-blind, placebo-controlled trial of vilazodone in children and adolescents with major depressive disorder with twenty-six-week open-label follow-up. *Journal of Child and Adolescent Psychopharmacology, 30(6),* 355-365. DOI: 10.1089/cap.2019.0176
+
+Le Noury, J., Nardo, J. M., Healy, D., Jureidini, J., Raven, M., Tufanaru, C., & Abi-Jaoude, E. (2015). Restoring Study 329: efficacy and harms of paroxetine and imipramine in treatment of major depression in adolescence. *BMJ, 351,*, h4320. DOI: 10.1136/bmj.h4320
+
+Weihs, K. L., Murphy, W., Abbas, R., Chiles, D., England, R. D., Ramaker, S., & Wajsbrot, D. B. (2018). Desvenlafaxine versus placebo in a fluoxetine-referenced study of children and adolescents with major depressive disorder. Journal of Child and Adolescent Psychopharmacology, 28(1), 36-46. DOI: 10.1089/cap.2017.0100
+
+*Unpublished clinical trials*
+
+Active Reference (Fluoxetine) Fixed-dose Study of Vortioxetine in Paediatric Patients Aged 12 to 17 Years With Major Depressive Disorder (MDD). ClinicalTrials.gov Identifier: NCT02709746. Accessed 17 Jan 2024.
+
+Safety and Efficacy of Levomilnacipran ER in Adolescent Participants With Major Depressive Disorder. ClinicalTrials.gov Identifier: NCT02431806. Accessed 17 Jan 2024.
+
+**Hierarchy of depression symptom severity measurement scales**
+
+Where multiple depression rating scales were used, we selected the best available measure according to the following hierarchy used in Cipriani et al. (2016).
+
+1. Children’s Depression Rating Scale (CDRS)
+1. Hamilton Depression Rating Scale (HAMD)
+1. Montgomery Asberg Depression Rating Scale (MADRS)
+1. Beck Depression Inventory (BDI)
+1. Children’s Depression Inventory (CDI)
+1. Schedule for Affective Disorders and Schizophrenia for School-Aged Children (K-SADS)
+1. Mood and Feeling Questionnaire (MFQ)
+1. Reynolds Adolescent Depression Scale (RADS)
+1. Bellevue Index of Depression (BID)
+1. Child Depression Scale (CDS)
+1. Centre for Epidemiological Studies Depression Scale (CES-D)
+1. Child Assessment Schedule (CAS)
+1. Child Behaviour Checklist-Depression (CBCL-D)
+
 ## Full description of methods (including formalisms)
 
 ## Included studies
 
-We drew upon RCTs included in two recent comprehensive meta-analyses with open data available for each medication and psychotherapy, and supplemented them with an updated systematic review. Please refer to these original meta-analyses for a detailed description of their search strategy and study selection criteria. Psychotherapy studies were drawn from a systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021] (dataset available [here](https://www.metapsy.org/)). Whilst Cuijpers et al. (2021) excluded studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below. We also included studies which had data available for other variables in interest, including number of sites or baseline demographics; hence we have more psychotherapy studies included in this review compared to the original meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuijpers et al.'s (2021) literature search.
+We drew upon RCTs included in two recent comprehensive meta-analyses with open data available for each medication and psychotherapy, and supplemented them with an updated systematic review. Please refer to these original meta-analyses for a detailed description of their search strategy and study selection criteria. Psychotherapy studies were drawn from a systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021] (dataset available [here](https://docs.metapsy.org/databases/depression-childadol-psyctr/)). Whilst Cuijpers et al. (2021) excluded studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below. We also included studies which had data available for other variables in interest, including number of sites or baseline demographics; hence we have more psychotherapy studies included in this review compared to the original meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuijpers et al.'s (2021) literature search.
 
 Medication studies were drawn from a network meta-analysis examining the efficacy and tolerability of antidepressants and placebo for major depressive disorder in children and adolescents [@ciprianiComparativeEfficacyTolerability2016]. A dataset was made available online though did not include means or standard deviations at baseline or post-test. We were unable to access the full dataset used in this meta-analysis, and hence completed extraction from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and therefore complete extraction for two RCTs (Almeida-Montes, 2005; Eli Lilly, 1986). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
 
@@ -2916,6 +2984,14 @@ control_summary_no_wl <- control_summary_no_wl %>%
 
 control_summary_no_wl <- control_summary_no_wl %>% 
   mutate(across(where(is.numeric), ~round(., 2)))
+
+session_es_no_wl <- effect_btwn(sessions)
+frequency_es_no_wl <- effect_btwn(frequency)
+length_sessions_mins_es_no_wl <- effect_btwn(length_sessions_mins)
+total_hours_es_no_wl <- effect_btwn(total_hours)
+total_period_weeks_es_no_wl <- effect_btwn(total_period_weeks)
+
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
