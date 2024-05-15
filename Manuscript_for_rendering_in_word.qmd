@@ -128,6 +128,7 @@ library(RefManageR)
 library(ftExtra)
 library(dplyr)
 library(broom)
+library(effsize)
 
 # For referencing
 bib_data <- ReadBib("emotion_concepts_paper.bib")
@@ -137,7 +138,16 @@ bib_data <- ReadBib("emotion_concepts_paper.bib")
 knitr::opts_chunk$set(tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bold = TRUE))
 ```
 
-# Introduction
+# Abstract
+**Question:** Psychotherapy and medication are the main treatments for adolescent depression, with guidelines recommending psychotherapy as the first-line treatment for most cases. Given the scarcity of head-to-head comparisons, recommendations are based on indirect comparisons of outcomes obtained in randomised controlled trials (RCTs) within each modality. Here we examine whether basic conditions required to draw valid inferences from these indirect comparisons are met.
+**Study selection and analysis:** Drawing upon studies included in two recent meta-analyses, and supplementing with an original systematic search, 88 RCTs of psychotherapy and medication for child and adolescent depression (mean age 4-18 years) were identified. Using meta-analytic approaches, we examined comparability of a) participant characteristics and b) trial characteristics in medication and psychotherapy trials. Lastly, we examined whether psychotherapy controls are well-matched to active conditions. 
+**Findings:** Participants in medication RCTs had higher depression severity and were more likely to be male compared to psychotherapy RCTs. The pooled effect size of medication controls was very large (SMD=-1.9), and was medium for psychotherapy controls (SMD=-0.5). Medication RCTs also had significantly more trial sites. Within psychotherapy RCTs, control conditions were less intensive on average than active conditions (e.g. fewer contact hours).
+**Conclusions:** Medication and psychotherapy RCTs differ on both participant and methodological characteristics, thereby violating the conditions for valid comparison between modalities. Psychotherapy controls often involve little therapist contact and are easy-to-beat comparators. These findings cast doubt on the confidence with which psychotherapy is recommended over medication for youth depression, and highlight the pressing need to improve the evidence base.  
+
+# Key messages
+Psychotherapy is recommended before medication for most cases of depression in children and adolescents, a recommendation that is based on indirect comparisons of outcomes from randomised controlled trials (RCTs) within each treatment modality. We examine the validity of these inferences by scrutinising the comparability of psychotherapy and medication RCTs. We find significant differences in sample characteristics (namely depression severity and sex composition) and trial design features, such that the effect sizes of medication controls (i.e. pill placebo) are much larger than those for psychotherapy controls, and that medication RCTs feature significantly more trial sites. We also examine the quality of controls used in psychotherapy RCTs and find that they are poorly matched to active intervention arms in ways such as human contact hours, and hence represent poor and easy to beat comparators. Our findings underscore the need for a higher quality evidence base upon which to base treatment guidelines and clinical decision making.
+
+# Background
 
 Should a child or an adolescent receive psychotherapy or medication for their depression, and what information should be used to guide decision-making? 
 
@@ -179,9 +189,11 @@ An inter-related issue concerns the effect of control conditions. Often, in the 
 
 Additionally, control conditions in RCTs should generate counterfactual conditions to the intervention [@guoChapterCounterfactualFramework2014]: what would have been the outcome had an individual not received the intervention, with all else being equal. A pill placebo condition, where the appearance of the drug is faithfully emulated, is an effort for all else to be equal. In psychotherapy trials, control conditions may not be so well matched to the intervention (e.g. with respect to number of hours of therapist contact).
 
+# Objective
+
 In this study we examine RCTs of psychotherapy and medication for child and adolescent depression (mean age 4-18 years). We hypothesise that there are substantial methodological differences between psychotherapy and medication RCTs, making comparisons problematic, and we examine this in the following ways. First, we conduct meta-analyses to compare sample characteristics of medication and psychotherapy trials including: a) baseline severity of depression; b) percentage females; and c) mean age. Second, we examine trial characteristics including the efficacy of the control arms, using random effects meta-regression, and the number of trial sites. Third, we examine the quality of psychotherapy control conditions by scrutinising the extent to which they are matched to the active intervention in ways such as number and frequency of sessions, and hence whether they represent fair pairings from which to draw valid efficacy inferences.
 
-# Method
+# Study selection and analysis
 
 The study protocol was registered on the Open Science Framework (OSF) and can be found [here](https://osf.io/bfmc6). 
 
@@ -793,7 +805,7 @@ list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan,
 
 ```
 
-# Results
+# Findings
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
@@ -1154,8 +1166,10 @@ df_for_baseline_severity <- df_long_for_metan %>%
   mutate(se_baseline = pooled_sd_baseline / sqrt(n_overall))
 
 df_for_baseline_severity <- df_for_baseline_severity %>% 
-  distinct(new_study_id, .keep_all = TRUE) %>% 
-  filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
+  distinct(new_study_id, .keep_all = TRUE) 
+
+df_for_baseline_severity <- df_for_baseline_severity %>% 
+    filter(new_study_id != "March, 2004")  # removing TADS because it does not technically belong to either the psy or med groups
 
 met_sev <- metagen(TE = perc_baseline_overall,
                            seTE = perc_se_baseline,
@@ -1248,6 +1262,8 @@ df_for_sex_metan <- df_baseline_demographics %>%
 
 df_for_sex_metan <- df_for_sex_metan %>% 
   filter(percent_women != 100) # filter out studies with only women %>% 
+  
+df_for_sex_metan <- df_for_sex_metan %>% 
   filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 met_perc_women_overall <- metagen(TE = percent_women,
@@ -1354,7 +1370,9 @@ df_baseline_demographics <- df_baseline_demographics %>%
                          ifelse(psy_or_med == 1, mean_se_age_psy, mean_se_age_med)))
 
 df_for_age_metan <- df_baseline_demographics %>% 
-  filter(!is.na(mean_age)) %>% 
+  filter(!is.na(mean_age))  
+
+df_for_age_metan <- df_for_age_metan %>% 
   filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 
@@ -1831,7 +1849,9 @@ df_no_sites <- df_no_sites %>%
   distinct(new_study_id, .keep_all = TRUE) %>% 
   mutate(number_of_sites = as.numeric(number_of_sites))
 
-df_baseline_demographics <- full_join(df_baseline_demographics, df_no_sites, by = "new_study_id") %>% 
+df_baseline_demographics <- full_join(df_baseline_demographics, df_no_sites, by = "new_study_id") 
+
+df_baseline_demographics <- df_baseline_demographics %>% 
   filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
 
 # we have different vectors for psy and med trials, lets coalesce
@@ -2075,7 +2095,7 @@ length_sessions_mins <- group_function(df_descr_psy_conditions,"levels_var","len
 total_hours <- group_function(df_descr_psy_conditions,"levels_var","total_hours")
 total_period_weeks <- group_function(df_descr_psy_conditions,"levels_var","total_period_weeks")
 
-control_summary <- rbind(sessions, frequency, length_sessions_mins, total_hours, total_period_weeks)
+control_summary <- rbind(sessions, frequency, length_sessions_mins, total_hours)
 
 control_summary <- control_summary %>% 
   select(-c(Median, IQR))
@@ -2093,67 +2113,15 @@ control_summary <- control_summary %>%
     Column == "freq_weeks" ~ "Intensity (sessions per week)",
     Column == "length_sessions_mins" ~ "Session length (mins)",
     Column == "total_hours" ~ "Total intervention hours",
-    Column == "total_period_weeks" ~ "Intervention duration (weeks)",
     TRUE ~ as.character(Column)  # Keep original value if no match
   ))
 
-control_summary <- control_summary %>% 
-  mutate(across(where(is.numeric), ~round(., 2)))
 
-#function for between group effect sizes (cohens d)
 
-effect_btwn <- function(df) {
-  pooled_sd <- sqrt(((df$N[1]-1)*df$SD[1]^2 + (df$N[2]-1)*df$SD[2]^2) / (df$N[1] + df$N[2] - 2))
-  mean_diff <- df$Mean[1] - df$Mean[2]
-  effect_btwn <- mean_diff / pooled_sd
-  return(effect_btwn)
-}
-
-session_es <- effect_btwn(sessions)
-frequency_es <- effect_btwn(frequency)
-length_sessions_mins_es <- effect_btwn(length_sessions_mins)
-total_hours_es <- effect_btwn(total_hours)
-total_period_weeks_es <- effect_btwn(total_period_weeks)
-
-view(df_descr_psy_conditions)
-testing <- df_descr_psy_conditions %>% 
-  filter()
-
-other_ctr_ids <- df_long_for_metan[df_long_for_metan$type == "other ctr",]$new_study_id
-testing <- df_descr_psy_conditions %>% 
-  filter(new_study_id %in% other_ctr_ids)
-view(testing)
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-intensity-of-int
-#| tbl-cap: "Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
-#| tbl-cap-location: top
-
-as_grouped_data(control_summary, groups = "Column") %>% 
-  as_flextable(hide_grouplabel = TRUE ) %>% 
-  bold(i = c(1, 4, 7, 10, 13), bold = TRUE, part = "body") %>%  
-  set_table_properties(width = 1) %>%  # Set table width 
-  autofit() %>%  # Autofit column widths 
-  align(j = 2:4, align = "center", part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  # add_header_row(values = "Comparing the intensity of the intervention between active and control arms of psychotherapy studies", colwidths = 4) %>% # This is a work around for the problems with rendering captions
-  # add_header_row(values = "Table 5", colwidths = 4) %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
-  #italic(i = 2, italic = TRUE, part = "header") %>% 
-  border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  #padding(i = 2, padding.bottom = 15, part = "header") %>% 
-  paginate(init = TRUE) %>% 
-  line_spacing(space = .7, part = "all")
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+# other_ctr_ids <- df_long_for_metan[df_long_for_metan$type == "other ctr",]$new_study_id
+# testing <- df_descr_psy_conditions %>% 
+#   filter(new_study_id %in% other_ctr_ids)
+# view(testing)
 
 # t tests
 
@@ -2161,7 +2129,6 @@ session_no_t_test <- t.test(no_sessions ~ levels_var, data = df_descr_psy_condit
 freq_t_test <- t.test(freq_weeks ~ levels_var, data = df_descr_psy_conditions)
 session_length_t_test <- t.test(length_sessions_mins ~ levels_var, data = df_descr_psy_conditions)
 total_hours_t_test <- t.test(total_hours ~ levels_var, data = df_descr_psy_conditions)
-total_period_t_test <- t.test(total_period_weeks ~ levels_var, data = df_descr_psy_conditions)
 
 extract_t_test_stats <- function(df) {
 
@@ -2181,9 +2148,10 @@ results_session_no_t_test <- extract_t_test_stats(session_no_t_test)
 results_freq_t_test <- extract_t_test_stats(freq_t_test)
 results_session_length_t_test <- extract_t_test_stats(session_length_t_test)
 results_total_hours_t_test <- extract_t_test_stats(total_hours_t_test)
-results_total_period_t_test <- extract_t_test_stats(total_period_t_test)
 
-control_summary_t_tests <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test, results_total_period_t_test)
+# for t test table
+
+control_summary_t_tests <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test)
 
 # For row names
 control_summary_t_tests <- control_summary_t_tests %>%
@@ -2191,8 +2159,7 @@ control_summary_t_tests <- control_summary_t_tests %>%
     row_number() == 1 ~ "Number of sessions",
     row_number() == 2 ~ "Intensity (sessions per week)",
     row_number() == 3 ~ "Session length (mins)",
-    row_number() == 4 ~ "Total intervention hours",
-    row_number() == 5 ~ "Intervention duration (weeks)"
+    row_number() == 4 ~ "Total intervention hours"
   )) 
 
 # Define new column names
@@ -2206,37 +2173,145 @@ control_summary_t_tests <- control_summary_t_tests %>%
   mutate(across(where(is.numeric) & !matches("p-value"), ~ round(., 2))) %>%
   mutate(`p-value` = ifelse(`p-value` < 0.001, "< 0.001", sprintf("%.3f", `p-value`)))
 
+# function for between group effect sizes (cohens d)
+# 
+# effect_btwn <- function(df) {
+#   pooled_sd <- sqrt(((df$N[1]-1)*df$SD[1]^2 + (df$N[2]-1)*df$SD[2]^2) / (df$N[1] + df$N[2] - 2))
+#   mean_diff <- df$Mean[1] - df$Mean[2]
+#   effect_btwn <- mean_diff / pooled_sd
+#   return(effect_btwn)
+# }
+# 
+# session_es <- effect_btwn(sessions)
+# frequency_es <- effect_btwn(frequency)
+# length_sessions_mins_es <- effect_btwn(length_sessions_mins)
+# total_hours_es <- effect_btwn(total_hours)
+# total_period_weeks_es <- effect_btwn(total_period_weeks)
+
+# using a package to calculate instead
+
+session_es <- cohen.d(df_descr_psy_conditions$no_sessions ~ df_descr_psy_conditions$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+frequency_es <- cohen.d(df_descr_psy_conditions$freq_weeks ~ df_descr_psy_conditions$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+length_sessions_mins_es <- cohen.d(df_descr_psy_conditions$length_sessions_mins ~ df_descr_psy_conditions$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+total_hours_es <- cohen.d(df_descr_psy_conditions$total_hours ~ df_descr_psy_conditions$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+
+# going to try displaying summary statistics and t-tests in one place
+
+control_summary <- cbind(control_summary, 
+                          "Cohen's d" = rep(NA, nrow(control_summary)),
+                         "Upper CI" = rep(NA, nrow(control_summary)),
+                         "Lower CI" = rep(NA, nrow(control_summary)),
+                         t = rep(NA, nrow(control_summary)), 
+                          df = rep(NA, nrow(control_summary)), 
+                          "p-value" = rep(NA, nrow(control_summary)))
+
+# Update the first row with session_es
+control_summary[1, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  session_es$estimate, session_es$conf.int[1], session_es$conf.int[2], 
+  control_summary_t_tests$`t statistic`[1], control_summary_t_tests$df[1], 
+  control_summary_t_tests$`p-value`[1]
+)
+
+# Update the third row with frequency_es
+control_summary[3, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  frequency_es$estimate, frequency_es$conf.int[1], frequency_es$conf.int[2], 
+  control_summary_t_tests$`t statistic`[2], control_summary_t_tests$df[2], 
+  control_summary_t_tests$`p-value`[2]
+)
+
+# Update the fifth row with length_sessions_mins_es
+control_summary[5, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  length_sessions_mins_es$estimate, length_sessions_mins_es$conf.int[1], length_sessions_mins_es$conf.int[2], 
+  control_summary_t_tests$`t statistic`[3], control_summary_t_tests$df[3], 
+  control_summary_t_tests$`p-value`[3]
+)
+
+# Update the seventh row with total_hours_es
+control_summary[7, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  total_hours_es$estimate, total_hours_es$conf.int[1], total_hours_es$conf.int[2], 
+  control_summary_t_tests$`t statistic`[4], control_summary_t_tests$df[4], 
+  control_summary_t_tests$`p-value`[4]
+)
+
+control_summary <- control_summary %>%
+  mutate(
+    `Cohen's d` = as.numeric(`Cohen's d`),
+    `Upper CI` = as.numeric(`Upper CI`),
+    `Lower CI` = as.numeric(`Lower CI`)
+  ) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+# # plot
+# 
+# ggplot(df_descr_psy_conditions_no_wl, aes(x = total_hours, fill = levels_var)) +
+#   geom_histogram(position = "identity", alpha = 0.5, binwidth = 5, color = "black") +
+#   facet_wrap(~ levels_var, ncol = 2) +
+#   theme_minimal() +
+#   labs(title = "Histograms of Number of Total Hours by Group",
+#        x = "Number of Hours",
+#        y = "Frequency") +
+#   scale_fill_manual(values = c("lightpink", "lightblue"))  
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-t-tests-intensity
-#| tbl-cap: "Results for t-tests Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
+#| label: tbl-intensity-of-int
+#| tbl-cap: "Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
 #| tbl-cap-location: top
 
-flextable(control_summary_t_tests) %>%
-  set_table_properties(width = 1) %>%  # Set table width %>% 
+as_grouped_data(control_summary, groups = "Column") %>% 
+  as_flextable(hide_grouplabel = TRUE ) %>% 
+  bold(i = c(1, 4, 7, 10), bold = TRUE, part = "body") %>%  
+  set_table_properties(width = 1) %>%  # Set table width 
   autofit() %>%  # Autofit column widths 
-  align(j = 2:ncol(control_summary_t_tests), align = "center", part = "all") %>% 
+  align(j = 2:9, align = "center", part = "all") %>% 
   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  #add_header_row(values = "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials", colwidths = 6) %>% # This is a work around for the problems with rendering captions
-  #add_header_row(values = "Table 6", colwidths = 6) %>% 
+  # add_header_row(values = "Comparing the intensity of the intervention between active and control arms of psychotherapy studies", colwidths = 4) %>% # This is a work around for the problems with rendering captions
+  # add_header_row(values = "Table 5", colwidths = 4) %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
   #italic(i = 2, italic = TRUE, part = "header") %>% 
   border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
+  hline(j = 1:4, part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = c(1,4), part = "body", border = small_border) %>% 
   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
   hline(part = "header", border = big_border) %>% 
   #padding(i = 2, padding.bottom = 15, part = "header") %>% 
   paginate(init = TRUE) %>% 
   line_spacing(space = .7, part = "all") 
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
+# #| label: tbl-t-tests-intensity
+# #| tbl-cap: "Results for t-tests Comparing the intensity of the intervention between active and control arms of psychotherapy studies"
+# #| tbl-cap-location: top
+# 
+# flextable(control_summary_t_tests) %>%
+#   set_table_properties(width = 1) %>%  # Set table width %>% 
+#   autofit() %>%  # Autofit column widths 
+#   align(j = 2:ncol(control_summary_t_tests), align = "center", part = "all") %>% 
+#   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+#   #add_header_row(values = "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials", colwidths = 6) %>% # This is a work around for the problems with rendering captions
+#   #add_header_row(values = "Table 6", colwidths = 6) %>% 
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+#   #italic(i = 2, italic = TRUE, part = "header") %>% 
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>% 
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>% 
+#   #padding(i = 2, padding.bottom = 15, part = "header") %>% 
+#   paginate(init = TRUE) %>% 
+#   line_spacing(space = .7, part = "all") 
 
 ```
 
-As seen in @tbl-intensity-of-int active conditions featured significantly more sessions than control conditions (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Number of sessions"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Number of sessions"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Number of sessions"]`). These sessions were also significantly longer (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Session length (mins)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Session length (mins)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Session length (mins)"]`) and more frequent (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`). The total intervention hours were higher in active vs control conditions (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Total intervention hours"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Total intervention hours"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Total intervention hours"]`), though the duration was similar (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`). 
+<!-- As seen in @tbl-intensity-of-int active conditions featured significantly more sessions than control conditions (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Number of sessions"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Number of sessions"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Number of sessions"]`). These sessions were also significantly longer (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Session length (mins)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Session length (mins)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Session length (mins)"]`) and more frequent (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Intensity (sessions per week)"]`). The total intervention hours were higher in active vs control conditions (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Total intervention hours"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Total intervention hours"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Total intervention hours"]`), though the duration was similar (*t* (`r control_summary_t_tests$df[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`) = `r control_summary_t_tests$"t statistic"[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`, *p* = `r control_summary_t_tests$"p-value"[control_summary_t_tests$Outcome == "Intervention duration (weeks)"]`).  -->
 
-# Discussion
+As seen in @tbl-intensity-of-int, active conditions featured significantly more sessions when compared to control conditions. Sessions in active conditions were longer and more frequent, resulting in significantly more intervention hours overall. Notably, many control conditions were very poorly described and their intensity could not be quantified, resulting in missing data for a number of trials. We performed a sensitivity analysis where we excluded trials that used a WL control condition; with the exception of number of sessions, differences between active and control arms were no longer statistically significant though remained substantial, with between-group Cohen's ds ranging from 0.41-0.54 (please see @tbl-intensity-of-int-no-wl in the Supplement). 
+
+# Conclusions and Clinical Implications
 
 ```{r, echo=FALSE}
 # Filter the dataframe
@@ -2247,8 +2322,17 @@ filtered_df <- df_long_for_metan %>%
 type_counts <- filtered_df %>%
   count(type) %>%
   mutate(total_count = sum(n),
-         wl_cau_sum = sum(n[type %in% c("wl", "cau")]),
-         wl_cau_percentage = wl_cau_sum / total_count * 100)
+         wl_sum = sum(n[type == "wl"]),
+         wl_percentage = wl_sum / total_count * 100)
+
+# how many examples of matching of active and control in number of hours
+
+# instances_count <- df_descr_psy_conditions_no_wl %>%
+#   filter(!is.na(total_hours)) %>%
+#   group_by(new_study_id, total_hours) %>%
+#   summarise(count = n()) %>%
+#   filter(count > 1) %>%
+#   summarise(total_instances = n())
 
 ```
 
@@ -2264,13 +2348,13 @@ First, medication trials are vastly more likely to be multi-site than their psyc
 
 Second, psychotherapy controls have moderate effect size (-0.5) whereas pill-placebo has very large effect size (-1.9). Our analysis could be critiqued as it relies on comparing within arm symptom change per trial, therefore effectively breaking randomization. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving the randomization (in order to balance confounders) is critical. However, we note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomization structure. More importantly, we do not make the claim with our analyses that these differences are genuinely due to efficacy differences; they may well be because people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences concerning the comparison of the two modalities. This is particularly problematic as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings. Our results make obvious that comparing treatments based on the between-group effect sizes of each modality is misleading.
 
-Moving beyond comparison between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other basic conditions of the "all else is equal" assumption of a counterfactual condition. In order to test that a psychological treatment is effective per se (e.g. because of the specific techniques) rather than because of generic effects (e.g. pleasant human contact), aspects such as therapist contact time should be matched. We find that there are vast differences between treatment and control arms in psychotherapy trials which may artificially inflate estimates of the efficacy of psychological treatments. Additionally, it is notable that most (67.24%) psychotherapy RCT control conditions are either WL or TAU, both of which are likely to be associated with disappointment bias, thereby further inflating estimates of efficacy of psychological treatments.
+Moving beyond comparison between the two modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving the treatment. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind). Yet, our results show that psychotherapy trials are unlikely to fulfill some other basic conditions of the "all else is equal" assumption of a counterfactual condition. In order to test that a psychological treatment is effective per se (e.g. because of the specific techniques) rather than because of generic effects (e.g. pleasant human contact), aspects such as therapist contact time should be matched. Many (24%) psychotherapy RCTs use waitlist controls, which by definition do not match for hours of therapist contact, and are often associated with disappointment bias. TAU and other psychotherapy control conditions varied drastically; 9 RCTs used controls that exactly matched the active arm in total number of contact hours, though several studies used bibliotherapy (e.g. an educational brochure) or online-only control conditions which did not involve any direct therapist contact. Importantly, controls were often very poorly described, resulting in difficulties quantifying their intensity and hence evaluating their adequacy as counterfactual conditions. Overall, there is a lack of rigor in matching control to active treatment conditions in psychotherapy RCTs, with the latter typically featuring considerably more contact hours, which may artificially inflate estimates of the efficacy of psychological treatments.
 
 Given all of the above, the certainty with which guidelines recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have several profound implications for patients, their families, clinicians and policy makers.
 
 First, the grounds for a comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is an urgent need to revisit guidelines and public information in light of the limitations.
 
-Second, the low quality of control conditions of psychotherapy trials for adolescent depression should prompt a rethinking of what needs to be done to create fair comparators. Indeed, investment should be directed into providing rigorous evidence that establishes depression psychotherapies as more efficacious than fair controls. There are examples of psychotherapy RCTs where such rigor has been applied, such as @youngRandomizedDepressionPrevention2016 where active and control arms were matched on frequency and duration of sessions, and total amount of contact. 
+Second, the low quality of control conditions of psychotherapy trials for adolescent depression should prompt a rethinking of what needs to be done to create fair comparators. Indeed, investment should be directed into providing rigorous evidence that establishes depression psychotherapies as more efficacious than fair controls. There are examples of psychotherapy RCTs where such rigor has been applied (e.g. Bolton, 2007; Liddle, 1990; Rohde, 2004) in matching active and control arms on variables such as therapist time and attention, provision of homework, and small group interaction. 
 
 Third, our findings make clear the inherent difficulties of comparing psychotherapy with medication trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. The first obstacle is the comparability of the populations taking part. Head-to-head comparisons of psychotherapy with medication (as has been done in [@marchFluoxetineCognitiveBehavioralTherapy2004]) are more favourable in this regard, yet even so these trials might sample the population of those who are indifferent to which treatment they would receive. And even in such a design, difficulties with blinding of the psychotherapy control would have to be overcome to draw valid inferences.
 
@@ -2958,9 +3042,8 @@ sessions <- group_function(df_descr_psy_conditions_no_wl,"levels_var","no_sessio
 frequency <- group_function(df_descr_psy_conditions_no_wl,"levels_var","freq_weeks")
 length_sessions_mins <- group_function(df_descr_psy_conditions_no_wl,"levels_var","length_sessions_mins")
 total_hours <- group_function(df_descr_psy_conditions_no_wl,"levels_var","total_hours")
-total_period_weeks <- group_function(df_descr_psy_conditions_no_wl,"levels_var","total_period_weeks")
 
-control_summary_no_wl <- rbind(sessions, frequency, length_sessions_mins, total_hours, total_period_weeks)
+control_summary_no_wl <- rbind(sessions, frequency, length_sessions_mins, total_hours)
 
 control_summary_no_wl <- control_summary_no_wl %>% 
   select(-c(Median, IQR))
@@ -2978,51 +3061,8 @@ control_summary_no_wl <- control_summary_no_wl %>%
     Column == "freq_weeks" ~ "Intensity (sessions per week)",
     Column == "length_sessions_mins" ~ "Session length (mins)",
     Column == "total_hours" ~ "Total intervention hours",
-    Column == "total_period_weeks" ~ "Intervention duration (weeks)",
     TRUE ~ as.character(Column)  # Keep original value if no match
   ))
-
-control_summary_no_wl <- control_summary_no_wl %>% 
-  mutate(across(where(is.numeric), ~round(., 2)))
-
-session_es_no_wl <- effect_btwn(sessions)
-frequency_es_no_wl <- effect_btwn(frequency)
-length_sessions_mins_es_no_wl <- effect_btwn(length_sessions_mins)
-total_hours_es_no_wl <- effect_btwn(total_hours)
-total_period_weeks_es_no_wl <- effect_btwn(total_period_weeks)
-
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-intensity-of-int-no-wl
-#| tbl-cap: "Comparing the intensity of the intervention between active and control arms of psychotherapy studies: waitlist studies excluded"
-#| tbl-cap-location: top
-
-as_grouped_data(control_summary_no_wl, groups = "Column") %>% 
-  as_flextable(hide_grouplabel = TRUE ) %>% 
-  bold(i = c(1, 4, 7, 10, 13), bold = TRUE, part = "body") %>%  
-  set_table_properties(width = 1) %>%  # Set table width 
-  autofit() %>%  # Autofit column widths 
-  align(j = 2:4, align = "center", part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  # add_header_row(values = "Comparing the intensity of the intervention between active and control arms of psychotherapy studies", colwidths = 4) %>% # This is a work around for the problems with rendering captions
-  # add_header_row(values = "Table 5", colwidths = 4) %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
-  #italic(i = 2, italic = TRUE, part = "header") %>% 
-  border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  #padding(i = 2, padding.bottom = 15, part = "header") %>% 
-  paginate(init = TRUE) %>% 
-  line_spacing(space = .7, part = "all")
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
 # t tests
 
@@ -3030,7 +3070,6 @@ session_no_t_test <- t.test(no_sessions ~ levels_var, data = df_descr_psy_condit
 freq_t_test <- t.test(freq_weeks ~ levels_var, data = df_descr_psy_conditions_no_wl)
 session_length_t_test <- t.test(length_sessions_mins ~ levels_var, data = df_descr_psy_conditions_no_wl)
 total_hours_t_test <- t.test(total_hours ~ levels_var, data = df_descr_psy_conditions_no_wl)
-total_period_t_test <- t.test(total_period_weeks ~ levels_var, data = df_descr_psy_conditions_no_wl)
 
 extract_t_test_stats <- function(df) {
 
@@ -3050,9 +3089,8 @@ results_session_no_t_test <- extract_t_test_stats(session_no_t_test)
 results_freq_t_test <- extract_t_test_stats(freq_t_test)
 results_session_length_t_test <- extract_t_test_stats(session_length_t_test)
 results_total_hours_t_test <- extract_t_test_stats(total_hours_t_test)
-results_total_period_t_test <- extract_t_test_stats(total_period_t_test)
 
-control_summary_t_tests_no_wl <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test, results_total_period_t_test)
+control_summary_t_tests_no_wl <- rbind(results_session_no_t_test, results_freq_t_test, results_session_length_t_test, results_total_hours_t_test)
 
 # For row names
 control_summary_t_tests_no_wl <- control_summary_t_tests_no_wl %>%
@@ -3060,8 +3098,7 @@ control_summary_t_tests_no_wl <- control_summary_t_tests_no_wl %>%
     row_number() == 1 ~ "Number of sessions",
     row_number() == 2 ~ "Intensity (sessions per week)",
     row_number() == 3 ~ "Session length (mins)",
-    row_number() == 4 ~ "Total intervention hours",
-    row_number() == 5 ~ "Intervention duration (weeks)"
+    row_number() == 4 ~ "Total intervention hours"
   )) 
 
 # Define new column names
@@ -3075,31 +3112,120 @@ control_summary_t_tests_no_wl <- control_summary_t_tests_no_wl %>%
   mutate(across(where(is.numeric) & !matches("p-value"), ~ round(., 2))) %>%
   mutate(`p-value` = ifelse(`p-value` < 0.001, "< 0.001", sprintf("%.3f", `p-value`)))
 
+# calculating with my function
+
+# session_es_no_wl <- effect_btwn(sessions)
+# frequency_es_no_wl <- effect_btwn(frequency)
+# length_sessions_mins_es_no_wl <- effect_btwn(length_sessions_mins)
+# total_hours_es_no_wl <- effect_btwn(total_hours)
+# total_period_weeks_es_no_wl <- effect_btwn(total_period_weeks)
+
+# using a package to calculate instead
+
+session_es_no_wl <- cohen.d(df_descr_psy_conditions_no_wl$no_sessions ~ df_descr_psy_conditions_no_wl$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+frequency_es_no_wl <- cohen.d(df_descr_psy_conditions_no_wl$freq_weeks ~ df_descr_psy_conditions_no_wl$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+length_sessions_mins_es_no_wl <- cohen.d(df_descr_psy_conditions_no_wl$length_sessions_mins ~ df_descr_psy_conditions_no_wl$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+total_hours_es_no_wl <- cohen.d(df_descr_psy_conditions_no_wl$total_hours ~ df_descr_psy_conditions_no_wl$levels_var, pooled = TRUE, paired = FALSE, within=FALSE, na.rm=FALSE )
+
+# going to try displaying summary statistics and t-tests in one place
+
+control_summary_no_wl <- cbind(control_summary_no_wl, 
+                          "Cohen's d" = rep(NA, nrow(control_summary_no_wl)),
+                         "Upper CI" = rep(NA, nrow(control_summary_no_wl)),
+                         "Lower CI" = rep(NA, nrow(control_summary_no_wl)),
+                         t = rep(NA, nrow(control_summary_no_wl)), 
+                          df = rep(NA, nrow(control_summary_no_wl)), 
+                          "p-value" = rep(NA, nrow(control_summary_no_wl)))
+
+# Update the first row with session_es_no_wl
+control_summary_no_wl[1, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  session_es_no_wl$estimate, session_es_no_wl$conf.int[1], session_es_no_wl$conf.int[2], 
+  control_summary_t_tests_no_wl$`t statistic`[1], control_summary_t_tests_no_wl$df[1], 
+  control_summary_t_tests_no_wl$`p-value`[1]
+)
+
+# Update the third row with frequency_es_no_wl
+control_summary_no_wl[3, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  frequency_es_no_wl$estimate, frequency_es_no_wl$conf.int[1], frequency_es_no_wl$conf.int[2], 
+  control_summary_t_tests_no_wl$`t statistic`[2], control_summary_t_tests_no_wl$df[2], 
+  control_summary_t_tests_no_wl$`p-value`[2]
+)
+
+# Update the fifth row with length_sessions_mins_es_no_wl
+control_summary_no_wl[5, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  length_sessions_mins_es_no_wl$estimate, length_sessions_mins_es_no_wl$conf.int[1], length_sessions_mins_es_no_wl$conf.int[2], 
+  control_summary_t_tests_no_wl$`t statistic`[3], control_summary_t_tests_no_wl$df[3], 
+  control_summary_t_tests_no_wl$`p-value`[3]
+)
+
+# Update the seventh row with total_hours_es_no_wl
+control_summary_no_wl[7, c("Cohen's d", "Upper CI", "Lower CI", "t", "df", "p-value")] <- c(
+  total_hours_es_no_wl$estimate, total_hours_es_no_wl$conf.int[1], total_hours_es_no_wl$conf.int[2], 
+  control_summary_t_tests_no_wl$`t statistic`[4], control_summary_t_tests_no_wl$df[4], 
+  control_summary_t_tests_no_wl$`p-value`[4]
+)
+
+control_summary_no_wl <- control_summary_no_wl %>%
+  mutate(
+    `Cohen's d` = as.numeric(`Cohen's d`),
+    `Upper CI` = as.numeric(`Upper CI`),
+    `Lower CI` = as.numeric(`Lower CI`)
+  ) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-t-tests-intensity-no-wl
-#| tbl-cap: "Results for t-tests comparing the intensity of the intervention between active and control arms of psychotherapy studies: waitlist studies excluded"
+#| label: tbl-intensity-of-int-no-wl
+#| tbl-cap: "Comparing the intensity of the intervention between active and control arms of psychotherapy studies: waitlist studies excluded"
 #| tbl-cap-location: top
 
-flextable(control_summary_t_tests_no_wl) %>%
-  set_table_properties(width = 1) %>%  # Set table width %>% 
+as_grouped_data(control_summary_no_wl, groups = "Column") %>% 
+  as_flextable(hide_grouplabel = TRUE ) %>% 
+  bold(i = c(1, 4, 7, 10), bold = TRUE, part = "body") %>%  
+  set_table_properties(width = 1) %>%  # Set table width 
   autofit() %>%  # Autofit column widths 
-  align(j = 2:ncol(control_summary_t_tests_no_wl), align = "center", part = "all") %>% 
+  align(j = 2:9, align = "center", part = "all") %>% 
   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  #add_header_row(values = "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials", colwidths = 6) %>% # This is a work around for the problems with rendering captions
-  #add_header_row(values = "Table 6", colwidths = 6) %>% 
+  # add_header_row(values = "Comparing the intensity of the intervention between active and control arms of psychotherapy studies", colwidths = 4) %>% # This is a work around for the problems with rendering captions
+  # add_header_row(values = "Table 5", colwidths = 4) %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
   #italic(i = 2, italic = TRUE, part = "header") %>% 
   border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
+  hline(j = 1:4, part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = c(1,4), part = "body", border = small_border) %>% 
   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
   hline(part = "header", border = big_border) %>% 
   #padding(i = 2, padding.bottom = 15, part = "header") %>% 
   paginate(init = TRUE) %>% 
-  line_spacing(space = .7, part = "all") 
+  line_spacing(space = .7, part = "all")
+
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
+# #| label: tbl-t-tests-intensity-no-wl
+# #| tbl-cap: "Results for t-tests comparing the intensity of the intervention between active and control arms of psychotherapy studies: waitlist studies excluded"
+# #| tbl-cap-location: top
+# 
+# flextable(control_summary_t_tests_no_wl) %>%
+#   set_table_properties(width = 1) %>%  # Set table width %>% 
+#   autofit() %>%  # Autofit column widths 
+#   align(j = 2:ncol(control_summary_t_tests_no_wl), align = "center", part = "all") %>% 
+#   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+#   #add_header_row(values = "Results for t-tests comparing intervention intensity between active and control arms of psychotherapy trials", colwidths = 6) %>% # This is a work around for the problems with rendering captions
+#   #add_header_row(values = "Table 6", colwidths = 6) %>% 
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+#   #italic(i = 2, italic = TRUE, part = "header") %>% 
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>% 
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>% 
+#   #padding(i = 2, padding.bottom = 15, part = "header") %>% 
+#   paginate(init = TRUE) %>% 
+#   line_spacing(space = .7, part = "all") 
 
 ```
 
