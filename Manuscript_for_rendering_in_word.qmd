@@ -78,6 +78,10 @@ author:
           state:
           postal-code: SO17 1BJ
           country: United Kingdom
+  - name: Glyn Lewis
+    email: glyn.lewis@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1        
   - name: Georgina Krebs
     email: g.krebs@ucl.ac.uk
     affiliations:
@@ -146,7 +150,7 @@ knitr::opts_chunk$set(tab.cap.fp_text = officer::fp_text_lite(italic = FALSE, bo
 **Conclusions:** Medication and psychotherapy RCTs differ on fundamental participant and methodological characteristics, thereby violating key conditions for valid comparison between them. Psychotherapy controls often involve little therapist contact and are easy-to-beat comparators. These findings cast doubt on the confidence with which psychotherapy is recommended for youth depression, and highlight the pressing need to improve the evidence base.  
 
 # Key messages
-Psychotherapy is recommended before medication for most cases of depression in children and adolescents, a recommendation that is based on indirect comparisons of outcomes from randomised controlled trials (RCTs) within each treatment modality. We examine the validity of these inferences by scrutinising the comparability of psychotherapy and medication RCTs. We find significant differences in sample characteristics (namely depression severity and sex composition) and trial design features, such that the effect sizes of medication controls (i.e. pill placebo) are much larger than those for psychotherapy controls, and that medication RCTs feature significantly more trial sites. We also examine the quality of controls used in psychotherapy RCTs and find that they are poorly matched to active intervention arms in ways such as human contact hours, and hence represent poor and easy to beat comparators. Our findings underscore the need for a higher quality evidence base upon which to base treatment guidelines and clinical decision making.
+Psychotherapy is recommended before medication for most cases of depression in children and adolescents, a recommendation that is based on indirect comparisons of outcomes from randomised controlled trials (RCTs) within each treatment modality. We examine the validity of these inferences by scrutinising the comparability of psychotherapy and medication RCTs. We find significant differences in sample characteristics (namely depression severity and sex composition) and trial design features, such that the within-group effect sizes of medication controls (i.e. pill placebo) are much larger than those for psychotherapy controls, and that medication RCTs feature significantly more trial sites. We also examine the quality of controls used in psychotherapy RCTs and find that they are poorly matched to active intervention arms in ways such as human contact hours, and hence represent poor and easy to beat comparators. Our findings underscore the need for a higher quality evidence base upon which to base treatment guidelines and clinical decision making.
 
 # Background
 
@@ -184,9 +188,9 @@ The assumption that medication and psychotherapy trials sample from the same pop
 
 Regarding the second point, differences in trial design may impact outcomes in a differential way between medication and psychotherapy trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. Most obviously, participants in psychotherapy trials are generally unblinded to treatment allocation, with the exception perhaps of trials that compare two equally plausible treatment arms [@calvoInterventionAdolescentsEarlyOnset2014]. This creates differential expectations which may favour the psychotherapy active condition, as participants are content to be receiving the “cutting edge” treatment, whilst those in the control are dissatisfied for having missed out (i.e. “disappointment bias” [@reltonEthicsTrialsCohorts2017]. By contrast, in new antidepressant trials, patients (and raters) were largely unable to judge treatment allocation [@linAssessmentBlindingRandomized2022], suggesting that expectancy effects are well-matched across conditions. Since expectancy is substantially associated with treatment outcomes [@constantinoExpectations2011], if expectancy differs between medication and psychotherapy trials, comparisons between them, including in NMA, become questionable.
 
-Another difference in design is the number of trial sites. The number of sites in medication trials is positively related to the magnitude of placebo response [@bridgePlaceboResponseRandomized2009; @dechartresSingleCenterTrialsShow2011]. This phenomenon may be due to lower quality of assessments in multi-site trials, with higher rates of classification errors and therefore higher apparent spontaneous remission or regression to the mean. 
+Another difference in design is the number of trial sites. The number of sites in medication trials is positively related to the magnitude of placebo response [@bridgePlaceboResponseRandomized2009; @dechartresSingleCenterTrialsShow2011; @meisterPlaceboResponseRates2020]. This phenomenon may be due to lower quality of assessments in multi-site trials, with higher rates of classification errors and therefore higher apparent spontaneous remission or regression to the mean. 
 
-An inter-related issue concerns the effect of control conditions. Often psychotherapy and medication are compared on the basis of their respective effect sizes (i.e. differences between the active and control conditions for each modality). For these to be comparable, medication and psychotherapy controls ought to be equal in their effects. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100%-60% and another from a difference of 40%-0%.
+An inter-related issue concerns the effect of control conditions. Often psychotherapy and medication are compared on the basis of their respective effect sizes (i.e. differences between the active and control conditions for each modality). For these to be comparable, medication and psychotherapy controls ought to be equal in their effects. Otherwise, misleading conclusions could be drawn, e.g. two effect sizes of 40% would be considered equal, even if one arose from a difference of 100% versus 60% and another from a difference of 40% versus 0% (i.e. from different points of reference).
 
 Additionally, control conditions in RCTs should generate counterfactual conditions to the intervention [@guoChapterCounterfactualFramework2014]: what would have been the outcome had an individual not received the intervention, with all else being equal. Pill placebo, where the appearance of the drug is faithfully emulated, is an effort for all else to be equal. In psychotherapy trials, control conditions may not be so well matched to the intervention (e.g. in number of hours of therapist contact).
 
@@ -1639,7 +1643,7 @@ We applied metaregression to obtain the SMDs and confidence intervals of each of
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #| label: fig-plot-means-all
-#| fig-cap: "Meta-analytic estimates of within-group changes: all studies"
+#| fig-cap: "Meta-analytic estimates of within-group changes for overall sample"
 #| fig-cap-location: top
 
 df_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
@@ -1754,85 +1758,114 @@ We  conducted a series of sensitivity analyses (all figures in the Supplemental 
 ##### Addressing Regression to the Mean
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-#### Let's start from the beginning and regress cohens on the baseline dataframe.
+# #### Let's start from the beginning and regress cohens on the baseline dataframe.
+# 
+# # create a new list with dfs for the sims
+# df_long_for_metan_adj_cohens_d <- df_long_for_metan
+# # rename the cohens_d value to make space for the new cohen's d
+# df_long_for_metan_adj_cohens_d <-
+#   df_long_for_metan_adj_cohens_d %>%
+# rename(unadjusted_cohens_d = cohens_d,
+# )
+# # estimate the cohen's d from the residuals
+# model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$perc_baseline_mean, na.action=na.exclude)
+# 
+# # there is a great effect of the baseline means, as shown here
+# results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
+# 
+# # extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
+# df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
+# 
+# # apply function to simulate standard errors
+# list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d,
+#                                    num_repetitions = 1000,
+#                                    seed  = 1974,
+#                                    n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)),
+#                                    a = 0.45,
+#                                    b = .9,
+#                                    mean = 0.65,
+#                                    sd = 0.2)
+# 
+# 
+# # add the four level variable and re-level
+# for(i in 1: length(list_df_simulated_adj_cohens_d)){
+# 
+#   list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
+#   list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>%
+#     mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+#                                       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+#     )
+# 
+#   list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
+# 
+#   # relevel so that medication control becomes the reference category for the regression
+#   #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+#   list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
+#                                                          "medication_control",
+#                                                          "medication_active",
+#                                                          "psychotherapy_control",
+#                                                          "psychotherapy_active")
+# }
+# 
+# 
+# 
+# 
+# 
+# # Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
+# # specify model
+# model_x <- as.formula(~ four_level_var)
+# 
+# # run metareg function
+# # here you can use the simulated results directly
+# list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_x)
+# 
+# # extract coefficients and model characteristics.
+# condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
+# aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
+# aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
+# 
+# # extract SMDs from the  list
+# list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
+# 
+# # calculate mean SMDs and ses
+# df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
+# 
+# df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
+# 
 
-# create a new list with dfs for the sims
-df_long_for_metan_adj_cohens_d <- df_long_for_metan
-# rename the cohens_d value to make space for the new cohen's d
-df_long_for_metan_adj_cohens_d <-
-  df_long_for_metan_adj_cohens_d %>%
-rename(unadjusted_cohens_d = cohens_d,
+####code to extract baseline-adjusted post means for CDRS and HAMD 
+
+de_meaned_baseline_mean <- (list_df_simulated[[1]]$perc_baseline_mean - mean(list_df_simulated[[1]]$perc_baseline_mean, na.rm = TRUE)) 
+
+lm_for_baseline_means <- lm(list_df_simulated[[1]]$perc_post_mean ~ de_meaned_baseline_mean + list_df_simulated[[1]]$four_level_var, na.action=na.exclude, )
+
+coefs_lm_for_baseline_means  <- broom:: tidy(lm_for_baseline_means)
+
+condition <- coefs_lm_for_baseline_means$term
+
+smds <-c(coefs_lm_for_baseline_means$estimate[1], coefs_lm_for_baseline_means$estimate[-1] + coefs_lm_for_baseline_means$estimate[1])
+
+upper_ci <- smds + coefs_lm_for_baseline_means$std.error*1.96
+
+lower_ci <- smds - coefs_lm_for_baseline_means$std.error*1.96
+
+de_meaned_smd_with_cis <- data.frame (
+
+  condition = levels(list_df_simulated[[1]]$four_level_var),
+
+  smds = smds[-2],
+  
+  lower_ci = lower_ci[-2],
+
+  upper_ci = upper_ci[-2]
+
 )
-# estimate the cohen's d from the residuals
-model_adjust_cohens_d <-  lm(df_long_for_metan_adj_cohens_d$unadjusted_cohens_d ~ df_long_for_metan_adj_cohens_d$perc_baseline_mean, na.action=na.exclude)
-
-# there is a great effect of the baseline means, as shown here
-results_adjusted_cohens_d <- broom:: tidy(model_adjust_cohens_d )
-
-# extract the residuals which are the adjusted cohen's d, to get the simulated standard errors
-df_long_for_metan_adj_cohens_d$cohens_d <- residuals(model_adjust_cohens_d )
-
-# apply function to simulate standard errors
-list_df_simulated_adj_cohens_d <- simulate_dataframes_for_st_errors(df = df_long_for_metan_adj_cohens_d,
-                                   num_repetitions = 1000,
-                                   seed  = 1974,
-                                   n = length(unique(df_long_for_metan_adj_cohens_d$new_study_id)),
-                                   a = 0.45,
-                                   b = .9,
-                                   mean = 0.65,
-                                   sd = 0.2)
-
-
-# add the four level variable and re-level
-for(i in 1: length(list_df_simulated_adj_cohens_d)){
-
-  list_df_simulated_adj_cohens_d[[i]]$arm_effect_size <- factor(list_df_simulated_adj_cohens_d[[i]]$arm_effect_size)
-  list_df_simulated_adj_cohens_d[[i]] <- list_df_simulated_adj_cohens_d[[i]] %>%
-    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
-                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
-    )
-
-  list_df_simulated_adj_cohens_d[[i]]$four_level_var <- factor(list_df_simulated_adj_cohens_d[[i]]$four_level_var) # turn to factor
-
-  # relevel so that medication control becomes the reference category for the regression
-  #  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
-  list_df_simulated_adj_cohens_d[[i]]$four_level_var <-   fct_relevel(list_df_simulated_adj_cohens_d[[i]]$four_level_var,
-                                                         "medication_control",
-                                                         "medication_active",
-                                                         "psychotherapy_control",
-                                                         "psychotherapy_active")
-}
-
-
-
-
-
-# Run metaregression model (assuming that the four level variable is present given that I create this dataframe from the list_)
-# specify model
-model_x <- as.formula(~ four_level_var)
-
-# run metareg function
-# here you can use the simulated results directly
-list_model_1_meta_reg_adj_cohens_d <- run_metaregression(list_df_simulated_adj_cohens_d, model_x)
-
-# extract coefficients and model characteristics.
-condition <- levels(list_df_simulated_adj_cohens_d[[1]]$four_level_var)
-aggregate_results_overall_adjusted_cohens_d <-  aggregate_model_results(list_model_1_meta_reg_adj_cohens_d, condition)
-aggregate_results_overall_adjusted_cohens_d <- cbind(aggregate_results_overall_adjusted_cohens_d, condition)
-
-# extract SMDs from the  list
-list_dummy_var_means_adjusted_cohens_d <-  lapply(list_model_1_meta_reg_adj_cohens_d, extract_coefficients_func)
-
-# calculate mean SMDs and ses
-df_mean_coefs_from_sim_adjusted_cohens_d <- calculate_mean_coefs_ses(list_dummy_var_means_adjusted_cohens_d, condition)
-
-df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
 
 ```
 
-We addressed potential regression to the mean by residualising SMDs by the percentage adjusted baseline scores in one regression model (see @tbl-adj-smds in the Supplement). The difference between the medication control and psychotherapy control arms remained similar to the overall analyses.
+We addressed potential regression to the mean by including the baseline score for each depression scale in the linear regression model as per equation 3 in @barnettRegressionMeanWhat2004 (see @tbl-de-meaned in the Supplement). The difference between the medication control and psychotherapy control arms remained significantly different.
 
 ### Number of trial sites
 
@@ -2343,23 +2376,23 @@ Severity is particularly important as it may moderate treatment response, with s
 
 We then turned to our second question about whether trial design conditions are comparable between modalities. We found that medication trials are vastly more likely to be multi-site than their psychotherapy counterparts; in the current study, 93% of medication RCTs were multisite compared to 54% of psychotherapy RCTs. Multisite trials are associated with higher pill placebo response [@bridgePlaceboResponseRandomized2009], and are less common in publicly-funded trials which show lower pill placebo efficacy. Also, in single-site trials, principal investigators are often intellectually invested in the treatment (in psychotherapy these are often treatments developed or modified by the PI); this is in stark contrast to the incentive structure in multi-site trials where the number of recruited participants is the primary unit of reimbursement.
 
-Second, psychotherapy controls have moderate effect sizes (-0.5) whereas medication controls have very large effect sizes (-1.9). Our analysis could be critiqued as it compares within arm symptom change per trial, therefore effectively breaking randomisation. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving randomisation to balance confounders is critical. However, we note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomisation structure. More importantly, we do not claim that these differences are genuinely due to efficacy differences; they may well be because people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences from comparisons of modalities. This is particularly problematic as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings, which our findings make obvious is misleading.
+Second, psychotherapy controls have moderate effect sizes (-0.5) whereas medication controls have very large effect sizes (-1.9). Our analysis could be critiqued as it compares within arm symptom change per trial, therefore effectively breaking randomisation. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving randomisation to balance confounders is critical. However, we note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomisation structure. Indeed, in Zhou et al. [@zhouComparativeEfficacyAcceptability2020] the estimates for psychotherapy controls, TAU and waitlist conditions favoured placebo (though CIs were broad because these were indirectly estimated), as did estimates for psychodynamic and behavioural therapy. CBT did not differentiate from placebo, a result that is likely heavily weighted by the results of their direct comparison in the TADS trial [@marchFluoxetineCognitiveBehavioralTherapy2004]. More importantly, we do not claim that these differences are genuinely due to efficacy differences; they may well be because people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the vast disparity in the response to control conditions is reason for major concern about our ability to draw inferences from comparisons of modalities. This is particularly problematic as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings, which our findings make obvious is misleading.
 
-Moving beyond comparison between modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving treatment. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind) yet psychotherapy trials are unlikely to fulfill some other basic conditions of the "all else is equal" assumption. In order to test that a psychological treatment is effective per se (e.g. because of the specific techniques) rather than because of generic effects (e.g. pleasant human contact), aspects such as therapist contact time should be matched. Many (24%) psychotherapy RCTs use waitlist controls, which by definition do not match for hours of therapist contact, and are often associated with disappointment bias. TAU and other psychotherapy control conditions varied drastically; 9 RCTs used controls that exactly matched the active arm in total number of contact hours, though several studies used bibliotherapy or online-only control conditions which did not involve any direct therapist contact. Importantly, controls were often very poorly described, resulting in difficulties quantifying their intensity and hence evaluating their adequacy as counterfactual conditions. Overall, there is a lack of rigor in matching control to active treatment conditions in psychotherapy RCTs, with the latter typically featuring considerably more contact hours, which may artificially inflate estimates of the efficacy of psychological treatments.
+Moving beyond comparison between modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving treatment. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind) yet psychotherapy trials are unlikely to fulfill some other basic conditions of the "all else is equal" assumption. In order to test that a psychological treatment is effective per se (e.g. because of the specific techniques) rather than because of generic effects (e.g. pleasant human contact), aspects such as therapist contact time should be matched. Many (24%) psychotherapy RCTs use waitlist controls, which by definition do not match for hours of therapist contact, and are often associated with disappointment bias. TAU and other psychotherapy control conditions varied drastically; 9 RCTs used controls that exactly matched the active arm in total number of contact hours, though several studies used bibliotherapy or online-only control conditions which did not involve any direct therapist contact. Importantly, controls were often very poorly described, resulting in difficulties quantifying their intensity and hence evaluating their adequacy as counterfactual conditions. Overall, there is very poor matching of control to active treatment conditions in psychotherapy RCTs, with the latter typically featuring considerably more contact hours, which may artificially inflate estimates of the efficacy of psychological treatments.
 
 Given all of the above, the certainty with which guidelines recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have several profound implications for patients, their families, clinicians and policy makers.
 
 First, the grounds for comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is an urgent need to revisit guidelines and public information in light of the limitations.
 
-Second, the low quality of psychotherapy control conditions should prompt consideration of how to create fair comparators. Investment should be directed into providing rigorous evidence that establishes depression psychotherapies as more efficacious than fair controls. There are examples of RCTs where such rigor has been applied (e.g. Bolton, 2007; Liddle, 1990; Rohde, 2004) in matching active and control arms on variables such as therapist time and attention, provision of homework, and small group interaction. 
+Second, the low quality of psychotherapy control conditions should prompt consideration of how to create fair comparators. Investment should be directed into providing rigorous evidence that establishes depression psychotherapies as more efficacious than fair controls. There are examples of RCTs where such rigor has been applied (e.g. Bolton, 2007; Liddle, 1990; Rohde, 2004) in matching active and control arms on variables such as therapist time and attention, provision of homework, and small group interaction. Moreover, there is a place for comparing interventions to TAU, however issues of disappointment bias should be addressed to avoid inflating treatment estimates.
 
-Third, our findings make clear the inherent difficulties of comparing psychotherapy with medication trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. The first obstacle is the comparability of the populations taking part. Head-to-head comparisons of psychotherapy with medication (as done in [@marchFluoxetineCognitiveBehavioralTherapy2004]) are more favourable in this regard, yet even so these trials might sample the population of those who are indifferent to which treatment they receive. And even in such a design, difficulties with blinding of the psychotherapy control would have to be overcome to draw valid inferences.
+Third, our findings make clear the inherent difficulties of comparing psychotherapy with medication trials [@delgiovaneCombiningPharmacologicalNonpharmacological2019]. The first obstacle is the comparability of the populations taking part. Head-to-head comparisons of psychotherapy with medication (as done in [@marchFluoxetineCognitiveBehavioralTherapy2004]) are more favourable in this regard, yet even so these trials might sample the population of those who are indifferent to which treatment they receive [@kingImpactParticipantPhysician2005]. And even in such a design, difficulties with blinding of the psychotherapy control would have to be overcome to draw valid inferences.
 
 In summary, the current findings give cause for consternation about the state of the evidence for treatments of youth depression. Our data question the state of knowledge about the efficacy of psychotherapies and the extent to which giving them primacy in the treatment of depression is justified and beneficial for young people. Returning to our motivating question, the stakeholders, including patients and clinicians, deserve better evidence on which to base their choices.
 
 # Supplemental Materials
 
-## Systematic review search terms and PRISMA chart
+## Systematic review description and search terms
 
 We conducted a systematic search for medication studies published from 31 May 2015 up to 1 Jan 2021 (i.e. after the final search date of Cipriani et al.'s [@ciprianiComparativeEfficacyTolerability2016] review up to the final search date of Cuijpers et al's [@cuijpersEffectsPsychologicalTreatments2021] review). We searched PubMed, the Cochrane Central Register of Controlled Trials, Embase, Web of Science, CINAHL, PsycINFO and LiLACS for randomised controlled trials (RCTs) comparing any antidepressant with placebo in the treatment of children and adolescents with a primary diagnosis of major depressive disorder. We used the same search terms as Cipriani [@ciprianiComparativeEfficacyTolerability2016] with one additional search term to include only placebo-controlled trials (see below). We additionally applied filters to specify our date range, and to exclude reviews and non-human studies. We also searched clinical trial registers for published and unpublished studies however all RCTs meeting inclusion criteria had already been identified from the database search outlined above. Please see @fig-prisma for the PRISMA flow diagram. 
 
@@ -2369,7 +2402,7 @@ We used Covidence, an online software tool, to manage our systematic review. Our
 
 Explicit search strategy: title/abstract = (depress* or dysthymi\* or "mood disorder\*" or "affective disorder*") AND (adolesc\* or child\* or boy\* or girl\* or juvenil\* or minors or paediatri\* or pediatri\* or pubescen\* or school\* or student\* or teen\* or young or youth\*) AND (selective serotonin reuptake inhibitor or SSRI or citalopram or fluoxetine or paroxetine or sertraline or escitalopram or fluvoxamine or serotonin norepinephrine reuptake inhibitor\* or SNRI or venlafaxine or duloxetine or milnacipran or reboxetine or bupropion or noradrenergic and specific serotonergic antidepressants or NaSSA or mirtazapine or TCA or tricyclic or amersergide or amineptine or amitriptyline or amoxapine or butriptyline or chlorpoxiten or clomipramine or clorimipramine or demexiptiline or desipramine or dibenzipin or dothiepin or doxepin or imipramine or lofepramine or melitracen or metapramine or nortriptyline or noxiptiline or opipramol or protriptyline or quinupramine or tianeptine or trimipramine) AND (placebo)
 
-**References for included trials**
+##References for included trials
 
 References for trials included in the existing meta-analyses drawn upon for this study can be found [here](https://docs.metapsy.org/databases/depression-childadol-psyctr/) for psychotherapy RCTs and [here](https://ora.ox.ac.uk/objects/uuid:e0b5ae23-d562-4348-94b8-84f70b7812c5) for medication RCTs. Below are references for the seven additional RCTs identified in the original systematic review conducted for the current study. 
 
@@ -2391,7 +2424,7 @@ Active Reference (Fluoxetine) Fixed-dose Study of Vortioxetine in Paediatric Pat
 
 Safety and Efficacy of Levomilnacipran ER in Adolescent Participants With Major Depressive Disorder. ClinicalTrials.gov Identifier: NCT02431806. Accessed 17 Jan 2024.
 
-**Hierarchy of depression symptom severity measurement scales**
+## Hierarchy of depression symptom severity measurement scales
 
 Where multiple depression rating scales were used, we selected the best available measure according to the following hierarchy used in Cipriani et al. [@ciprianiComparativeEfficacyTolerability2016].
 
@@ -2588,6 +2621,226 @@ table_all_trials %>%
 
 ```
 
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
+#| label: tbl-hamd-baseline
+#| tbl-cap: "HAM-D scores at baseline across psychotherapy and medication RCTs"
+#| tbl-cap-location: top
+
+# now for the ham-d
+# For row names
+results_met_sev_hamd <- results_met_sev_hamd %>%
+  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
+
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(results_met_sev_hamd) <- new_column_names
+
+# Rounding
+results_met_sev_hamd <- results_met_sev_hamd %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) 
+
+results_met_sev_hamd %>% 
+  as_flextable() %>% 
+  align(j = 2:ncol(results_met_sev_hamd), align = "center", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
+  border_remove() %>% # this is to remove borders that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  line_spacing(space = .7, part = "all") %>% 
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  autofit()
+
+# # All of the below is for the HAMD baseline meta-analysis when we have 4 levels
+# # Prepare to tabulate
+# 
+# table_2_hamd_metareg_baseline <- results_hamd_metareg_baseline[[2]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "baseline_smds") %>%
+#   relocate("n", .before = "baseline_smds") %>%
+#   relocate("lower_cis_smds", .before = "upper_cis_smds")
+# 
+# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# 
+# # Assign new column names to the data frame
+# colnames(table_2_hamd_metareg_baseline) <- new_column_names
+# 
+# flextable(table_2_hamd_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_2_hamd_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+# 
+# # Regression results
+# 
+# table_1_hamd_metareg_baseline <- results_hamd_metareg_baseline[[1]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "term") %>%
+#   select(-c("term", "type"))
+# 
+# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
+# 
+# # Assign new column names to the data frame
+# colnames(table_1_hamd_metareg_baseline) <- new_column_names
+# 
+# flextable(table_1_hamd_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_1_hamd_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
+#| label: tbl-cdrs-baseline
+#| tbl-cap: "CDRS scores at baseline across psychotherapy and medication RCTs"
+#| tbl-cap-location: top
+
+# For row names
+results_met_sev_cdrs <- results_met_sev_cdrs %>%
+  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
+
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(results_met_sev_cdrs) <- new_column_names
+
+# Rounding
+results_met_sev_cdrs <- results_met_sev_cdrs %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
+  slice(1, 3, 2)
+
+results_met_sev_cdrs %>% 
+  as_flextable() %>% 
+  align(j = 2:ncol(results_met_sev_cdrs), align = "center", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
+  border_remove() %>% # this is to remove borders that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  line_spacing(space = .7, part = "all") %>% 
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  autofit()
+
+# # All of the below is for the CDRS baseline meta-analysis when we have 4 levels
+# # Prepare to tabulate
+# 
+# table_2_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[2]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "baseline_smds") %>%
+#   relocate("n", .before = "baseline_smds") %>%
+#   relocate("lower_cis_smds", .before = "upper_cis_smds")
+# 
+# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# 
+# # Assign new column names to the data frame
+# colnames(table_2_cdrs_metareg_baseline) <- new_column_names
+# 
+# flextable(table_2_cdrs_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_2_cdrs_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+# 
+# # Regression results
+# 
+# table_1_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[1]] %>%
+#   mutate(across(where(is.numeric), ~round(., 2))) %>%
+#   mutate(condition = case_when(
+#     condition == "medication_control" ~ "Medication Control",
+#     condition == "medication_active" ~ "Medication Active",
+#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
+#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
+#     TRUE ~ as.character(condition))) %>%
+#   relocate("condition", .before = "term") %>%
+#   select(-c("term", "type"))
+# 
+# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
+# 
+# # Assign new column names to the data frame
+# colnames(table_1_cdrs_metareg_baseline) <- new_column_names
+# 
+# flextable(table_1_cdrs_metareg_baseline) %>%
+#   set_table_properties(width = 1) %>%
+#   autofit() %>%
+#   font(fontname = "Calibri", part = "all") %>%
+#   bold(part = "header") %>%   # Bold the relevant header rows
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   border_remove() %>% # this is to remove borders around the caption that look strange
+#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+#   vline(j = 1, part = "body", border = small_border) %>%
+#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+#   hline(part = "header", border = big_border) %>%
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
+#   align(j = 2:ncol(table_1_cdrs_metareg_baseline), align = "center", part = "all") %>%
+#   align(j = 1, align = "left", part = "all") %>%
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   line_spacing(space = .7, part = "all")
+
+```
+
 ## Metaregression sensitivity analyses 
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -2726,304 +2979,154 @@ print(stab_sims)
 
 ```
 
+
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-hamd-baseline
-#| tbl-cap: "HAM-D Baseline Scores across Psychotherapy and Medication RCTs"
-#| tbl-cap-location: top
-
-# now for the ham-d
-# For row names
-results_met_sev_hamd <- results_met_sev_hamd %>%
-  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
-
-# Define new column names
-new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
-
-# Assign new column names to the data frame
-colnames(results_met_sev_hamd) <- new_column_names
-
-# Rounding
-results_met_sev_hamd <- results_met_sev_hamd %>%
-  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
-  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) 
-
-results_met_sev_hamd %>% 
-  as_flextable() %>% 
-  align(j = 2:ncol(results_met_sev_hamd), align = "center", part = "all") %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
-  border_remove() %>% # this is to remove borders that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  line_spacing(space = .7, part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  autofit()
-
-# # All of the below is for the HAMD baseline meta-analysis when we have 4 levels
-# # Prepare to tabulate
+# #| label: tbl-adj-smds
+# #| tbl-cap: "SMDs adjusted by baseline scores"
+# #| tbl-cap-location: top
 # 
-# table_2_hamd_metareg_baseline <- results_hamd_metareg_baseline[[2]] %>%
+# table_mean_coefs_from_sim_adjusted_cohens_d <- df_mean_coefs_from_sim_adjusted_cohens_d %>%
 #   mutate(across(where(is.numeric), ~round(., 2))) %>%
 #   mutate(condition = case_when(
 #     condition == "medication_control" ~ "Medication Control",
 #     condition == "medication_active" ~ "Medication Active",
 #     condition == "psychotherapy_control" ~ "Psychotherapy Control",
 #     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-#     TRUE ~ as.character(condition))) %>%
-#   relocate("condition", .before = "baseline_smds") %>%
-#   relocate("n", .before = "baseline_smds") %>%
-#   relocate("lower_cis_smds", .before = "upper_cis_smds")
+#     TRUE ~ as.character(condition))) 
 # 
-# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
+# new_column_names <- c("Condition", "Coefficient", "SE", "Lower CI", "Upper CI")
 # 
 # # Assign new column names to the data frame
-# colnames(table_2_hamd_metareg_baseline) <- new_column_names
+# colnames(table_mean_coefs_from_sim_adjusted_cohens_d) <- new_column_names
 # 
-# flextable(table_2_hamd_metareg_baseline) %>%
+# flextable(table_mean_coefs_from_sim_adjusted_cohens_d) %>%
 #   set_table_properties(width = 1) %>%
 #   autofit() %>%
-#   font(fontname = "Calibri", part = "all") %>%
+#   font(fontname = "Calibri", part = "all") %>% 
 #   bold(part = "header") %>%   # Bold the relevant header rows
-#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
 #   border_remove() %>% # this is to remove borders around the caption that look strange
 #   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-#   vline(j = 1, part = "body", border = small_border) %>%
+#   vline(j = 1, part = "body", border = small_border) %>% 
 #   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-#   hline(part = "header", border = big_border) %>%
-#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
-#   align(j = 2:ncol(table_2_hamd_metareg_baseline), align = "center", part = "all") %>%
-#   align(j = 1, align = "left", part = "all") %>%
-#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   hline(part = "header", border = big_border) %>% 
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+#   align(j = 2:ncol(table_mean_coefs_from_sim_adjusted_cohens_d), align = "center", part = "all") %>% 
+#   align(j = 1, align = "left", part = "all") %>% 
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>% 
 #   line_spacing(space = .7, part = "all")
 # 
-# # Regression results
-# 
-# table_1_hamd_metareg_baseline <- results_hamd_metareg_baseline[[1]] %>%
+# aggregate_results_overall_adjusted_cohens_d <- aggregate_results_overall_adjusted_cohens_d %>%
 #   mutate(across(where(is.numeric), ~round(., 2))) %>%
 #   mutate(condition = case_when(
 #     condition == "medication_control" ~ "Medication Control",
 #     condition == "medication_active" ~ "Medication Active",
 #     condition == "psychotherapy_control" ~ "Psychotherapy Control",
 #     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-#     TRUE ~ as.character(condition))) %>%
-#   relocate("condition", .before = "term") %>%
-#   select(-c("term", "type"))
+#     TRUE ~ as.character(condition))) %>% 
+#   relocate("condition", .before = "coefficients") 
 # 
-# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
+# new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "Upper CI", "T2", "I2", "k", "R2")
 # 
 # # Assign new column names to the data frame
-# colnames(table_1_hamd_metareg_baseline) <- new_column_names
+# colnames(aggregate_results_overall_adjusted_cohens_d) <- new_column_names
 # 
-# flextable(table_1_hamd_metareg_baseline) %>%
+# table_results_overall_adjusted_cohens_d <- aggregate_results_overall_adjusted_cohens_d[, 1:6]
+# 
+# flextable(table_results_overall_adjusted_cohens_d) %>%
 #   set_table_properties(width = 1) %>%
 #   autofit() %>%
-#   font(fontname = "Calibri", part = "all") %>%
+#   add_footer_row(values = as_paragraph("T", as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "T2"],
+#                       "; ", as_i("I"), as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "I2"], 
+#                       "; ", as_i("K"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "k"],
+#                       "; ", as_i("R"), as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "R2"], "."), colwidths = 6) %>%
+#   # add_header_row(values = "Results from metaregression with overall sample", colwidths = 6) %>%
+#   # add_header_row(values = "Table 4", colwidths = 6) %>% 
 #   bold(part = "header") %>%   # Bold the relevant header rows
-#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
+#   # italic(i = 2, italic = TRUE, part = "header") %>% 
 #   border_remove() %>% # this is to remove borders around the caption that look strange
 #   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-#   vline(j = 1, part = "body", border = small_border) %>%
+#   vline(j = 1, part = "body", border = small_border) %>% 
 #   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-#   hline(part = "header", border = big_border) %>%
-#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
-#   align(j = 2:ncol(table_1_hamd_metareg_baseline), align = "center", part = "all") %>%
-#   align(j = 1, align = "left", part = "all") %>%
-#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
+#   hline(part = "header", border = big_border) %>% 
+#   # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+#   align(j = 2:ncol(table_aggregate_results_overall), align = "center", part = "all") %>% 
+#   align(j = 1, align = "left", part = "all") %>% 
+#   font(fontname = "Calibri", part = "all") %>% 
+#   paginate(init = TRUE, hdr_ftr = TRUE) %>% 
 #   line_spacing(space = .7, part = "all")
 
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-cdrs-baseline
-#| tbl-cap: "CDRS Baseline Scores across Psychotherapy and Medication RCTs"
+#| label: tbl-de-meaned
+#| tbl-cap: "Results from baseline-adjusted model"
 #| tbl-cap-location: top
 
-# For row names
-results_met_sev_cdrs <- results_met_sev_cdrs %>%
-  mutate(subgroup = if_else(subgroup == 0, "Medication", "Psychotherapy"))
-
-# Define new column names
-new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
-
-# Assign new column names to the data frame
-colnames(results_met_sev_cdrs) <- new_column_names
-
-# Rounding
-results_met_sev_cdrs <- results_met_sev_cdrs %>%
-  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
-  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
-  mutate_all(~if_else(is.na(.), "", as.character(.))) %>% 
-  slice(1, 3, 2)
-
-results_met_sev_cdrs %>% 
-  as_flextable() %>% 
-  align(j = 2:ncol(results_met_sev_cdrs), align = "center", part = "all") %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
-  border_remove() %>% # this is to remove borders that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  line_spacing(space = .7, part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
-  autofit()
-
-# # All of the below is for the CDRS baseline meta-analysis when we have 4 levels
-# # Prepare to tabulate
-# 
-# table_2_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[2]] %>%
-#   mutate(across(where(is.numeric), ~round(., 2))) %>%
-#   mutate(condition = case_when(
-#     condition == "medication_control" ~ "Medication Control",
-#     condition == "medication_active" ~ "Medication Active",
-#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
-#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-#     TRUE ~ as.character(condition))) %>%
-#   relocate("condition", .before = "baseline_smds") %>%
-#   relocate("n", .before = "baseline_smds") %>%
-#   relocate("lower_cis_smds", .before = "upper_cis_smds")
-# 
-# new_column_names <- c("Condition", "N", "Baseline Scores", "Lower CI", "Upper CI")
-# 
-# # Assign new column names to the data frame
-# colnames(table_2_cdrs_metareg_baseline) <- new_column_names
-# 
-# flextable(table_2_cdrs_metareg_baseline) %>%
-#   set_table_properties(width = 1) %>%
-#   autofit() %>%
-#   font(fontname = "Calibri", part = "all") %>%
-#   bold(part = "header") %>%   # Bold the relevant header rows
-#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-#   border_remove() %>% # this is to remove borders around the caption that look strange
-#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-#   vline(j = 1, part = "body", border = small_border) %>%
-#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-#   hline(part = "header", border = big_border) %>%
-#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
-#   align(j = 2:ncol(table_2_cdrs_metareg_baseline), align = "center", part = "all") %>%
-#   align(j = 1, align = "left", part = "all") %>%
-#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
-#   line_spacing(space = .7, part = "all")
-# 
-# # Regression results
-# 
-# table_1_cdrs_metareg_baseline <- results_cdrs_metareg_baseline[[1]] %>%
-#   mutate(across(where(is.numeric), ~round(., 2))) %>%
-#   mutate(condition = case_when(
-#     condition == "medication_control" ~ "Medication Control",
-#     condition == "medication_active" ~ "Medication Active",
-#     condition == "psychotherapy_control" ~ "Psychotherapy Control",
-#     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-#     TRUE ~ as.character(condition))) %>%
-#   relocate("condition", .before = "term") %>%
-#   select(-c("term", "type"))
-# 
-# new_column_names <- c("Condition", "Estimate", "SE", "Statistic", "p value")
-# 
-# # Assign new column names to the data frame
-# colnames(table_1_cdrs_metareg_baseline) <- new_column_names
-# 
-# flextable(table_1_cdrs_metareg_baseline) %>%
-#   set_table_properties(width = 1) %>%
-#   autofit() %>%
-#   font(fontname = "Calibri", part = "all") %>%
-#   bold(part = "header") %>%   # Bold the relevant header rows
-#   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
-#   border_remove() %>% # this is to remove borders around the caption that look strange
-#   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-#   vline(j = 1, part = "body", border = small_border) %>%
-#   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-#   hline(part = "header", border = big_border) %>%
-#   # padding(i = 2, padding.bottom = 15, part = "header") %>%
-#   align(j = 2:ncol(table_1_cdrs_metareg_baseline), align = "center", part = "all") %>%
-#   align(j = 1, align = "left", part = "all") %>%
-#   paginate(init = TRUE, hdr_ftr = TRUE) %>%
-#   line_spacing(space = .7, part = "all")
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-adj-smds
-#| tbl-cap: "SMDs adjusted by baseline scores"
-#| tbl-cap-location: top
-
-table_mean_coefs_from_sim_adjusted_cohens_d <- df_mean_coefs_from_sim_adjusted_cohens_d %>%
+de_meaned_smd_with_cis <- de_meaned_smd_with_cis %>%
   mutate(across(where(is.numeric), ~round(., 2))) %>%
   mutate(condition = case_when(
     condition == "medication_control" ~ "Medication Control",
     condition == "medication_active" ~ "Medication Active",
     condition == "psychotherapy_control" ~ "Psychotherapy Control",
     condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) 
+    TRUE ~ as.character(condition)))
 
-new_column_names <- c("Condition", "Coefficient", "SE", "Lower CI", "Upper CI")
-
-# Assign new column names to the data frame
-colnames(table_mean_coefs_from_sim_adjusted_cohens_d) <- new_column_names
-
-flextable(table_mean_coefs_from_sim_adjusted_cohens_d) %>%
-  set_table_properties(width = 1) %>%
-  autofit() %>%
-  font(fontname = "Calibri", part = "all") %>% 
-  bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
-  border_remove() %>% # this is to remove borders around the caption that look strange
-  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
-  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
-  align(j = 2:ncol(table_mean_coefs_from_sim_adjusted_cohens_d), align = "center", part = "all") %>% 
-  align(j = 1, align = "left", part = "all") %>% 
-  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
-  line_spacing(space = .7, part = "all")
-
-aggregate_results_overall_adjusted_cohens_d <- aggregate_results_overall_adjusted_cohens_d %>%
-  mutate(across(where(is.numeric), ~round(., 2))) %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition))) %>% 
-  relocate("condition", .before = "coefficients") 
-
-new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "Upper CI", "T2", "I2", "k", "R2")
+new_column_names <- c("Condition", "SMDs", "Lower CI", "Upper CI")
 
 # Assign new column names to the data frame
-colnames(aggregate_results_overall_adjusted_cohens_d) <- new_column_names
+colnames(de_meaned_smd_with_cis) <- new_column_names
 
-table_results_overall_adjusted_cohens_d <- aggregate_results_overall_adjusted_cohens_d[, 1:6]
-
-flextable(table_results_overall_adjusted_cohens_d) %>%
+flextable(de_meaned_smd_with_cis) %>%
   set_table_properties(width = 1) %>%
   autofit() %>%
-  add_footer_row(values = as_paragraph("T", as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "T2"],
-                      "; ", as_i("I"), as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "I2"], 
-                      "; ", as_i("K"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "k"],
-                      "; ", as_i("R"), as_sup("2"), " = ", aggregate_results_overall_adjusted_cohens_d[1, "R2"], "."), colwidths = 6) %>%
-  # add_header_row(values = "Results from metaregression with overall sample", colwidths = 6) %>%
-  # add_header_row(values = "Table 4", colwidths = 6) %>% 
+  font(fontname = "Calibri", part = "all") %>%
   bold(part = "header") %>%   # Bold the relevant header rows
-  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
-  # italic(i = 2, italic = TRUE, part = "header") %>% 
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
   border_remove() %>% # this is to remove borders around the caption that look strange
   hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
-  vline(j = 1, part = "body", border = small_border) %>% 
+  vline(j = 1, part = "body", border = small_border) %>%
   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
-  hline(part = "header", border = big_border) %>% 
-  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
-  align(j = 2:ncol(table_aggregate_results_overall), align = "center", part = "all") %>% 
-  align(j = 1, align = "left", part = "all") %>% 
-  font(fontname = "Calibri", part = "all") %>% 
-  paginate(init = TRUE, hdr_ftr = TRUE) %>% 
+  hline(part = "header", border = big_border) %>%
+  # padding(i = 2, padding.bottom = 15, part = "header") %>%
+  align(j = 2:ncol(de_meaned_smd_with_cis), align = "center", part = "all") %>%
+  align(j = 1, align = "left", part = "all") %>%
+  paginate(init = TRUE, hdr_ftr = TRUE) %>%
   line_spacing(space = .7, part = "all")
 
+table_coefs_lm_for_baseline_means <- coefs_lm_for_baseline_means[c(1, 3:5),] 
+
+table_coefs_lm_for_baseline_means <- table_coefs_lm_for_baseline_means %>%
+  mutate(across(where(is.numeric) & !matches("p.value"), ~ round(., 2))) %>%
+  mutate(`p.value` = ifelse(`p.value` < 0.001, "< 0.001", sprintf("%.3f", `p.value`)))
+
+new_column_names <- c("Condition", "Estimate", "SE", "t value", "p-value")
+
+# Assign new column names to the data frame
+colnames(table_coefs_lm_for_baseline_means) <- new_column_names
+
+table_coefs_lm_for_baseline_means$Condition <- c("Medication Control", "Medication Active", "Psychotherapy Control", "Psychotherapy Active")
+
+flextable(table_coefs_lm_for_baseline_means) %>%
+  set_table_properties(width = 1) %>%
+  autofit() %>%
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>%
+  # italic(i = 2, italic = TRUE, part = "header") %>%
+  border_remove() %>% # this is to remove borders around the caption that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>%
+  border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>%
+  # padding(i = 2, padding.bottom = 15, part = "header") %>%
+  align(j = 2:ncol(table_coefs_lm_for_baseline_means), align = "center", part = "all") %>%
+  align(j = 1, align = "left", part = "all") %>%
+  font(fontname = "Calibri", part = "all") %>%
+  paginate(init = TRUE, hdr_ftr = TRUE) %>%
+  line_spacing(space = .7, part = "all")
 ```
+
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
 
