@@ -1835,9 +1835,9 @@ We  conducted a series of sensitivity analyses (all figures in the Supplemental 
 # df_mean_coefs_from_sim_adjusted_cohens_d <- data.frame(cbind(condition, df_mean_coefs_from_sim_adjusted_cohens_d))
 # 
 
-####code to extract baseline-adjusted post means for CDRS and HAMD 
+####code to extract baseline-adjusted post means
 
-de_meaned_baseline_mean <- (list_df_simulated[[1]]$perc_baseline_mean - mean(list_df_simulated[[1]]$perc_baseline_mean, na.rm = TRUE)) 
+de_meaned_baseline_mean <- (list_df_simulated[[1]]$perc_baseline_mean - mean(list_df_simulated[[1]]$perc_baseline_mean, na.rm = TRUE))
 
 lm_for_baseline_means <- lm(list_df_simulated[[1]]$perc_post_mean ~ de_meaned_baseline_mean + list_df_simulated[[1]]$four_level_var, na.action=na.exclude, )
 
@@ -1856,7 +1856,7 @@ de_meaned_smd_with_cis <- data.frame (
   condition = levels(list_df_simulated[[1]]$four_level_var),
 
   smds = smds[-2],
-  
+
   lower_ci = lower_ci[-2],
 
   upper_ci = upper_ci[-2]
@@ -2940,42 +2940,42 @@ print(plot_means_hamd)
 It could be argued that the choice of standard errors of the changes for the calculation of the confidence intervals could have affect the results in one or the other direction. To address such concerns we have simulated 1000 different datasets with SMDs coming from a broad distribution. If standard error distributions were influential, this should show up as substantial variability across simulations. We test this idea in the @fig-stab-sims which displays across the 1000 simulations the z-value of the contrast between medication and psychotherapy control arms (the mean of which we presented in @tbl-results-overall). As can be seen, the variability in the z-score is minimal and consistently far away from the threshold for significance, i.e. the value of z = 1.645.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-#| label: fig-stab-sims
-#| fig-cap: "Stability of the Statistic of the Difference between Medication and Psychotherapy Control Arms"
-#| fig-cap-location: top
-
-# examine the stability of the simulations
-
-z_psy_con_vs_med_con <- 0
-for(i in 1: length(list_model_1_meta_reg)){
-z_psy_con_vs_med_con[i] <- list_model_1_meta_reg[[i]]$zval[condition=="psychotherapy_control"]
-
-}
-
-stability_sims <- data.frame(n_sims = 1:1000, z_value = z_psy_con_vs_med_con)
-
-stab_sims <- stability_sims %>%
-  ggplot(aes(x = n_sims, y = z_value)) +
-  geom_point() +
-  geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
-  geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
-               arrow = arrow(length = unit(0.3, "cm")),
-               color = "black") +
-  annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line significant)", hjust = -0.1, vjust = 0) +
-  geom_segment(aes(x = 300, xend = 300, y = 7.5, yend = min(stability_sims$z_value-0.3)),
-               arrow = arrow(length = unit(0.3, "cm")),
-               color = "black") +
-  annotate("text", x = 300, y = 7.5, label = "simulated z-values",
-           hjust = -0.1, vjust = 0) +
-  theme_minimal() +
-  labs(
-    x = "Number of Simulations",
-    y = "z-value",
-    title = "Stability of the Statistic of the Difference between Medication and Psychotherapy Control Arms",
-    subtitle = "Results from 1000 simulations with within-group standard errors"
-  )
-
-print(stab_sims)
+# #| label: fig-stab-sims
+# #| fig-cap: "Stability of the Statistic of the Difference between Medication and Psychotherapy Control Arms"
+# #| fig-cap-location: top
+# 
+# # examine the stability of the simulations
+# 
+# z_psy_con_vs_med_con <- 0
+# for(i in 1: length(list_model_1_meta_reg)){
+# z_psy_con_vs_med_con[i] <- list_model_1_meta_reg[[i]]$zval[condition=="psychotherapy_control"]
+# 
+# }
+# 
+# stability_sims <- data.frame(n_sims = 1:1000, z_value = z_psy_con_vs_med_con)
+# 
+# stab_sims <- stability_sims %>%
+#   ggplot(aes(x = n_sims, y = z_value)) +
+#   geom_point() +
+#   geom_hline(yintercept = 1.65, linetype = "dotted", color = "red") +
+#   geom_segment(aes(x = 300, xend = 300, y = 2, yend = 1.65),
+#                arrow = arrow(length = unit(0.3, "cm")),
+#                color = "black") +
+#   annotate("text", x = 300, y = 2.0, label = "p < 0.05 threshold (values above line significant)", hjust = -0.1, vjust = 0) +
+#   geom_segment(aes(x = 300, xend = 300, y = 7.5, yend = min(stability_sims$z_value-0.3)),
+#                arrow = arrow(length = unit(0.3, "cm")),
+#                color = "black") +
+#   annotate("text", x = 300, y = 7.5, label = "simulated z-values",
+#            hjust = -0.1, vjust = 0) +
+#   theme_minimal() +
+#   labs(
+#     x = "Number of Simulations",
+#     y = "z-value",
+#     title = "Stability of the Statistic of the Difference between Medication and Psychotherapy Control Arms",
+#     subtitle = "Results from 1000 simulations with within-group standard errors"
+#   )
+# 
+# print(stab_sims)
 
 ```
 
@@ -3095,7 +3095,7 @@ flextable(de_meaned_smd_with_cis) %>%
   paginate(init = TRUE, hdr_ftr = TRUE) %>%
   line_spacing(space = .7, part = "all")
 
-table_coefs_lm_for_baseline_means <- coefs_lm_for_baseline_means[c(1, 3:5),] 
+table_coefs_lm_for_baseline_means <- coefs_lm_for_baseline_means[c(1, 3:5),]
 
 table_coefs_lm_for_baseline_means <- table_coefs_lm_for_baseline_means %>%
   mutate(across(where(is.numeric) & !matches("p.value"), ~ round(., 2))) %>%
