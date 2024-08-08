@@ -135,7 +135,7 @@ library(broom)
 library(effsize)
 
 # For referencing
-bib_data <- ReadBib("emotion_concepts_paper.bib")
+bib_data <- ReadBib("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/emotion_concepts_paper.bib")
 
 ```
 
@@ -658,13 +658,13 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
 # Transforming data ------------------------------------------------------
 # import master dataset 
 
-df_appl_v_orange <-readxl:: read_excel("df_appl_v_orange.xlsx")
+df_appl_v_orange <-readxl::read_excel("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/df_appl_v_orange.xlsx")
 
 # Here we add in instrument end point values (mins / maxs).
 # We will use these to transform the scale into % as follows: (observed score - min of the scale)/(max-min)
 # We have done this for both means and standard deviations.
 
-df_scale_ranges <- read.csv("scale_ranges.csv")
+df_scale_ranges <- read.csv("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/scale_ranges.csv")
 df_appl_v_orange <- full_join(df_appl_v_orange, df_scale_ranges, by = "instrument_name")
 
 df_appl_v_orange <- df_appl_v_orange %>% 
@@ -898,8 +898,11 @@ list_df_simulated[[i]]$four_level_var <-   fct_relevel(list_df_simulated[[i]]$fo
 # A) the overall sample
 # B) the CBT vs Fluox and Escitalopram sample
 # C) the no WL sample
-# E) the CDRS only sample (**Argyris** do we still want this?)
-# F) Clinical Levels Depression
+# D) clinical levels of depression
+# E) the CDRS only sample
+# E) HAMD sensitivity analysis
+# G) Studies with post SD
+# H) Studies with variance <.02
 
 # A. Estimate Means and CIs for the overall ----------------------------------
 
@@ -1027,7 +1030,7 @@ coef_and_se_means_no_wl <- left_join(coef_and_se_means_no_wl, study_count_no_wl_
                                       select(condition, n),  
                                     by = "condition")
 
-# D Clinical Levels Depression Sensitivity Analysis ---------------------------------------
+# D. Clinical Levels Depression Sensitivity Analysis---------------------------------------
 
 # We need to decide how we want to do this. We have mdd, mood, sub, and cut categories. For now I'll just exclude sub. 
 
@@ -1110,7 +1113,7 @@ coef_and_se_means_cdrs_study <- left_join(coef_and_se_means_cdrs_study, study_co
                                       select(condition, n),  
                                     by = "condition")
 
-# E. HAMD Sensitivity Analysis ---------------------------------------
+# F. HAMD Sensitivity Analysis ---------------------------------------
 
 hamd_study_ids <-
   df_appl_v_orange[df_appl_v_orange$instrument_name == "hamd",]$new_study_id
@@ -1150,11 +1153,143 @@ coef_and_se_means_hamd_study <- left_join(coef_and_se_means_hamd_study, study_co
                                       select(condition, n),  
                                     by = "condition")
 
+# G. Post SD Sensitivity Analysis ---------------------------------------
+
+##--------- Data preparation
+
+#For this we need to filter the master df by missing post_sd_active and post_sd_control in df_first_row
+
+#create subset of first_row
+
+df_first_row <- read.csv("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/df_first_row.csv")
+
+#create new_study_ids to match master dataset
+df_first_row  <- df_first_row  %>%
+  mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+                                  .default = study ))
+
+df_first_row_reduced <- df_first_row %>%
+  filter(!(new_study_id == "March, 2004" & is.na(control_type))) %>%
+  select(new_study_id, post_sd_active, post_sd_control)
+
+#as first_row has multiple rows per study (showing different arm pairs), I will keep only one row per study
+
+df_first_row_reduced <- df_first_row_reduced %>%
+  group_by(new_study_id) %>%
+  slice_head(n = 1) %>%
+  ungroup()
+
+#create a column in master df that shows 1 if any missing post sds in first_row
+
+df_long_for_metan_with_missing <- df_long_for_metan %>%
+  left_join(df_first_row_reduced, by = "new_study_id") %>%
+  mutate(missing_post_sd = ifelse(is.na(post_sd_active) | is.na(post_sd_control), 1, 0)) %>%
+  select(-post_sd_active, -post_sd_control) %>%
+  arrange(arm_effect_size, new_study_id)
+
+#all studies missing sds in active are also missing them in control, so we can go ahead and filter out all arms of these studies
+
+df_long_for_metan_without_missing <- df_long_for_metan_with_missing %>%
+  filter(missing_post_sd == 0)
+
+n_distinct(df_long_for_metan_without_missing$new_study_id) #61 studies
+n_distinct(df_long_for_metan$new_study_id) #88 studies total
+nrow(df_long_for_metan_without_missing) #140 arms
+nrow(df_long_for_metan) #203 arms
+
+##------------ Estimates 
+
+#take study ids where study does not have missing post SD
+sd_study_ids <-
+  df_long_for_metan_with_missing[df_long_for_metan_with_missing$missing_post_sd ==0,]$new_study_id
+
+# use those ids to subset all dataframes in the list
+list_sd_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+  list_sd_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                 %in% sd_study_ids,]
+}
+
+# count the number of studies
+study_count_sd_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% sd_study_ids,])
+
+# apply the metareg function to the list of clinical studies
+model_1 <- as.formula(~ four_level_var)
+list_model_1_sd_study <- run_multi_metaregression(list_sd_study , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_sd_study <-  aggregate_model_results(list_model_1_sd_study, condition)
+
+# extract SMDs from the list for clinical studies
+means_sd_study <-  lapply(list_model_1_sd_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_sd_study <- calculate_mean_coefs_ses(means_sd_study, condition)
+coef_and_se_means_sd_study <- data.frame(cbind(condition, coef_and_se_means_sd_study))
+
+# add the ns to the dataframe
+coef_and_se_means_sd_study <- left_join(coef_and_se_means_sd_study, study_count_sd_study[study_count_sd_study$is_missing == FALSE, ] %>% 
+                                            ungroup() %>% 
+                                            select(condition, n),  
+                                          by = "condition")
+
+#H. Studies with variances <.02-----------------------------
+
+##-----------Data preparation
+
+#create column with variance in master df
+df_long_for_metan$baseline_variances <- (df_long_for_metan$perc_baseline_sd)^2
+
+#take study ids where variance =2 or less
+var2_study_ids <-
+  df_long_for_metan[df_long_for_metan$baseline_variances<=0.02,]$new_study_id
+length(var2_study_ids)
+
+##------------Estimates
+
+# use those ids to subset all dataframes in the list
+list_var2_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+  
+  list_var2_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                               %in% var2_study_ids,]
+}
+
+# count the number of studies
+study_count_var2_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% var2_study_ids,])
+
+# apply the metareg function to the list of clinical studies
+model_1 <- as.formula(~ four_level_var)
+list_model_1_var2_study <- run_multi_metaregression(list_var2_study, model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_var2_study <-  aggregate_model_results(list_model_1_var2_study, condition)
+
+# extract SMDs from the list for clinical studies
+means_var2_study <-  lapply(list_model_1_var2_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_var2_study <- calculate_mean_coefs_ses(means_var2_study, condition)
+coef_and_se_means_var2_study <- data.frame(cbind(condition, coef_and_se_means_var2_study))
+
+# add the ns to the dataframe
+coef_and_se_means_var2_study <- left_join(coef_and_se_means_var2_study, study_count_var2_study[study_count_var2_study$is_missing == FALSE, ] %>% 
+                                          ungroup() %>% 
+                                          select(condition, n),  
+                                        by = "condition")
+
 ```
 
 ## Included studies
 
-Data for included are summarised in @tbl-all-trials and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. Please see @fig-prisma for a summary of the sources of included RCTs.
+Data for included studies are summarised in @tbl-all-trials and are also available as a csv dataframe on \[<https://github.com/transatlantic-comppsych/apples_oranges>\]. Please see @fig-prisma for a summary of the sources of included RCTs.
 
 In total, there were `r length(unique(df_long_for_metan$new_study_id))` RCTs which included `r sum(df_count_studies[df_count_studies$condition == "medication_active", "n"])` active arms and `r sum(df_count_studies[df_count_studies$condition == "medication_control", "n"])` control arms of medication trials; and `r sum(df_count_studies[df_count_studies$condition == "psychotherapy_active", "n"])` active arms and `r sum(df_count_studies[df_count_studies$condition == "psychotherapy_control", "n"])` control arms from psychotherapy RCTs. Note that the number of active and control arms does not exactly match because some studies feature more than one control or active arm.
 
@@ -2460,7 +2595,7 @@ Moving beyond comparison between modalities, we examined whether psychotherapy c
 
 Given all of the above, the certainty with which guidelines recommend psychotherapy over medication for adolescent depression is surprising. Indeed, we believe that our findings have several profound implications for patients, their families, clinicians and policy makers.
 
-First, the grounds for comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is an urgent need to revisit guidelines and public information in light of the limitations.
+First, the grounds for comparison between medication and psychotherapy should be seen as shaky, rather than offering confidence, and there is a need to revisit guidelines and public information in light of the limitations.
 
 Second, the low quality of psychotherapy control conditions should prompt consideration of how to create fair comparators. Investment should be directed into providing rigorous evidence that establishes depression psychotherapies as more efficacious than fair controls. There are examples of RCTs where such rigor has been applied (e.g. Bolton, 2007; Liddle, 1990; Rohde, 2004) in matching active and control arms on variables such as therapist time and attention, provision of homework, and small group interaction. Moreover, there is a place for comparing interventions to TAU, however issues of disappointment bias should be addressed to avoid inflating treatment estimates.
 
