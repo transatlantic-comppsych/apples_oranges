@@ -133,9 +133,13 @@ library(ftExtra)
 library(dplyr)
 library(broom)
 library(effsize)
+library(here)
+
+#setting paths using here package
+here::here()
 
 # For referencing
-bib_data <- ReadBib("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/emotion_concepts_paper.bib")
+bib_data <- ReadBib(here("emotion_concepts_paper.bib"))
 
 ```
 
@@ -658,13 +662,13 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
 # Transforming data ------------------------------------------------------
 # import master dataset 
 
-df_appl_v_orange <-readxl::read_excel("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/df_appl_v_orange.xlsx")
+df_appl_v_orange <-readxl::read_excel(here("df_appl_v_orange.xlsx"))
 
 # Here we add in instrument end point values (mins / maxs).
 # We will use these to transform the scale into % as follows: (observed score - min of the scale)/(max-min)
 # We have done this for both means and standard deviations.
 
-df_scale_ranges <- read.csv("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/scale_ranges.csv")
+df_scale_ranges <- read.csv(here("scale_ranges.csv"))
 df_appl_v_orange <- full_join(df_appl_v_orange, df_scale_ranges, by = "instrument_name")
 
 df_appl_v_orange <- df_appl_v_orange %>% 
@@ -789,7 +793,7 @@ df_long_for_metan <- df_long_for_metan %>%
   mutate(product_perc_women = (percent_women/100)* (1-(percent_women/100)) )
 
 df_long_for_metan <- df_long_for_metan %>% 
-  mutate(percent_women_std_error = sqrt(product_perc_women/ n_overall ))
+  mutate(percent_women_std_error = sqrt(product_perc_women/ n_overall))
 
 # Create unique IDs by arm for multilevel metaregression
 
@@ -1161,7 +1165,7 @@ coef_and_se_means_hamd_study <- left_join(coef_and_se_means_hamd_study, study_co
 
 #create subset of first_row
 
-df_first_row <- read.csv("C:/Users/Raphaelle/Documents/AIM Lab/apples_and_oranges/main_git/apples_oranges/df_first_row.csv")
+df_first_row <- read.csv(here("df_first_row.csv"))
 
 #create new_study_ids to match master dataset
 df_first_row  <- df_first_row  %>%
@@ -1299,7 +1303,7 @@ Placebo pill was the control condition for all medication trials. In psychothera
 #| label: fig-prisma
 #| fig-cap: "PRISMA chart summarising sources of included studies"
 #| fig-cap-location: top
-knitr::include_graphics("PRISMA.png")
+knitr::include_graphics(here("PRISMA.png"))
 ```
 
 ## Sample characteristics at baseline in medication and psychotherapy trials
@@ -1307,6 +1311,7 @@ knitr::include_graphics("PRISMA.png")
 @tbl-baseline_results summarises the results from each of the meta-analyses examining sample characteristics at baseline. The summary statistics are provided for each subgroup (i.e. medication and psychotherapy) and the p-value derives from the test for subgroup differences.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
 # Start by looking at demographics at baseline
 # Currently we have both control and active conditions, we just need each study once
 
@@ -1341,9 +1346,11 @@ extract_stats <- function(df) {
   
 }
 
-# Now look at baseline severity for overall psy vs med
-# Need to calculate the variables first
+#A. Baseline severity meta-analysis--------------
 
+# Overall psy vs med
+
+# Need to calculate the variables first
 df_for_baseline_severity <- df_long_for_metan %>% 
   group_by(new_study_id) %>%
   mutate(perc_baseline_overall = sum(perc_baseline_mean * baseline_n) / sum(baseline_n)) %>% 
@@ -1374,7 +1381,7 @@ met_sev <- metagen(TE = perc_baseline_overall,
 
 results_met_sev <- extract_stats(met_sev)
 
-# clinical sample
+# Clinical sample
 
 clin_study_ids <-
   df_appl_v_orange[df_appl_v_orange$diagnosis != "sub",]$new_study_id
@@ -1442,14 +1449,16 @@ met_sev_no_wl <- metagen(TE = perc_baseline_overall,
 
 results_met_sev_no_wl <- extract_stats(met_sev_no_wl)
 
-# Now start looking at perc_women variable 
+#B. Sex meta-analysis
+
+# Now start looking at perc_women variable
 # The metagen function doesn't like when NAs result in the TE vector being a different length to subgroup vector. Need to start by removing NAs.
 
 df_for_sex_metan <- df_baseline_demographics %>% 
   filter(!is.na(percent_women))
 
 df_for_sex_metan <- df_for_sex_metan %>% 
-  filter(percent_women != 100) # filter out studies with only women %>% 
+  filter(percent_women != 100) # filter out studies with only women
   
 df_for_sex_metan <- df_for_sex_metan %>% 
   filter(new_study_id != "March, 2004") # removing TADS because it does not technically belong to either the psy or med groups
@@ -1538,7 +1547,7 @@ met_perc_women_no_wl <- metagen(TE = percent_women,
 # Apply the function to the meta-analysis result
 results_met_perc_women_no_wl <- extract_stats(met_perc_women_no_wl)
 
-# Now start looking at age variable
+# C. Age meta-analysis--------------------
 
 # We have several studies for which we are missing SE for age. I am going to perform an imputation by taking an average
 # for the studies we do have, per modality, and substituting this in for missing values. 
@@ -1813,7 +1822,7 @@ To ensure that this was not an artefact of variable transformation, we also comp
 
 ### Sex
 
-For this analysis, we excluded the two psychotherapy trials which included entirely female samples (Moeini, 2019; Shomaker, 2016). As can be seen in @tbl-baseline_results, psychotherapy trials featured a significantly higher percentage of females when compared to medication trials. On average, samples were `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],2)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],2)`) female across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],2)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],2)`) female across medication trials. Excluding sub-clinical and waitlist control studies yielded similar results.
+For this analysis, we excluded the two psychotherapy trials which included entirely female samples (Moeini, 2019; Shomaker, 2016; see @tbl-all-studies-percfemale-results in Supplement for results with full sample). As can be seen in @tbl-baseline_results, psychotherapy trials featured a significantly higher percentage of females when compared to medication trials. On average, samples were `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 1][[2]],2)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 1][[2]],2)`) female across psychotherapy trials and `r round(results_met_perc_women_overall$TE_random[results_met_perc_women_overall$subgroup == 0][[2]],2)`% (*SE* = `r round(results_met_perc_women_overall$seTE_random[results_met_perc_women_overall$subgroup == 0][[2]],2)`) female across medication trials. Excluding sub-clinical and waitlist control studies yielded similar results.
 
 ### Age
 
@@ -1966,7 +1975,7 @@ flextable(table_aggregate_results_overall) %>%
 
 ##### Sensitivity analyses
 
-We conducted a series of sensitivity analyses (all figures in the Supplemental Materials). Excluding waitlist control studies (see @fig-plot-means-no-wl) and sub-clinical studies (see @fig-plot-means-clin) yielded a pattern of results very similar to the overall analyses. Next, we examined the data including only those studies that used the CDRS (see @fig-plot-means-cdrs) or the HAMD (see @fig-plot-means-hamd). Medication control and psychotherapy control conditions remained significantly different, though the small number of studies resulted in less precise estimates of the SMDs. Finally, we showed that different values for the pre-post measure correlation had minimal effect on the estimated outcomes (see @fig-stab-sims).
+We conducted a series of sensitivity analyses (all figures in the Supplement). Excluding waitlist control studies (see @fig-plot-means-no-wl) and sub-clinical studies (see @fig-plot-means-clin) yielded a pattern of results very similar to the overall analyses. Next, we examined the data including only those studies that used the CDRS (see @fig-plot-means-cdrs) or the HAMD (see @fig-plot-means-hamd). Medication control and psychotherapy control conditions remained significantly different, though the small number of studies resulted in less precise estimates of the SMDs. Finally, we showed that different values for the pre-post measure correlation had minimal effect on the estimated outcomes (see @fig-stab-sims).
 
 ##### Addressing Regression to the Mean
 
@@ -3054,6 +3063,150 @@ results_met_sev_cdrs %>%
 
 ```
 
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+
+#Repeating meta-analyses on sample characteristics including studies with females only
+
+#An issue that arise when trying to include studies with 100% female is that their SE ends up being 0, which is treated as NA in the metagen function. One way to circumvent this is to apply a continuity correction by adding a constant (e.g 0.5) to percent female. These studies will now be treated as having 99.5% females.
+
+#overall sample------------
+
+df_for_sex_metan_no_excl <- df_baseline_demographics %>% 
+  filter(!is.na(percent_women)) %>% #use full dataset to include all studies
+  filter(new_study_id != "March, 2004")# removing TADS because it does not technically belong to either the psy or med groups
+
+#using the formula for se (p*(1-p)/n) we add a constant for studies w 100% female
+
+correction_constant <- 0.5
+
+df_for_sex_metan_no_excl <- df_for_sex_metan_no_excl %>% 
+  mutate(constant_percent_women = ifelse(percent_women==100,percent_women-correction_constant,percent_women)) %>%
+  mutate(product_perc_women=(constant_percent_women/100)*(1-(constant_percent_women/100))) %>%
+  mutate(percent_women_std_error = sqrt(product_perc_women / n_overall))
+
+met_perc_women_no_excl  <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_sex_metan_no_excl,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across studies")
+
+    #Issue: standard error is 0 for 100% female studies so the model     treats them as NA! fix if we want to include all studies in these analyses
+
+met_perc_women_no_excl <- update(met_perc_women_no_excl,
+                              subgroup = df_for_sex_metan_no_excl$psy_or_med, subgroup.name = "treatment modality",
+                              tau.common = FALSE)
+
+# Apply the function to the meta-analysis result
+
+results_met_perc_women_no_excl <- extract_stats(met_perc_women_no_excl)
+
+# Clinical only-------------
+
+df_for_sex_metan_no_excl_clin <- df_for_sex_metan_no_excl %>%
+  filter(new_study_id %in% clin_study_ids)
+
+met_perc_women_no_excl_clin <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_sex_metan_no_excl_clin,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across clinical studies")
+
+met_perc_women_no_excl_clin <- update(met_perc_women_no_excl_clin,
+                           subgroup = df_for_sex_metan_no_excl_clin$psy_or_med, subgroup.name = "treatment modality",
+                           tau.common = FALSE)
+
+# Apply the function to the meta-analysis result
+results_met_perc_women_no_excl_clin <- extract_stats(met_perc_women_no_excl_clin)
+
+# Excluding wl--------------
+
+df_for_sex_metan_no_excl_no_wl <- df_for_sex_metan_no_excl %>%
+  filter(new_study_id %in% no_wl_ids) 
+
+met_perc_women_no_excl_no_wl <- metagen(TE = percent_women,
+                           seTE = percent_women_std_error,
+                           studlab = new_study_id,
+                           data = df_for_sex_metan_no_excl_no_wl,
+                           sm = "",
+                           fixed = FALSE,
+                           random = TRUE,
+                           method.tau = "REML",
+                           hakn = TRUE,
+                           title = "percentage women across studies with controls that are not wl",
+                           subgroup = psy_or_med,
+                           tau.common = FALSE)
+
+# Apply the function to the meta-analysis result
+results_met_perc_women_no_excl_no_wl <- extract_stats(met_perc_women_no_excl_no_wl)
+
+## Combine results for table
+
+df_baseline_results_no_excl <- rbind(results_met_perc_women_no_excl, results_met_perc_women_no_excl_clin, results_met_perc_women_no_excl_no_wl)
+
+# For row names
+df_baseline_results_no_excl <- df_baseline_results_no_excl %>%
+  mutate(subgroup = case_when(
+    row_number() %in% 1 ~ "Overall",
+    row_number() %in% 4 ~ "Excluding subclinical",
+    row_number() %in% 7 ~ "Excluding waitlist",
+    TRUE ~ if_else(subgroup == 0, "Medication", "Psychotherapy")
+  )) 
+
+# Define new column names
+new_column_names <- c("Subgroup", "K", "Mean", "SE", "Lower CI", "Upper CI", "T2", "p-value")
+
+# Assign new column names to the data frame
+colnames(df_baseline_results_no_excl) <- new_column_names
+
+# Rounding
+df_baseline_results_no_excl <- df_baseline_results_no_excl %>%
+  mutate(across(.cols = 2:(ncol(.) - 1), ~ round(., 2))) %>%
+  mutate_at(vars(ncol(.)), ~ round(., 3)) %>%
+  mutate_all(~if_else(is.na(.), "", as.character(.))) 
+
+big_border = fp_border(color="black", width = 1)
+small_border = fp_border(color="lightgray", width = 1)
+
+
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
+#| label: tbl-all-studies-percfemale-results
+#| tbl-cap: "Percentage female at baseline across medication and psychotherapy studies: Results for sample including all female studies"
+#| tbl-cap-location: top
+
+df_baseline_results_no_excl %>% 
+  as_flextable() %>% 
+  bold(i = c(1, 4, 7), j = NULL, bold = TRUE, part = "body") %>%  # Bold specific rows
+  # set_table_properties(layout = "fixed") %>%  # Autofit column widths
+  bg(i = 1, bg  = "#F2F2F2", part = "body") %>% # identify category sections
+  padding(i = c(2, 3, 5, 6, 8, 9), j = 1, padding.left = 10) %>% # indent some rows
+  align(j = 2:ncol(df_baseline_results_no_excl), align = "center", part = "all") %>% 
+  bold(part = "header") %>%   # Bold the relevant header rows
+  bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row  
+  # italic(i = 2, italic = TRUE, part = "header") %>% 
+  border_remove() %>% # this is to remove borders that look strange
+  hline(part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
+  vline(j = 1, part = "body", border = small_border) %>% 
+  border_outer(border = small_border, part = "all" ) %>%  # Add outer borders
+  hline(part = "header", border = big_border) %>% 
+  # padding(i = 2, padding.bottom = 15, part = "header") %>% 
+  line_spacing(space = .7, part = "all") %>%
+  font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
+  autofit()
+
+```
+
 ## Metaregression sensitivity analyses
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -3146,6 +3299,30 @@ print(plot_means_hamd)
 # png("plot_means_multi_cdrs.png")
 # plot_means_cdrs
 # dev.off()
+
+```
+
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+#| label: fig-plot-means-hamd
+#| fig-cap: "Meta-analytic estimates of within-group changes: HAM-D studies only"
+#| fig-cap-location: top
+
+coef_and_se_means_hamd_study <- coef_and_se_means_hamd_study %>%
+  mutate(condition = case_when(
+    condition == "medication_control" ~ "Medication Control",
+    condition == "medication_active" ~ "Medication Active",
+    condition == "psychotherapy_control" ~ "Psychotherapy Control",
+    condition == "psychotherapy_active" ~ "Psychotherapy Active",
+    TRUE ~ as.character(condition)))
+
+# subtitle_text_hamd <- "Metanalytic estimates of within-group changes: HAM-D studies only"
+plot_means_hamd <- plot_means_function(coef_and_se_means_hamd_study)
+print(plot_means_hamd)
+
+# png("plot_means_multi_cdrs.png")
+# plot_means_cdrs
+# dev.off()
+
 
 ```
 
