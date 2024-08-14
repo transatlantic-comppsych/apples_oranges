@@ -1,8 +1,29 @@
 ---
-title: "revision1_reply_to_reviewers"
+title: "Comparing Apples and Oranges in Youth Depression Treatments? A Quantitative Critique of the Evidence Base and Guidelines"
+subtitle: "Major Revision: Letter to Reviewers"
 format: docx
 editor: visual
 ---
+
+```{r}
+library(tidyverse)
+library(truncnorm)
+library(metafor)
+library(meta)
+library(kableExtra)
+library(flextable)
+library(magrittr)
+library(officer)
+library(RefManageR)
+library(ftExtra)
+library(dplyr)
+library(broom)
+library(effsize)
+library(here)
+
+#set source
+load("my_environment.RData")
+```
 
 ### Reviewer 1
 
@@ -19,6 +40,7 @@ This is to not unduly bias the results. We now present the analyses with all stu
 #| label: tbl-all-studies-percfemale-results
 #| tbl-cap: "Percentage female at baseline across medication and psychotherapy studies: Results for sample including all female studies"
 #| tbl-cap-location: top
+
 
 df_baseline_results_no_excl %>% 
   as_flextable() %>% 
@@ -73,7 +95,7 @@ The presence of effect modification depends on which measure is used in the stud
 To make this clear, we reproduce the table above, only adding another two column, one is the Odds Ratio (OR) another relative/multiplicative measure of relative risk that the reviewer also refers to as "more generalizable", and that of absolute risk, AR (i.e. the risk difference), an additive measure.
 
 |         |                          |                               |     |     |      |
-|---------|--------------------------|-------------------------------|-----|-----|------|
+|------------|------------|-------------|------------|------------|------------|
 |         | Control event rate (CER) | Experimental event rate (EER) | RR  | OR  | AR   |
 | Trial 1 | 5/100                    | 10/100                        | 2.0 | 2.1 | 0.05 |
 | Trial 2 | 30/100                   | 60/100                        | 2.0 | 3.5 | 0.3  |
@@ -82,31 +104,43 @@ As can be seen the ORs differ quite substantially and the ARs differ by an order
 
 To illustrate this point further in the context of trials, we point out that a key metric in intervention evaluation is the Numbers Needed to Treat (NNT) or its counterpart Numbers Needed to Harm (NNH). The NNT simply defined as the inverse of the AR, namely:
 
-NNT = 1/AR
+$$
+NNT = \frac{1}{AR}
+$$
 
-In the case above 
+In the case above: 
 
-NNT_trial_1 = 1/0.05 = 20 
+$$
+NNT_{Trial_1} = \frac{1}{0.05} = 20 
+$$
 
-whereas 
+whereas:
 
-NNT_trial_2 = 1/0.3 = 3.3
+$$
+NNT_{Trial_2} = \frac{1}{0.3} = 3.3 
+$$
 
 The interpretation of NNT in the context of a placebo-controlled trial is simply: the average number of people who need to be treated with active treatment rather than placebo for one additional person to benefit. It is obvious from the above that, were such numbers to occur in a clinical trial, the clinical and public health implications of the difference between two treatments would be potentially vast and that it would be wrong to have considered RRs alone. 
 
 But we would go a step further and argue that all summary measures, including the AR, can conceal important clinical and public health facts, and that therefore reporting data that are close as possible to the raw numbers is key. We will illustrate this with an example. 
 
-Let there be two treatments A and B, with data on their efficacy coming comparisons that each has had with A_control and B_control, respectively. The efficacy of A is defined as 
+Let there be two treatments A and B, with data on their efficacy coming comparisons that each has had with A_control and B_control, respectively. The efficacy of A is defined as:
 
-Eff_A = A -- A_control = 90% -- 60% = 30 
+$$
+Eff_{A} = A - A_{Control} = 90% - 60% = 30%
+$$
 
-and that of B as 
+and that of B as:
 
-Eff_B = B - B_control = 40% -- 10% = 30 
+$$
+Eff_{B} = B - B_{Control} = 40% - 10% = 30%
+$$
 
-And therefore 
+And therefore:
 
+$$
 Eff_A = Eff_B
+$$
 
 Since the AR is the same in each case, and one might conclude that we should be indifferent between the two treatments. However, it should be obvious that any rational agent, i.e. an agent who want so maximise benefit for themselves, would choose treatment A over B, if this were the data that they had to base their decision upon; indeed, nobody woudl choose a treatment with 40% probability recovery over one with 90% probability recovery? Unless of course there were a fundamental difference in the composition or circumstances of the trials.
 
@@ -149,11 +183,15 @@ Before we respond to the reviewer's point one by one, we would like to suggest t
 
 The average treatment effect is the measure of interest, defined as:
 
+$$
 ATE = E\[Y(1)\] - E\[Y(0)\] 
+$$
 
-And the conditional treatment effect
+And the conditional treatment effect:
 
+$$
 CATE(X = x) = E\[Y(1) - Y(0) \\mid X = x\]
+$$
 
 The CATE allows us to consider what may threaten external validity.
 
