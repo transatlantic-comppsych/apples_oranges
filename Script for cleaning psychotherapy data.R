@@ -87,9 +87,10 @@ df_full <- full_join(df_full, for_merge)
                       
 # create dataframe with main variables needed for meta-analysis
 df_full_psych <- df_full %>% 
-  select(c(Column1, study, year, condition_arm1, condition_arm2, descr_arm1, descr_arm2, instrument, rating,
-           mean_arm1: n_arm2, baseline_m_arm1:baseline_n_arm2, percent_women, responders_arm1, responders_arm2, 
-           ee, ec, country, comorbid_mental, `comorbid_mental?`, diagnosis))
+  select(Column1, study, year, condition_arm1, condition_arm2, descr_arm1, descr_arm2, instrument, rating,
+         mean_arm1, sd_arm1, n_arm1, mean_arm2, sd_arm2, n_arm2, baseline_m_arm1, baseline_sd_arm1, baseline_n_arm1, baseline_m_arm2, 
+         baseline_sd_arm2, baseline_n_arm2, percent_women, responders_arm1, responders_arm2, 
+         ee, ec, country, comorbid_mental, `comorbid_mental?`, diagnosis)
 
 # rename variables
 df_full_psych <- df_full_psych %>% rename(active_type = condition_arm1, control_type = condition_arm2, descr_active = descr_arm1, descr_control = descr_arm2, 
@@ -133,6 +134,71 @@ Working_Dataset_Psychotherapy <- Working_Dataset_Psychotherapy %>%
 
 df_full_psych <- full_join(df_full_psych, Working_Dataset_Psychotherapy, by = "Column1")
 
+# Append studies from Zhou et al
+
+  # Following comments from reviewers, we are now including studies from the Zhou NMA that are not covered in Cuijpers (there are not med studies)
+
+df_studies_from_zhou <- read_excel("Studies_from_Zhou_NMA.xlsx") #3 studies
+df_studies_from_zhou <- df_studies_from_zhou %>%
+  mutate(across(c(post_mean_active, post_sd_active, post_mean_control, post_sd_control,
+                 baseline_mean_active, baseline_sd_active, baseline_mean_control, baseline_sd_control,
+                 post_n_active, post_n_control, baseline_n_active, baseline_n_control, percent_women,
+                 age_m_active, age_sd_active, age_m_control, age_sd_control, age_m_overall, age_sd_overall), as.numeric)) # convert to numeric 
+
+# compute response rates as previous
+
+  # create dataframe with vectors needed to calculate no of responders
+
+df_clean_zhou <- df_studies_from_zhou %>% 
+  select(Column1, post_n_active, post_mean_active, post_sd_active, baseline_mean_active, post_n_control, 
+           post_mean_control, post_sd_control, baseline_mean_control) %>% 
+  na.omit()
+
+  `# create and store an empty vector
+
+responders_active <- 0
+responders_control <- 0
+
+# a loop to create a distribution of response per study and find out how many below the criterion
+# which is 50% reduction of baseline mean
+
+for(i in 1: nrow(df_clean_zhou)){ 
+  
+  responders_active[i] <- sum((rnorm(df_clean_zhou$post_n_active[i], df_clean_zhou$post_mean_active[i], 
+                                   df_clean_zhou$post_sd_active[i]))<(df_clean_zhou$baseline_mean_active[i]/2))
+  
+}
+
+for(i in 1: nrow(df_clean_zhou)){ 
+  
+  responders_control[i] <- sum((rnorm(df_clean_zhou$post_n_control[i], df_clean_zhou$post_mean_control[i], 
+                                   df_clean_zhou$post_sd_control[i]))<(df_clean_zhou$baseline_mean_control[i]/2))
+  
+}
+
+# create a dataframe with our estimated no of responders for each comparison
+df_responders_zhou <- as.data.frame(cbind(Column1 = df_clean_zhou$Column1, 
+                                          responders_active = responders_active, 
+                                          responders_control = responders_control))
+
+# add new values to zhou dataset
+df_full_zhou <- df_studies_from_zhou %>%
+  left_join(df_responders_zhou, by = "Column1", suffix = c("", "_new")) %>%
+  mutate(
+    responders_active = if_else(Column1 %in% df_responders_zhou$Column1, responders_active_new, NA),
+    responders_control = if_else(Column1 %in% df_responders_zhou$Column1, responders_control_new, NA)
+  ) %>%
+  select(-responders_active_new, -responders_control_new)
+
+df_full_zhou <- df_full_zhou %>%
+  mutate(across(where(is.character), ~ na_if(., "NA"))) #change NA from string to missing value
+
+#combine with cuijpers dataset
+
+df_full_psych <- rbind(df_full_psych, df_full_zhou)
+df_full_psych <- df_full_psych[order(df_full_psych$study), ] # re-arrange alphabetically
+df_full_psych$Column1 <- seq_len(nrow(df_full_psych)) # update row number in Column1
+
 # I am going to filter out recent studies published after the release of Cuijpers MA. This is because we are running a search for med
 # studies up to the last date of Cuijpers search (01/01/2021), and we want to be consistent.
 
@@ -140,7 +206,7 @@ df_full_psych <- df_full_psych %>%
   filter(!(year %in% c(2021, 2022, 2023)))
 
 # I'm going to remove the control condition for March 2004 - psy - as the control is actually placebo but right now it is being incorrectly
-# considered as a psychological control.
+# considered as a psychological control
 
 df_full_psych <- df_full_psych %>%
   mutate_at(vars(contains("control")), ~ifelse(study == "March, 2004", NA, .))
