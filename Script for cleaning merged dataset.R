@@ -244,8 +244,8 @@ write.csv(df_first_row, "df_first_row.csv")
 
 #check how many med comparisons we cannot calc cohens d for (for primary instrument)
 filter_test <- df_first_row %>% filter(psy_or_med == 0)
-sum(is.na(filter_test$cohens_d_active))
-sum(is.na(filter_test$cohens_d_control))
+sum(is.na(filter_test$cohens_d_active)) # 33
+sum(is.na(filter_test$cohens_d_control)) # 33
 
 # start looking at demographics, baseline and post means, and cohens d per arm
 df_demographics <- df_first_row %>% dplyr:: select(study, year, psy_or_med, active_type, control_type, descr_active, descr_control,
@@ -261,11 +261,12 @@ df_demographics$descr_control <- ifelse(is.na(df_demographics$descr_control), df
 df_demographics <- df_demographics %>%  dplyr::select(-c(active_type, control_type))
 df_demographics <- df_demographics %>%  arrange(psy_or_med)
 
-# check how many studies we have baseline means for primary instrument
+# check how many studies we have baseline means and sd for primary instrument
 df_summary_missing_data <- df_demographics %>% 
   group_by(psy_or_med) %>% 
   summarise(n_reporting_base_means_act = sum(!is.na(baseline_mean_active)), n_reporting_base_means_contr = sum(!is.na(baseline_mean_control)),
-  n_reporting_post_means_act = sum(!is.na(post_mean_active)), n_reporting_post_means_contr = sum(!is.na(post_mean_control)))
+  n_reporting_post_means_act = sum(!is.na(post_mean_active)), n_reporting_post_means_contr = sum(!is.na(post_mean_control)),
+  n_reporting_post_sd_act = sum(!is.na(post_sd_active)), n_reporting_post_sd_contr = sum(!is.na(post_sd_control)))
 
 # average cohens d, mean age and percent women, summarising across psy and med
 df_means_demo <- df_demographics %>%  
@@ -278,32 +279,32 @@ df_means_demo <- df_demographics %>%
 
 # Argyris looking at stats per instr
 
-# keep only non_zero values
-test_2 <- df_stats_per_instrument %>% 
-  filter((type == "med" & n != 0) | (type == "psy" & n != 0) )
-
-# keep only duplicated rows
-library(misty)
-test_2 <- df.duplicated(test_2, instr)
-
-get_cdrs_means <- test_2 %>% 
-  filter(instr == "cdrs") 
-
-test_2 %>% 
-  filter(instr == "hamd") 
-
-
-test_2 %>% 
-  filter(instr == "bdi") 
-
-t.test.fromSummaryStats <- function(mu,n,s) {
-  -diff(mu) / sqrt( sum( s^2/n ) )
-}
-
-mu <- c(get_cdrs_means$avg_d_ctrl[1],get_cdrs_means$avg_d_ctrl[2])
-n <- c(get_cdrs_means$total_n_control[1],get_cdrs_means$total_n_control[2])
-s <- c(get_cdrs_means$sd_d_ctrl[1],get_cdrs_means$sd_d_ctrl[2])
-t.test.fromSummaryStats(mu,n,s)
+# # keep only non_zero values
+# test_2 <- df_stats_per_instrument %>% 
+#   filter((type == "med" & n != 0) | (type == "psy" & n != 0) )
+# 
+# # keep only duplicated rows
+# library(misty)
+# test_2 <- df.duplicated(test_2, instr)
+# 
+# get_cdrs_means <- test_2 %>% 
+#   filter(instr == "cdrs") 
+# 
+# test_2 %>% 
+#   filter(instr == "hamd") 
+# 
+# 
+# test_2 %>% 
+#   filter(instr == "bdi") 
+# 
+# t.test.fromSummaryStats <- function(mu,n,s) {
+#   -diff(mu) / sqrt( sum( s^2/n ) )
+# }
+# 
+# mu <- c(get_cdrs_means$avg_d_ctrl[1],get_cdrs_means$avg_d_ctrl[2])
+# n <- c(get_cdrs_means$total_n_control[1],get_cdrs_means$total_n_control[2])
+# s <- c(get_cdrs_means$sd_d_ctrl[1],get_cdrs_means$sd_d_ctrl[2])
+# t.test.fromSummaryStats(mu,n,s)
 
 # df_demographics %>% 
 #   group_by(psy_or_med ) %>% 
@@ -387,7 +388,7 @@ df_first_row_missing_sds <- df_first_row %>%
   summarise(
     rows_with_na_sds = sum(rowSums(is.na(dplyr::select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
   )
-df_first_row_missing_sds
+df_first_row_missing_sds # 33 rows missing SDs
 
 # Now check how many rows with missing means
 df_first_row_missing_means <- df_first_row %>% 
@@ -395,7 +396,7 @@ df_first_row_missing_means <- df_first_row %>%
   summarise(
     rows_with_na_means = sum(rowSums(is.na(dplyr::select(., c(baseline_mean_active , post_mean_active, baseline_mean_control, post_mean_control)))) > 0)
   )
-df_first_row_missing_means
+df_first_row_missing_means # 27 rows missing means
 
 # Let's impute missing SDs first. If either the baseline or post-intervention SD is unavailable, it will be substituted by the other.
 df_appl_v_orange <- df_appl_v_orange %>%
@@ -423,9 +424,9 @@ df_first_row_missing_sds <- df_first_row %>%
   summarise(
     rows_with_na_sds = sum(rowSums(is.na(dplyr::select(., c(baseline_sd_active , post_sd_active, baseline_sd_control, post_sd_control)))) > 0)
   )
-df_first_row_missing_sds
+df_first_row_missing_sds # 11
 
-# We have gone from 21 to 8 studies with missing SDs. Great!
+# We have gone from 33 to 11 studies with missing SDs. Great!
 
 # And check to see how many studies with missing means after performing imputation
 
@@ -436,7 +437,7 @@ df_first_row_missing_means <- df_first_row %>%
   )
 df_first_row_missing_means
 
-# We have gone from 15 to 9 studies with missing means. Great!
+# We have gone from 27 to 9 studies with missing means. Great!
 
 # Lets recalculate cohens d now that we have more data
 df_appl_v_orange <- df_appl_v_orange %>% 
@@ -446,22 +447,22 @@ df_appl_v_orange <- df_appl_v_orange %>%
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE)
 
 filter_test <- df_first_row %>% filter(psy_or_med == 0)
-sum(!is.na(filter_test$cohens_d_active))
-sum(!is.na(filter_test$cohens_d_control))
+sum(!is.na(filter_test$cohens_d_active)) # 35
+sum(!is.na(filter_test$cohens_d_control)) # 35
 
-# Before we could only calculate cohens d for 12 med studies, now we can calculate this for 22
+# Before we could only calculate cohens d for 16 med studies, now we can calculate this for 35
 
-# how many unique med comparisons do we have
-unique_psy <- df_appl_v_orange %>% 
-  filter(psy_or_med == 1) %>% 
-  summarise(unique_psy = n_distinct(study_ID))
-unique_psy
-
-# and for psy
+# how many unique med comparisons do we have 
 unique_med <- df_appl_v_orange %>% 
   filter(psy_or_med == 0) %>% 
   summarise(unique_med = n_distinct(study_ID))
-unique_med
+unique_med # 49
+
+# and for psy
+unique_psy <- df_appl_v_orange %>% 
+  filter(psy_or_med == 1) %>% 
+  summarise(unique_psy = n_distinct(study_ID))
+unique_psy # 69
 
 # Check again to identify which med studies still have missing values in our columns of interest after performing the imputation above
 new_columns_with_missing_values <- df_first_row %>%
@@ -606,16 +607,17 @@ df_appl_v_orange <- df_appl_v_orange %>%
            ((post_sd_control + baseline_sd_control)/2))
 df_first_row <- df_appl_v_orange %>% distinct(study_ID, .keep_all = TRUE) 
 filter_test <- df_first_row %>% filter(psy_or_med == 0)
+
 sum(!is.na(filter_test$cohens_d_active))
-sum(!is.na(filter_test$cohens_d_control))
+sum(!is.na(filter_test$cohens_d_control)) # now we have 44 studies with cohens d
 unique(filter_test$study_ID)
 
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 0) %>% 
-  dplyr::select(study_ID)
+  dplyr::select(study_ID) # 5 with missing ds 
 
-# We have cohens ds for 28/33 med studies. For Bristol Myers Squibb 2002a, Emslie 2002b, Hughes 1990 and Paxil GlaxoSmithKline 2009
+# We have cohens ds for 44/49 med studies. For Bristol Myers Squibb 2002a, Emslie 2002b, Hughes 1990 and Paxil GlaxoSmithKline 2009
 # we will not be able to calculate ds due to very poor reporting in the original studies. No possible way to impute missing data.
 # The other study is Emslie 2007(combined) which is actually misleading as it is a combination of 2007a and 2007b, however for two outcome measures
 # data has been provided for the studies combined. We have complete data on the CDRS for the individual studies. Have checked with Argyris, we will remove this study. 
@@ -623,16 +625,16 @@ study_ids_with_missing_ds <- df_first_row %>%
 df_appl_v_orange <- df_appl_v_orange %>% 
   filter(study_ID != "Emslie_2007 (combined)_Venlafaxine_Placebo")
 
-# Okay, I think that is done. We now have Cohens ds for 28/32 studies and that's the best we can do. 
+# We now have Cohens ds for 44/48 studies and that's the best we can do. 
 
 # Let's look at missing ds for psy studies  -------------------------------
 
 # Look at cohens d missing for psy studies
 filter_test <- df_first_row %>% filter(psy_or_med == 1)
-sum(!is.na(filter_test$cohens_d_active))
-sum(!is.na(filter_test$cohens_d_control))
+sum(!is.na(filter_test$cohens_d_active)) # 61 active arms
+sum(!is.na(filter_test$cohens_d_control)) # 60 control arms
 
-# We have cohens d for 58/66 studies. Let's identify the studies w missing data. 
+# We have cohens d for 61/69 studies. Let's identify the studies w missing data. 
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 1) %>% 
@@ -668,9 +670,9 @@ unique(filter_test$study_ID)
 study_ids_with_missing_ds <- df_first_row %>%
   filter(is.na(cohens_d_active)) %>%
   filter(psy_or_med == 1) %>% 
-  dplyr::select(study_ID)
+  dplyr::select(study_ID) # 6 studies with missing ds
 
-# Great, now we have Cohens ds for Shomaker 2016 and Yu 2002. Hence we now have cohens d for 60 / 66 psy studies. 
+# Great, now we have Cohens ds for Shomaker 2016 and Yu 2002. Hence we now have cohens d for 62/69 psy studies. 
 
 # Argyris and Charlotte discussed using change scores rather than pre and post means / sds as these are more easily accessible
 # for psy studies change scores can be easily computed using baseline and post means. SDs of change scores can be computed according to Cochrane recource
@@ -992,51 +994,48 @@ openxlsx:: write.xlsx(df_appl_v_orange, "df_appl_v_orange.xlsx") # you can use t
 
 #######Important code########### latest as of 30th December 2023
 
-
+###Has been added to the main quarto
 
 # Start here------------------------------------------------------
 
 #Need to use SMDs, ie our Cohen's d and then use Standard error of SMD, to achieve this
 # I need reliabilities.
 
-# note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
-# Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
-# Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
-# for the CDRS-R total score in 53 clinic-referred6- to 12-year-olds.
-
-
 ### A few more tidying things from Argyris before doing metanalyses
-# # discovered an error in the percentage women o fthe Fristad study. I have checked in the
+# # discovered an error in the percentage women of the Fristad study. I have checked in the
 # # cuijpers dataset and the correct percentage is 43.1, but could not verify with the paper as it is not in 
 # # our folder and after a quick search I could not find it online either. Messaged Charlotte on Discord to
 # # check again.
 df_appl_v_orange[df_appl_v_orange$study_ID=="Fristad, 2019_cbt + placebo_placebo",]$percent_women <-43.1
 
-
+# note re: CDRS reliability from here https://www.liebertpub.com/doi/epdf/10.1089/104454601317261546 
+# Using a   2-week interval, and different psychiatrists from the first to the second assessment, 
+# Poz-nanski et    al. (1984) demonstrated high reliability (r=   0.86) 
+# for the CDRS-R total score in 53 clinic-referred6- to 12-year-olds.
 
 # Create SEs proportions for percentage women --------------------------------------------
 
 # # We also need to calculate SE for proportion women for the baseline calculations
 # # for proportions, this is calculated as sqrt(p(1-p)/n), which I implement stepwise below
-
-product_perc_women <-  (df_appl_v_orange$percent_women/100)*
-  (1-(df_appl_v_orange$percent_women/100) ) 
-
-total_n <- df_appl_v_orange$baseline_n_active + 
-  df_appl_v_orange$baseline_n_control
-
-df_appl_v_orange$percent_women_std_error <- sqrt(product_perc_women/total_n )
-
-
-# Calculate SE for baseline severity --------------------------------------
-
-
-df_appl_v_orange$baseline_st_error_active <- 
-  df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
-
-df_appl_v_orange$baseline_st_error_control <-
-  df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
-
+# 
+# product_perc_women <-  (df_appl_v_orange$percent_women/100)*
+#   (1-(df_appl_v_orange$percent_women/100) ) 
+# 
+# total_n <- df_appl_v_orange$baseline_n_active + 
+#   df_appl_v_orange$baseline_n_control
+# 
+# df_appl_v_orange$percent_women_std_error <- sqrt(product_perc_women/total_n )
+# 
+# 
+# # Calculate SE for baseline severity --------------------------------------
+# 
+# 
+# df_appl_v_orange$baseline_st_error_active <- 
+#   df_appl_v_orange$baseline_sd_active/sqrt(df_appl_v_orange$baseline_n_active)
+# 
+# df_appl_v_orange$baseline_st_error_control <-
+#   df_appl_v_orange$baseline_sd_control/sqrt(df_appl_v_orange$baseline_n_control)
+# 
 
 
 # Turn into a long database with unique rows ------------------------------
@@ -1045,118 +1044,118 @@ df_appl_v_orange$baseline_st_error_control <-
 ### Important: create a dataset that will have unique control studies (see problem that we identified with Charlotte, 
 #namely common control conditions)
 # create new id with Charlotte to help with better identification and work with duplicates (see below) 
-df_appl_v_orange  <- df_appl_v_orange  %>%
-  mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
-                                  .default = study ))
-
-
-
-# Step 1: keep only the rows with the top instrument in our hierarchy
-df_with_distinct_instruments <-  df_appl_v_orange %>%          
-  group_by(new_study_id) %>% 
-  filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
-
-# Step 2: turn dataframes to long
-# A: turn long the rows with active
-turn_long_active_type <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, active_type, psy_or_med, baseline_n_active, cohens_d_active) %>% 
-  pivot_longer(cols = c(cohens_d_active), 
-               names_to = "arm_effect_size", 
-               values_to = "cohens_d") 
-
-# also rename active_type to treatment for the merge below.
-turn_long_active_type <- rename(turn_long_active_type,treatment = active_type,
-                                baseline_n = baseline_n_active) 
-
-# to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
-turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
-# but here another one where the same study reasonably contributes two actives, fluoxetine and duloxetine.
-turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
-
-
-# we now need to go through each study id and remove duplicates
-turn_long_active_type <-
-  turn_long_active_type %>% 
-  group_by(new_study_id) %>% 
-  distinct(treatment, .keep_all = TRUE)
-
-# Now checking if this worked with the studies that I used to illustrate the problem above. 
-turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
-turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
-# also check one which is single to make sure it is kept
-turn_long_active_type[turn_long_active_type$new_study_id == "Ackerson, 1998",]
-
-
-
-# B: turn long control rows
-turn_long_control_type <- df_with_distinct_instruments %>% 
-  dplyr:: select(new_study_id, control_type, psy_or_med, baseline_n_control, cohens_d_control) %>% 
-  pivot_longer(cols = c(cohens_d_control), 
-               names_to = "arm_effect_size", 
-               values_to = "cohens_d") 
-
-# also rename active_type to treatment for the merge below.
-turn_long_control_type <- rename(turn_long_control_type,treatment = control_type,
-                                 baseline_n = baseline_n_control) 
-
-# to illustrate the issue, here we have one study with two controls that are reasonable. 
-turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
-# but here another one where the same study reasonably contributes two placebos
-turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
-
-
-# we now need to go through each study id and remove duplicates
-turn_long_control_type <-
-  turn_long_control_type %>% 
-  group_by(new_study_id) %>% 
-  distinct(treatment, .keep_all = TRUE)
-
-# Now checking if this worked with the studies that I used to illustrate the problem above. 
-turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
-turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
-# also check one which is single to make sure it is kept
-turn_long_control_type[turn_long_control_type$new_study_id == "Ackerson, 1998",]
-
-
-### Now merge the active and control datasets
-df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
-dim(df_long_for_metan ) #check dimension
-#make sure no study lost
-length(unique(df_long_for_metan$new_study_id ) ) == length(unique(df_appl_v_orange$new_study_id ) )
-
-# Now check again the studies with muliple arms
-# Now checking if this worked with the studies that I used to illustrate the problem above. 
-df_long_for_metan[df_long_for_metan$new_study_id == "Stallard, 2012",]
-df_long_for_metan[df_long_for_metan$new_study_id == "Atkinson, 2014",]
-# also check one which is single to make sure it is kept
-df_long_for_metan[df_long_for_metan$new_study_id == "Ackerson, 1998",]
-
-
-# save this as the master dataframe  --------------------------------------
-# use this datafram to perform all operations below in quarto
-# ask Charlotte to check steps above (lines 986 to 1121)
-write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
-
-# describe studies
-n_unique_studies <- length(unique(df_long_for_metan$new_study_id))
-df_count_studies <- df_long_for_metan %>% 
-  group_by(psy_or_med, arm_effect_size) %>% 
-  count(is.na(cohens_d))
-
-
-df_count_studies <-rename(df_count_studies, is_missing = `is.na(cohens_d)`)
-
-df_count_studies <-
-  df_count_studies %>% 
-  mutate(condition = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
-                             psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
-                             psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
-                             psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
-  )
-
-df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n
-
-df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
+# df_appl_v_orange  <- df_appl_v_orange  %>%
+#   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+#                                   .default = study ))
+# 
+# 
+# 
+# # Step 1: keep only the rows with the top instrument in our hierarchy
+# df_with_distinct_instruments <-  df_appl_v_orange %>%          
+#   group_by(new_study_id) %>% 
+#   filter(instrument_value == min(instrument_value)) # coded for the smallest number to be best. 
+# 
+# # Step 2: turn dataframes to long
+# # A: turn long the rows with active
+# turn_long_active_type <- df_with_distinct_instruments %>% 
+#   dplyr:: select(new_study_id, active_type, psy_or_med, baseline_n_active, cohens_d_active) %>% 
+#   pivot_longer(cols = c(cohens_d_active), 
+#                names_to = "arm_effect_size", 
+#                values_to = "cohens_d") 
+# 
+# # also rename active_type to treatment for the merge below.
+# turn_long_active_type <- rename(turn_long_active_type,treatment = active_type,
+#                                 baseline_n = baseline_n_active) 
+# 
+# # to illustrate the issue, here we have one study with two controls for which the active at the moment, also exists twice. 
+# turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
+# # but here another one where the same study reasonably contributes two actives, fluoxetine and duloxetine.
+# turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
+# 
+# 
+# # we now need to go through each study id and remove duplicates
+# turn_long_active_type <-
+#   turn_long_active_type %>% 
+#   group_by(new_study_id) %>% 
+#   distinct(treatment, .keep_all = TRUE)
+# 
+# # Now checking if this worked with the studies that I used to illustrate the problem above. 
+# turn_long_active_type[turn_long_active_type$new_study_id == "Stallard, 2012",]
+# turn_long_active_type[turn_long_active_type$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# turn_long_active_type[turn_long_active_type$new_study_id == "Ackerson, 1998",]
+# 
+# 
+# 
+# # B: turn long control rows
+# turn_long_control_type <- df_with_distinct_instruments %>% 
+#   dplyr:: select(new_study_id, control_type, psy_or_med, baseline_n_control, cohens_d_control) %>% 
+#   pivot_longer(cols = c(cohens_d_control), 
+#                names_to = "arm_effect_size", 
+#                values_to = "cohens_d") 
+# 
+# # also rename active_type to treatment for the merge below.
+# turn_long_control_type <- rename(turn_long_control_type,treatment = control_type,
+#                                  baseline_n = baseline_n_control) 
+# 
+# # to illustrate the issue, here we have one study with two controls that are reasonable. 
+# turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
+# # but here another one where the same study reasonably contributes two placebos
+# turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
+# 
+# 
+# # we now need to go through each study id and remove duplicates
+# turn_long_control_type <-
+#   turn_long_control_type %>% 
+#   group_by(new_study_id) %>% 
+#   distinct(treatment, .keep_all = TRUE)
+# 
+# # Now checking if this worked with the studies that I used to illustrate the problem above. 
+# turn_long_control_type[turn_long_control_type$new_study_id == "Stallard, 2012",]
+# turn_long_control_type[turn_long_control_type$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# turn_long_control_type[turn_long_control_type$new_study_id == "Ackerson, 1998",]
+# 
+# 
+# ### Now merge the active and control datasets
+# df_long_for_metan <-rbind(turn_long_active_type, turn_long_control_type)
+# dim(df_long_for_metan ) #check dimension
+# #make sure no study lost
+# length(unique(df_long_for_metan$new_study_id ) ) == length(unique(df_appl_v_orange$new_study_id ) )
+# 
+# # Now check again the studies with muliple arms
+# # Now checking if this worked with the studies that I used to illustrate the problem above. 
+# df_long_for_metan[df_long_for_metan$new_study_id == "Stallard, 2012",]
+# df_long_for_metan[df_long_for_metan$new_study_id == "Atkinson, 2014",]
+# # also check one which is single to make sure it is kept
+# df_long_for_metan[df_long_for_metan$new_study_id == "Ackerson, 1998",]
+# 
+# 
+# # save this as the master dataframe  --------------------------------------
+# # use this datafram to perform all operations below in quarto
+# # ask Charlotte to check steps above (lines 986 to 1121)
+# write.csv(df_long_for_metan, "df_long_for_metan", row.names = F)
+# 
+# # describe studies
+# n_unique_studies <- length(unique(df_long_for_metan$new_study_id))
+# df_count_studies <- df_long_for_metan %>% 
+#   group_by(psy_or_med, arm_effect_size) %>% 
+#   count(is.na(cohens_d))
+# 
+# 
+# df_count_studies <-rename(df_count_studies, is_missing = `is.na(cohens_d)`)
+# 
+# df_count_studies <-
+#   df_count_studies %>% 
+#   mutate(condition = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+#                              psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+#                              psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+#                              psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+#   )
+# 
+# df_count_studies[df_count_studies$condition == "medication_active"& df_count_studies$is_missing == FALSE,]$n
+# 
+# df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == FALSE,]
 
 
 # Generate simulations of standard errors ---------------------------------
@@ -1169,678 +1168,678 @@ df_count_studies_not_missing <- df_count_studies[df_count_studies$is_missing == 
 # I will generate random numbers per study id from a distribution with these parameters. 
 # it is reasonable to generate one random correlation value per study as there is no reason why the correlation should
 # systematically vary within studies
-
-# I have created a function for this
-library(truncnorm)
-
-
-simulate_dataframes_for_st_errors <- function(df, num_repetitions, seed, n, a, b, mean, sd) { # n refers to the number
-                                                                                              # of unique ids to which a correlation coef
-                                                                                              # is allocated.
-  set.seed(seed)
-  
-  # Empty list to store simulated dfs
-  list_df_simulated <- list()
-  
-  for (i in 1:num_repetitions) {
-    # Simulate the vector
-    simulated_correlations_vector <- truncnorm::rtruncnorm(n, a, b, mean, sd)  #using the truncnorm to create correlations
-    
-    # Create a copy of the original dataframe
-    df_simulated_copy <- df
-    
-    # Add/update the sims column
-    df_simulated_copy$correlation_sim_values <- simulated_correlations_vector[match(df_simulated_copy$new_study_id, unique(df_simulated_copy$new_study_id))]
-    
-    # Remove duplicated columns
-    df_simulated_copy <- df_simulated_copy[, !duplicated(colnames(df_simulated_copy))]
-    
-    # Calculate the ses
-    df_simulated_copy <- df_simulated_copy %>% 
-      group_by(new_study_id, baseline_n) %>% 
-      mutate(simulated_se = sqrt(((2*(1-correlation_sim_values))/baseline_n) + 
-                                   (cohens_d^2/(2*baseline_n))))
-    
-    # Add the simulated dataframe to the list
-    list_df_simulated[[i]] <- df_simulated_copy
-  }
-  
-  return(list_df_simulated)
-}
-
-list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan, 
-                                              num_repetitions = 1000, 
-                                              seed  = 1974,
-                                              n = length(unique(df_long_for_metan$new_study_id)), 
-                                              a = 0.45, 
-                                              b = .9, 
-                                              mean = 0.65, 
-                                              sd = 0.2)
-
-#check this worked
-
-list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
-summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
-
-
-
-# Run metaregression ------------------------------------------------------
-library(metafor)
-# add a new multilevel variable for the regression
-
-for(i in 1: length(list_df_simulated)){
-  list_df_simulated[[i]] <- list_df_simulated[[i]] %>% 
-    mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
-                                      psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
-                                      psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
-    )
-  
-  list_df_simulated[[i]]$four_level_var <- factor(list_df_simulated[[i]]$four_level_var) # turn to factor
-  
-  # relevel so that medication control becomes the reference category for the regression
-  list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
-}
-
-
-# check it worked
-# list_df_simulated[[2]] %>% 
-#   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
-
-
-
-# specify the model 
-model_1 <- as.formula(~ four_level_var)
-
-# run the metaregression
-list_model_1_meta_reg <- list()
-
-for(i in 1: length(list_df_simulated)){
-  
-  list_model_1_meta_reg[[i]] <- rma(yi = cohens_d, 
-                                    sei = simulated_se, 
-                                    data = list_df_simulated[[i]] , 
-                                    method = "ML", 
-                                    mods = model_1 , 
-                                    test = "knha")   
-  
-}
-
-# list_model_1_meta_reg[[2]]
-
-
-# Function to extract parameters (coefs, ses, CI) for each level of the dummy variable
-# it is an awkward one, because I couldnt' come up with a better way to add the intercept to each coefficient
-# given the named output of the built in coef function. 
-# here I exctract the coeffcients
-extract_coefficients_func <- function(df_with_coefs){
-  list_coefs <- list()
-  coefs <- 0
-  coefficient_output <- 0
-  
-  for(i in 1: length(coefficients(df_with_coefs))){
-    
-    temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
-                         length(coefficients(df_with_coefs)) - 1 ))
-    coefs[i] <- coef(df_with_coefs)[[i]]
-    
-    coefficient_output <- temp_vec + coefs
-    
-    st_error_output <- df_with_coefs$se
-    
-    df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
-    
-    df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
-    df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
-  }
-  return (df_coefficients )
-}
-
-
-# dummy_var_means <- extract_coefficients_func(list_model_1_meta_reg[[1]])
-
-list_dummy_var_means <-lapply(list_model_1_meta_reg, extract_coefficients_func)
-
-# this is the way to get the means and SEs from the simulation across all datasets. 
-
-df_mean_coefs_from_sim <- data.frame(
-  
-  condition = levels(list_df_simulated[[1]]$four_level_var),
-  
-  mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[2,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[3,1])),
-                      mean(sapply(list_dummy_var_means, function(df) df[4,1]))),
-  
-  mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[2,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[3,2])),
-              mean(sapply(list_dummy_var_means, function(df) df[4,2])))
-  
-)
-
-# and add the CIs
-
-df_mean_coefs_from_sim$upper_ci <- df_mean_coefs_from_sim$mean_coefficient + 1.96 * df_mean_coefs_from_sim$mean_se
-
-df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.96 * df_mean_coefs_from_sim$mean_se
-# df_mean_coefs_from_sim # this is now the dataframe containing the means you need for plotting.
-
-#also, add the n of studies non missing from variable created above
-#important first create the same condition variable: 
-df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
-
-# I needed to join them because of the relevelling, the rows would not align otherwise.
-#df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
-
-
-# need to merge this with the count studies variable to obtain the ks
-library(forcats)
-ordering_criterion <- unique(df_mean_coefs_from_sim$condition)
-
 # 
-df_count_studies_not_missing <- df_count_studies_not_missing %>% arrange(ordering_criterion) %>%
-  mutate(condition = fct_relevel(condition, levels = unique(condition)))
-# I will use this for plotting below.
-
-
-
-# plot results from simulated means ---------------------------------------
-
-# Create summary stats text
-df_mean_coefs_from_sim$text_label <- 0
-for(i in 1: nrow(df_mean_coefs_from_sim))
-df_mean_coefs_from_sim$text_label[i] <-  paste(
-   "k = ", df_count_studies_not_missing $n[i],"\n", 
-   round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
-   "[" ,
- round(df_mean_coefs_from_sim$lower_ci[i],2), 
- round(df_mean_coefs_from_sim$upper_ci[i], 2),
-"]") 
-                                                              
-
-# recode condition for ease of plotting
-df_mean_coefs_from_sim$condition <- str_replace_all(df_mean_coefs_from_sim$condition, "_", " ")
-
-# encode colours
-redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
-blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
-
-
-
-
-ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
-                                   colour = condition, label = text_label)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
-  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
-  scale_size_continuous(guide = "none") +
-  guides(colour = FALSE) + 
-  scale_color_manual(values = c(redish_palette, blueish_palette)) +
-  theme_minimal() +
-  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
-       subtitle = "metanalytically derived estimates of within group changes") +
-  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
-  ylab("") +
-  ylim(0, nrow(df_mean_coefs_from_sim) + 1) +
-  xlim(-2.5, 0.5) +
-  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
-  geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
-  geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
-  theme(axis.title.x = element_text(size = 14), 
-        axis.text.x  = element_text(size = 14),
-        axis.text.y = (element_blank()),
-        plot.title = element_text(size = 16),
-        plot.subtitle = element_text(size = 14))+
-  geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
-  geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
-
-
-
-
-
-
-
-
-
-######BELOW IS MAINLY OLD CODE, stop here for the moment.
-
-mod_1 <- as.formula(~ arm_effect_size)
-mod_2 <- as.formula(~ psy_or_med + arm_effect_size)
-mod_3 <-  as.formula(~ psy_or_med*arm_effect_size)
-
-
-list_mod_1_meta_reg <- list()
-list_mod_2_meta_reg <- list()
-list_mod_3_meta_reg <- list()
-
-for(i in 1: length(list_df_simulated)){
-  
-  list_mod_1_meta_reg[[i]] <- rma(yi = cohens_d, 
-                                  sei = simulated_se, 
-                                  data = list_df_simulated[[i]] , 
-                                  method = "ML", 
-                                  mods = mod_1 , 
-                                  test = "knha")    
-  
-  
-  list_mod_2_meta_reg[[i]] <- rma(yi = cohens_d, 
-                                  sei = simulated_se, 
-                                  data = list_df_simulated[[i]] , 
-                                  method = "ML", 
-                                  mods = mod_2, 
-                                  test = "knha")
-  
-  
-  list_mod_3_meta_reg[[i]] <- rma(yi = cohens_d, 
-                                  sei = simulated_se, 
-                                  data = list_df_simulated[[i]] , 
-                                  method = "ML", 
-                                  mods = mod_3, 
-                                  test = "knha")
-  
-  
-}
-
-
-
-
-# Create a function to extract AICc and LRT values
-extract_aicc_lrt <- function(anova_result) {
-  aicc_r <- anova_result$fit.stats.r["AIC"][[1]]
-  aicc_f <- anova_result$fit.stats.f["AIC"][[1]]
-  lrt <- anova_result$LRT  # Assuming LRT is in the second row and fifth column
-  p_value <- anova_result$pval
-  return(cbind(aicc_f, aicc_r , lrt, p_value))
-}
-
-
-# Perform comparisons between list_mod_1_meta_reg and list_mod_2_meta_reg and 2 and 3
-comparison_result_1_vs_2 <- list()
-aicc_lrt_values_1_vs_2 <- list()
-comparison_result_2_vs_3 <- list()
-aicc_lrt_values_2_vs_3 <- list()
-
-for (i in 1:length(list_df_simulated)) {
-  comparison_result_1_vs_2[[i]] <- anova(list_mod_1_meta_reg[[i]], list_mod_2_meta_reg[[i]])
-  
-  aicc_lrt_values_1_vs_2[[i]] <- extract_aicc_lrt(comparison_result_1_vs_2[[i]])
-  
-  
-  comparison_result_2_vs_3[[i]] <- anova(list_mod_2_meta_reg[[i]], list_mod_3_meta_reg[[i]])
-  
-  aicc_lrt_values_2_vs_3[[i]] <- extract_aicc_lrt(comparison_result_2_vs_3[[i]])
-  
-}
-
-# dataframe for comparing models 1 and 2
-df_mods_1_vs_2 <- data.frame(do.call("rbind", aicc_lrt_values_1_vs_2))
-
-# dataframe for comparing models 2 and 3
-df_mods_2_vs_3 <- data.frame(do.call("rbind", aicc_lrt_values_2_vs_3)) 
-                            
-
-
-# this code allows me to extract the coefficients for each model. I am doing it here for the first one
-list_for_coefficients_winning_model <- list ()
-
-for (i in 1:length(list_df_simulated)) {
-  list_for_coefficients_winning_model[[i]] <-data.frame(broom:: tidy(list_mod_1_meta_reg[[i]]))
-  
-  names(list_for_coefficients_winning_model)[i] <-  paste("correlation at:", str_extract(var_to_long_act, "0.[0-9]"), "|")[i]
-  #paste("correlation at:", str_extract(var_to_long_act, "0.[0-9]"), "|")
-  
-}
-
-
-list_for_coefficients_winning_model[[1]]
-
-
-
-coef_psy_or_med_main_effect <- 0
-coef_psy_or_med_interaction <- 0
-
-for(i in 1: length(list_for_coefficients_winning_model)){
-  
-  coef_psy_or_med_main_effect[i] <- list_for_coefficients_winning_model[[i]]$p.value[2]
-  coef_psy_or_med_interaction[i] <- list_for_coefficients_winning_model[[i]]$p.value[4]
-  
-}
-
-perc_signif_coef_psy_or_med_main_effect <- 
-  (sum(coef_psy_or_med_main_effect<0.05) / length(coef_psy_or_med_main_effect))*100
-
-perc_signif_coef_psy_or_med_interaction_random_sims <- 
-  (sum(coef_psy_or_med_interaction<0.05) / length(coef_psy_or_med_interaction))*100
-
-
-
-# Add to the dataset the weights from the RE metanalysis and CIs for plotting ----------------------------
-
-# first obtain the CIs for each study
-for(i in 1: length(list_df_simulated)){
-list_df_simulated[[i]]$upper_conf_int <- with(list_df_simulated[[i]], cohens_d - (1.96*simulated_se))
-
-list_df_simulated[[i]]$lower_conf_int <- with(list_df_simulated[[i]], cohens_d + (1.96*simulated_se))
-
-list_df_simulated[[i]]$weights <-  weights(list_mod_3_meta_reg[[i]])  # this is the function to obtain the weights.
-
-}
-
-library(tidyverse)
-
-# Run individual metanalyses ----------------------------------------------
-
-### you will also need to get the group estimates for the means and CIs of SMDs from individidual 
-### metanalyses for each control and active. 
-
-head(list_df_simulated[[i]])
-
-test <- expand.grid(c("a", "b"), c("==0", "==1"))
-test
-eval(test[1,])
-
-
-
-# Create the possible combinations of control/active and meds/therapy
-combinations <- expand.grid(psy_or_med = c(0, 1), 
-                            arm_effect_size = c("cohens_d_control", "cohens_d_active"))
-
-
-# create new variables for labelling
-combinations <- combinations %>% 
-  mutate(treatment_type = case_when(psy_or_med == "0" ~ "anti-depressant", 
-                                                psy_or_med == "1" ~ "psychotherapy"), 
-         treatment_arm = case_when(arm_effect_size ==  "cohens_d_control" ~ "control", 
-                                   arm_effect_size == "cohens_d_active" ~ "active"))
-
-
-result <- list()
-name_vec <- 0
-# Loop over combos
-for (i in 1: nrow(combinations)) {
-
-
-  # Call the metagen function for each combo
-  result[[i]] <- metagen(
-    TE = cohens_d,
-    seTE = simulated_se,
-    studlab = new_study_id,
-    data = list_df_simulated[[1]][list_df_simulated[[1]]$psy_or_med == combinations$psy_or_med[i] & 
-                                    
-                        list_df_simulated[[1]]$arm_effect_size == combinations$arm_effect_size[i],],
-    sm = "SMD",
-    fixed = FALSE,
-    random = TRUE,
-    method.tau = "REML",
-    hakn = TRUE,
-    title = paste(combinations[i, "treatment_type"], # provide names
-                 combinations[i, "treatment_arm"])
-  )
- 
-  name_vec[i] = paste(combinations[i, "treatment_type"], # provide names
-                   combinations[i, "treatment_arm"])
-
-}
-
-
-## Here is a function I wrote to extrac the key results for graphing and tabulating.
-
-extract_stats <- function(result) {
-  # Check if the result is not NULL
-  if (is.null(result)) {
-    warning("Result is NULL. Returning NULL.")
-    return(NULL)
-  }
-  
-  # get the summary table with results
-  statistics <- summary(result)
-  
-  # Extract specific stats
-  extracted_stats <- c(
-    k_study = statistics$k.study,
-    TE_random = statistics$TE.random,
-    lower_random = statistics$lower.random,
-    upper_random = statistics$upper.random,
-    pval = statistics$pval.random,
-    tau2 = statistics$tau2,
-    lower_tau2 = statistics$lower.tau2,
-    upper_tau2 = statistics$upper.tau2
-  )
-  
-  return(extracted_stats)
-}
-
-# create a dataframe with the results
-statistics_indiv_metan <- lapply(result, extract_stats) 
-statistics_indiv_metan <- data.frame(do.call("rbind", statistics_indiv_metan))
-statistics_indiv_metan$condition <- name_vec
-
-# also split the last column into two for ease of plotting
-statistics_indiv_metan$treatment <- stringr::str_extract(statistics_indiv_metan$condition, stringr::regex(pattern = "[a-z,-]+(?=\\s)", ignore_case = F)) 
-statistics_indiv_metan$arm <- stringr::str_remove(statistics_indiv_metan$condition, stringr::regex(pattern = "[a-z,-]+(?=\\s)", ignore_case = F)) 
-
-
-
-# ATTEMPTS AT GRAPHING. ---------------------------------------------------
-
-
-# Ιndividual forest plots of individual metanalyses ----------------------------------
-
-# Generate PDF with a plot per page looping over the different metanalyses
-
-for(i in 1: nrow(statistics_indiv_metan)){
-  pdf_file <- paste0(statistics_indiv_metan$condition[i],".pdf")
-  pdf(pdf_file, width = 15, height = 15)
-  forest.meta(result[[i]], layout = "JAMA", sortvar = TE)
-  
-  grid:: grid.text(paste("Efficacy in the ", statistics_indiv_metan$condition[i], "arm"), .375, .97, gp=grid::gpar(cex=1.5))
-  dev.off()
-}
-# now we have one pdf per plot in the project directory.
-
-
-# plot the summary statistics ---------------------------------------------
-
-# Create summary stats text
-
-statistics_indiv_metan$text_label <-  c(
-  paste(statistics_indiv_metan$condition[1],"\n","k = ", statistics_indiv_metan$k_study[1],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[1],2) ), 
-   
-  paste(statistics_indiv_metan$condition[2],"\n","k = ", statistics_indiv_metan$k_study[2],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[2],2) ), 
-  
-  paste(statistics_indiv_metan$condition[3],"\n","k = ", statistics_indiv_metan$k_study[3],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[3],2) ), 
-   
-  paste(statistics_indiv_metan$condition[4],"\n","k = ", statistics_indiv_metan$k_study[4],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[4],2) ) 
-)
-
-
-
-# Create ggplot with points and error bars
-# Create ggplot with points, error bars, arrows, and text
-redish_palette <- c("anti-depressant control" = "deeppink", "anti-depressant active" = "deeppink3")
-blueish_palette <- c("psychotherapy control" = "steelblue1", "psychotherapy active" = "steelblue3")
-
-
-ggplot(statistics_indiv_metan, aes(x = TE_random, y = 1:nrow(statistics_indiv_metan), colour = condition, label = text_label)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(xmin = lower_random, xmax = upper_random), width = 0.2, position = position_dodge(0.5)) +
-  geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
-  scale_size_continuous(guide = "none") +
-  guides(colour = FALSE) + 
-  scale_color_manual(values = c(redish_palette, blueish_palette)) +
-  theme_minimal() +
-  labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
-       subtitle = "metanalytically derived estimates of within group changes") +
-  xlab("Standardized Mean Difference (SMD) with 95% CIs") +
-  ylab("") +
-  ylim(0, nrow(statistics_indiv_metan) + 1) +
-  xlim(-2.5, 0.5) +
-  geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
-  geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
-  geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
-  geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
-  theme(axis.title.x = element_text(size = 14), 
-        axis.text.x  = element_text(size = 14),
-        axis.text.y = (element_blank()),
-        plot.title = element_text(size = 16),
-        plot.subtitle = element_text(size = 14))+
-  geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
-  geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
-
-
-# Custom made Forest plot I made in ggplot in ggplot. Consider using ----------------------------------
-
+# # I have created a function for this
+# library(truncnorm)
 # 
+# 
+# simulate_dataframes_for_st_errors <- function(df, num_repetitions, seed, n, a, b, mean, sd) { # n refers to the number
+#                                                                                               # of unique ids to which a correlation coef
+#                                                                                               # is allocated.
+#   set.seed(seed)
+#   
+#   # Empty list to store simulated dfs
+#   list_df_simulated <- list()
+#   
+#   for (i in 1:num_repetitions) {
+#     # Simulate the vector
+#     simulated_correlations_vector <- truncnorm::rtruncnorm(n, a, b, mean, sd)  #using the truncnorm to create correlations
+#     
+#     # Create a copy of the original dataframe
+#     df_simulated_copy <- df
+#     
+#     # Add/update the sims column
+#     df_simulated_copy$correlation_sim_values <- simulated_correlations_vector[match(df_simulated_copy$new_study_id, unique(df_simulated_copy$new_study_id))]
+#     
+#     # Remove duplicated columns
+#     df_simulated_copy <- df_simulated_copy[, !duplicated(colnames(df_simulated_copy))]
+#     
+#     # Calculate the ses
+#     df_simulated_copy <- df_simulated_copy %>% 
+#       group_by(new_study_id, baseline_n) %>% 
+#       mutate(simulated_se = sqrt(((2*(1-correlation_sim_values))/baseline_n) + 
+#                                    (cohens_d^2/(2*baseline_n))))
+#     
+#     # Add the simulated dataframe to the list
+#     list_df_simulated[[i]] <- df_simulated_copy
+#   }
+#   
+#   return(list_df_simulated)
+# }
+# 
+# list_df_simulated <-  simulate_dataframes_for_st_errors (df = df_long_for_metan, 
+#                                               num_repetitions = 1000, 
+#                                               seed  = 1974,
+#                                               n = length(unique(df_long_for_metan$new_study_id)), 
+#                                               a = 0.45, 
+#                                               b = .9, 
+#                                               mean = 0.65, 
+#                                               sd = 0.2)
+# 
+# #check this worked
+# 
+# list_df_simulated[[10]][,c("new_study_id", "correlation_sim_values", "simulated_se")] # looks right
+# summary(list_df_simulated[[1000]]$correlation_sim_values, na.rm = T) # as expected # the mean is around the parameter I gave
+# 
+# 
+# 
+# # Run metaregression ------------------------------------------------------
+# library(metafor)
+# # add a new multilevel variable for the regression
+# 
+# for(i in 1: length(list_df_simulated)){
+#   list_df_simulated[[i]] <- list_df_simulated[[i]] %>% 
+#     mutate(four_level_var = case_when(psy_or_med == 0 & arm_effect_size == "cohens_d_active" ~ "medication_active",
+#                                       psy_or_med == 0 & arm_effect_size == "cohens_d_control" ~ "medication_control",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_active" ~ "psychotherapy_active",
+#                                       psy_or_med == 1 & arm_effect_size == "cohens_d_control" ~ "psychotherapy_control")
+#     )
+#   
+#   list_df_simulated[[i]]$four_level_var <- factor(list_df_simulated[[i]]$four_level_var) # turn to factor
+#   
+#   # relevel so that medication control becomes the reference category for the regression
+#   list_df_simulated[[i]]$four_level_var <- relevel(list_df_simulated[[1]]$four_level_var, ref = "medication_control")
+# }
+# 
+# 
+# # check it worked
+# # list_df_simulated[[2]] %>% 
+# #   dplyr:: select(psy_or_med, arm_effect_size, four_level_var)
+# 
+# 
+# 
+# # specify the model 
+# model_1 <- as.formula(~ four_level_var)
+# 
+# # run the metaregression
+# list_model_1_meta_reg <- list()
+# 
+# for(i in 1: length(list_df_simulated)){
+#   
+#   list_model_1_meta_reg[[i]] <- rma(yi = cohens_d, 
+#                                     sei = simulated_se, 
+#                                     data = list_df_simulated[[i]] , 
+#                                     method = "ML", 
+#                                     mods = model_1 , 
+#                                     test = "knha")   
+#   
+# }
+# 
+# # list_model_1_meta_reg[[2]]
+# 
+# 
+# # Function to extract parameters (coefs, ses, CI) for each level of the dummy variable
+# # it is an awkward one, because I couldnt' come up with a better way to add the intercept to each coefficient
+# # given the named output of the built in coef function. 
+# # here I exctract the coeffcients
+# extract_coefficients_func <- function(df_with_coefs){
+#   list_coefs <- list()
+#   coefs <- 0
+#   coefficient_output <- 0
+#   
+#   for(i in 1: length(coefficients(df_with_coefs))){
+#     
+#     temp_vec <- c(0, rep(coefficients(df_with_coefs)[[1]], 
+#                          length(coefficients(df_with_coefs)) - 1 ))
+#     coefs[i] <- coef(df_with_coefs)[[i]]
+#     
+#     coefficient_output <- temp_vec + coefs
+#     
+#     st_error_output <- df_with_coefs$se
+#     
+#     df_coefficients <- data.frame(cbind(coefficients = coefficient_output, se = st_error_output ))
+#     
+#     df_coefficients$lower_bound <- df_coefficients$coefficients - 1.96*df_coefficients$se
+#     df_coefficients$upper_bound <- df_coefficients$coefficients + 1.96*df_coefficients$se
+#   }
+#   return (df_coefficients )
+# }
+# 
+# 
+# # dummy_var_means <- extract_coefficients_func(list_model_1_meta_reg[[1]])
+# 
+# list_dummy_var_means <-lapply(list_model_1_meta_reg, extract_coefficients_func)
+# 
+# # this is the way to get the means and SEs from the simulation across all datasets. 
+# 
+# df_mean_coefs_from_sim <- data.frame(
+#   
+#   condition = levels(list_df_simulated[[1]]$four_level_var),
+#   
+#   mean_coefficient = c(mean(sapply(list_dummy_var_means, function(df) df[1,1])),
+#                       mean(sapply(list_dummy_var_means, function(df) df[2,1])),
+#                       mean(sapply(list_dummy_var_means, function(df) df[3,1])),
+#                       mean(sapply(list_dummy_var_means, function(df) df[4,1]))),
+#   
+#   mean_se = c(mean(sapply(list_dummy_var_means, function(df) df[1,2])),
+#               mean(sapply(list_dummy_var_means, function(df) df[2,2])),
+#               mean(sapply(list_dummy_var_means, function(df) df[3,2])),
+#               mean(sapply(list_dummy_var_means, function(df) df[4,2])))
+#   
+# )
+# 
+# # and add the CIs
+# 
+# df_mean_coefs_from_sim$upper_ci <- df_mean_coefs_from_sim$mean_coefficient + 1.96 * df_mean_coefs_from_sim$mean_se
+# 
+# df_mean_coefs_from_sim$lower_ci <- df_mean_coefs_from_sim$mean_coefficient - 1.96 * df_mean_coefs_from_sim$mean_se
+# # df_mean_coefs_from_sim # this is now the dataframe containing the means you need for plotting.
+# 
+# #also, add the n of studies non missing from variable created above
+# #important first create the same condition variable: 
+# df_count_studies_not_missing$condition <- str_replace_all(df_count_studies_not_missing$condition, "_", " ")
+# 
+# # I needed to join them because of the relevelling, the rows would not align otherwise.
+# #df_mean_coefs_from_sim <- right_join(df_mean_coefs_from_sim, df_count_studies_not_missing)
+# 
+# 
+# # need to merge this with the count studies variable to obtain the ks
 # library(forcats)
+# ordering_criterion <- unique(df_mean_coefs_from_sim$condition)
+# 
+# # 
+# df_count_studies_not_missing <- df_count_studies_not_missing %>% arrange(ordering_criterion) %>%
+#   mutate(condition = fct_relevel(condition, levels = unique(condition)))
+# # I will use this for plotting below.
 # 
 # 
-# # data processing 
-# list_df_simulated[[1]]$new_study_id_new <- list_df_simulated[[1]]$new_study_id
 # 
-# # prepare the label
-# list_df_simulated[[1]]$labels_for_facet <- factor(list_df_simulated[[1]]$psy_or_med, levels = c(0, 1),
-#                                                   labels = c("Control Arms of Anti-depressant trials" , "Control Arms of Psychotherapy trials"))
+# # plot results from simulated means ---------------------------------------
 # 
-# # Dataset just for controls only here
-# list_df_simulated_for_controls_plot <- list_df_simulated[[1]] %>%
-#   filter(arm_effect_size == "cohens_d_control") %>%
-#   group_by(psy_or_med)
+# # Create summary stats text
+# df_mean_coefs_from_sim$text_label <- 0
+# for(i in 1: nrow(df_mean_coefs_from_sim))
+# df_mean_coefs_from_sim$text_label[i] <-  paste(
+#    "k = ", df_count_studies_not_missing $n[i],"\n", 
+#    round(df_mean_coefs_from_sim$mean_coefficient[i], 2),
+#    "[" ,
+#  round(df_mean_coefs_from_sim$lower_ci[i],2), 
+#  round(df_mean_coefs_from_sim$upper_ci[i], 2),
+# "]") 
+#                                                               
 # 
-# # this attaches an extra number to the studies with two control arms
-# list_df_simulated_for_controls_plot <- within(list_df_simulated_for_controls_plot, new_study_id <- ave(new_study_id, new_study_id_new, FUN = make.unique))
+# # recode condition for ease of plotting
+# df_mean_coefs_from_sim$condition <- str_replace_all(df_mean_coefs_from_sim$condition, "_", " ")
 # 
-# # this doesn't work at the moment, need to fix it because the y-axis changes around.
-# # max_study_counts <- list_df_simulated_for_controls_plot %>%
+# # encode colours
+# redish_palette <- c("medication control" = "deeppink", "medication active" = "deeppink3")
+# blueish_palette <- c("psychotherapy active" = "steelblue1", "psychotherapy control" = "steelblue3")
+# 
+# 
+# 
+# 
+# ggplot(df_mean_coefs_from_sim, aes(x = mean_coefficient, y = 1:nrow(df_mean_coefs_from_sim),
+#                                    colour = condition, label = text_label)) +
+#   geom_point(size = 3) +
+#   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
+#   geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
+#   scale_size_continuous(guide = "none") +
+#   guides(colour = FALSE) + 
+#   scale_color_manual(values = c(redish_palette, blueish_palette)) +
+#   theme_minimal() +
+#   labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
+#        subtitle = "metanalytically derived estimates of within group changes") +
+#   xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+#   ylab("") +
+#   ylim(0, nrow(df_mean_coefs_from_sim) + 1) +
+#   xlim(-2.5, 0.5) +
+#   geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
+#   geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
+#   geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
+#   theme(axis.title.x = element_text(size = 14), 
+#         axis.text.x  = element_text(size = 14),
+#         axis.text.y = (element_blank()),
+#         plot.title = element_text(size = 16),
+#         plot.subtitle = element_text(size = 14))+
+#   geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
+#   geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# ######BELOW IS MAINLY OLD CODE, stop here for the moment.
+# 
+# mod_1 <- as.formula(~ arm_effect_size)
+# mod_2 <- as.formula(~ psy_or_med + arm_effect_size)
+# mod_3 <-  as.formula(~ psy_or_med*arm_effect_size)
+# 
+# 
+# list_mod_1_meta_reg <- list()
+# list_mod_2_meta_reg <- list()
+# list_mod_3_meta_reg <- list()
+# 
+# for(i in 1: length(list_df_simulated)){
+#   
+#   list_mod_1_meta_reg[[i]] <- rma(yi = cohens_d, 
+#                                   sei = simulated_se, 
+#                                   data = list_df_simulated[[i]] , 
+#                                   method = "ML", 
+#                                   mods = mod_1 , 
+#                                   test = "knha")    
+#   
+#   
+#   list_mod_2_meta_reg[[i]] <- rma(yi = cohens_d, 
+#                                   sei = simulated_se, 
+#                                   data = list_df_simulated[[i]] , 
+#                                   method = "ML", 
+#                                   mods = mod_2, 
+#                                   test = "knha")
+#   
+#   
+#   list_mod_3_meta_reg[[i]] <- rma(yi = cohens_d, 
+#                                   sei = simulated_se, 
+#                                   data = list_df_simulated[[i]] , 
+#                                   method = "ML", 
+#                                   mods = mod_3, 
+#                                   test = "knha")
+#   
+#   
+# }
+# 
+# 
+# 
+# 
+# # Create a function to extract AICc and LRT values
+# extract_aicc_lrt <- function(anova_result) {
+#   aicc_r <- anova_result$fit.stats.r["AIC"][[1]]
+#   aicc_f <- anova_result$fit.stats.f["AIC"][[1]]
+#   lrt <- anova_result$LRT  # Assuming LRT is in the second row and fifth column
+#   p_value <- anova_result$pval
+#   return(cbind(aicc_f, aicc_r , lrt, p_value))
+# }
+# 
+# 
+# # Perform comparisons between list_mod_1_meta_reg and list_mod_2_meta_reg and 2 and 3
+# comparison_result_1_vs_2 <- list()
+# aicc_lrt_values_1_vs_2 <- list()
+# comparison_result_2_vs_3 <- list()
+# aicc_lrt_values_2_vs_3 <- list()
+# 
+# for (i in 1:length(list_df_simulated)) {
+#   comparison_result_1_vs_2[[i]] <- anova(list_mod_1_meta_reg[[i]], list_mod_2_meta_reg[[i]])
+#   
+#   aicc_lrt_values_1_vs_2[[i]] <- extract_aicc_lrt(comparison_result_1_vs_2[[i]])
+#   
+#   
+#   comparison_result_2_vs_3[[i]] <- anova(list_mod_2_meta_reg[[i]], list_mod_3_meta_reg[[i]])
+#   
+#   aicc_lrt_values_2_vs_3[[i]] <- extract_aicc_lrt(comparison_result_2_vs_3[[i]])
+#   
+# }
+# 
+# # dataframe for comparing models 1 and 2
+# df_mods_1_vs_2 <- data.frame(do.call("rbind", aicc_lrt_values_1_vs_2))
+# 
+# # dataframe for comparing models 2 and 3
+# df_mods_2_vs_3 <- data.frame(do.call("rbind", aicc_lrt_values_2_vs_3)) 
+#                             
+# 
+# 
+# # this code allows me to extract the coefficients for each model. I am doing it here for the first one
+# list_for_coefficients_winning_model <- list ()
+# 
+# for (i in 1:length(list_df_simulated)) {
+#   list_for_coefficients_winning_model[[i]] <-data.frame(broom:: tidy(list_mod_1_meta_reg[[i]]))
+#   
+#   names(list_for_coefficients_winning_model)[i] <-  paste("correlation at:", str_extract(var_to_long_act, "0.[0-9]"), "|")[i]
+#   #paste("correlation at:", str_extract(var_to_long_act, "0.[0-9]"), "|")
+#   
+# }
+# 
+# 
+# list_for_coefficients_winning_model[[1]]
+# 
+# 
+# 
+# coef_psy_or_med_main_effect <- 0
+# coef_psy_or_med_interaction <- 0
+# 
+# for(i in 1: length(list_for_coefficients_winning_model)){
+#   
+#   coef_psy_or_med_main_effect[i] <- list_for_coefficients_winning_model[[i]]$p.value[2]
+#   coef_psy_or_med_interaction[i] <- list_for_coefficients_winning_model[[i]]$p.value[4]
+#   
+# }
+# 
+# perc_signif_coef_psy_or_med_main_effect <- 
+#   (sum(coef_psy_or_med_main_effect<0.05) / length(coef_psy_or_med_main_effect))*100
+# 
+# perc_signif_coef_psy_or_med_interaction_random_sims <- 
+#   (sum(coef_psy_or_med_interaction<0.05) / length(coef_psy_or_med_interaction))*100
+# 
+# 
+# 
+# # Add to the dataset the weights from the RE metanalysis and CIs for plotting ----------------------------
+# 
+# # first obtain the CIs for each study
+# for(i in 1: length(list_df_simulated)){
+# list_df_simulated[[i]]$upper_conf_int <- with(list_df_simulated[[i]], cohens_d - (1.96*simulated_se))
+# 
+# list_df_simulated[[i]]$lower_conf_int <- with(list_df_simulated[[i]], cohens_d + (1.96*simulated_se))
+# 
+# list_df_simulated[[i]]$weights <-  weights(list_mod_3_meta_reg[[i]])  # this is the function to obtain the weights.
+# 
+# }
+# 
+# library(tidyverse)
+# 
+# # Run individual metanalyses ----------------------------------------------
+# 
+# ### you will also need to get the group estimates for the means and CIs of SMDs from individidual 
+# ### metanalyses for each control and active. 
+# 
+# head(list_df_simulated[[i]])
+# 
+# test <- expand.grid(c("a", "b"), c("==0", "==1"))
+# test
+# eval(test[1,])
+# 
+# 
+# 
+# # Create the possible combinations of control/active and meds/therapy
+# combinations <- expand.grid(psy_or_med = c(0, 1), 
+#                             arm_effect_size = c("cohens_d_control", "cohens_d_active"))
+# 
+# 
+# # create new variables for labelling
+# combinations <- combinations %>% 
+#   mutate(treatment_type = case_when(psy_or_med == "0" ~ "anti-depressant", 
+#                                                 psy_or_med == "1" ~ "psychotherapy"), 
+#          treatment_arm = case_when(arm_effect_size ==  "cohens_d_control" ~ "control", 
+#                                    arm_effect_size == "cohens_d_active" ~ "active"))
+# 
+# 
+# result <- list()
+# name_vec <- 0
+# # Loop over combos
+# for (i in 1: nrow(combinations)) {
+# 
+# 
+#   # Call the metagen function for each combo
+#   result[[i]] <- metagen(
+#     TE = cohens_d,
+#     seTE = simulated_se,
+#     studlab = new_study_id,
+#     data = list_df_simulated[[1]][list_df_simulated[[1]]$psy_or_med == combinations$psy_or_med[i] & 
+#                                     
+#                         list_df_simulated[[1]]$arm_effect_size == combinations$arm_effect_size[i],],
+#     sm = "SMD",
+#     fixed = FALSE,
+#     random = TRUE,
+#     method.tau = "REML",
+#     hakn = TRUE,
+#     title = paste(combinations[i, "treatment_type"], # provide names
+#                  combinations[i, "treatment_arm"])
+#   )
+#  
+#   name_vec[i] = paste(combinations[i, "treatment_type"], # provide names
+#                    combinations[i, "treatment_arm"])
+# 
+# }
+# 
+# 
+# ## Here is a function I wrote to extrac the key results for graphing and tabulating.
+# 
+# extract_stats <- function(result) {
+#   # Check if the result is not NULL
+#   if (is.null(result)) {
+#     warning("Result is NULL. Returning NULL.")
+#     return(NULL)
+#   }
+#   
+#   # get the summary table with results
+#   statistics <- summary(result)
+#   
+#   # Extract specific stats
+#   extracted_stats <- c(
+#     k_study = statistics$k.study,
+#     TE_random = statistics$TE.random,
+#     lower_random = statistics$lower.random,
+#     upper_random = statistics$upper.random,
+#     pval = statistics$pval.random,
+#     tau2 = statistics$tau2,
+#     lower_tau2 = statistics$lower.tau2,
+#     upper_tau2 = statistics$upper.tau2
+#   )
+#   
+#   return(extracted_stats)
+# }
+# 
+# # create a dataframe with the results
+# statistics_indiv_metan <- lapply(result, extract_stats) 
+# statistics_indiv_metan <- data.frame(do.call("rbind", statistics_indiv_metan))
+# statistics_indiv_metan$condition <- name_vec
+# 
+# # also split the last column into two for ease of plotting
+# statistics_indiv_metan$treatment <- stringr::str_extract(statistics_indiv_metan$condition, stringr::regex(pattern = "[a-z,-]+(?=\\s)", ignore_case = F)) 
+# statistics_indiv_metan$arm <- stringr::str_remove(statistics_indiv_metan$condition, stringr::regex(pattern = "[a-z,-]+(?=\\s)", ignore_case = F)) 
+# 
+# 
+# 
+# # ATTEMPTS AT GRAPHING. ---------------------------------------------------
+# 
+# 
+# # Ιndividual forest plots of individual metanalyses ----------------------------------
+# 
+# # Generate PDF with a plot per page looping over the different metanalyses
+# 
+# for(i in 1: nrow(statistics_indiv_metan)){
+#   pdf_file <- paste0(statistics_indiv_metan$condition[i],".pdf")
+#   pdf(pdf_file, width = 15, height = 15)
+#   forest.meta(result[[i]], layout = "JAMA", sortvar = TE)
+#   
+#   grid:: grid.text(paste("Efficacy in the ", statistics_indiv_metan$condition[i], "arm"), .375, .97, gp=grid::gpar(cex=1.5))
+#   dev.off()
+# }
+# # now we have one pdf per plot in the project directory.
+# 
+# 
+# # plot the summary statistics ---------------------------------------------
+# 
+# # Create summary stats text
+# 
+# statistics_indiv_metan$text_label <-  c(
+#   paste(statistics_indiv_metan$condition[1],"\n","k = ", statistics_indiv_metan$k_study[1],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[1],2) ), 
+#    
+#   paste(statistics_indiv_metan$condition[2],"\n","k = ", statistics_indiv_metan$k_study[2],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[2],2) ), 
+#   
+#   paste(statistics_indiv_metan$condition[3],"\n","k = ", statistics_indiv_metan$k_study[3],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[3],2) ), 
+#    
+#   paste(statistics_indiv_metan$condition[4],"\n","k = ", statistics_indiv_metan$k_study[4],"\n", "tau2 = ", round(statistics_indiv_metan$tau2[4],2) ) 
+# )
+# 
+# 
+# 
+# # Create ggplot with points and error bars
+# # Create ggplot with points, error bars, arrows, and text
+# redish_palette <- c("anti-depressant control" = "deeppink", "anti-depressant active" = "deeppink3")
+# blueish_palette <- c("psychotherapy control" = "steelblue1", "psychotherapy active" = "steelblue3")
+# 
+# 
+# ggplot(statistics_indiv_metan, aes(x = TE_random, y = 1:nrow(statistics_indiv_metan), colour = condition, label = text_label)) +
+#   geom_point(size = 3) +
+#   geom_errorbar(aes(xmin = lower_random, xmax = upper_random), width = 0.2, position = position_dodge(0.5)) +
+#   geom_text(vjust = +1.5, size = 4) +  # Adjust vjust and size as needed
+#   scale_size_continuous(guide = "none") +
+#   guides(colour = FALSE) + 
+#   scale_color_manual(values = c(redish_palette, blueish_palette)) +
+#   theme_minimal() +
+#   labs(x = "TE-random", y = NULL, title = "Adolescent Depression Trial Efficacy by Treatment Type and Treatment Arm",
+#        subtitle = "metanalytically derived estimates of within group changes") +
+#   xlab("Standardized Mean Difference (SMD) with 95% CIs") +
+#   ylab("") +
+#   ylim(0, nrow(statistics_indiv_metan) + 1) +
+#   xlim(-2.5, 0.5) +
+#   geom_vline(xintercept = 0, linetype = "dashed", size = 1.5, colour = "grey") +
+#   geom_segment(x = -1.25, xend = -1.75, y = 4.7, yend = 4.7, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = -1.55, y = 4.9, label = "More Effective", color = "grey", vjust = 0.5, hjust = 1) +
+#   geom_segment(x = -1.35, xend = -0.85, y = 4.9, yend = 4.9, arrow = arrow(length = unit(0.25, "cm"), type = "closed"), color = "grey") +
+#   geom_text(x = -1.05, y = 5.05, label = "Less Effective", color = "grey", vjust = 0.5, hjust = 0)+
+#   theme(axis.title.x = element_text(size = 14), 
+#         axis.text.x  = element_text(size = 14),
+#         axis.text.y = (element_blank()),
+#         plot.title = element_text(size = 16),
+#         plot.subtitle = element_text(size = 14))+
+#   geom_curve(aes(x = 0.18, y = 4.73, xend = 0.02, yend = 4.5), color = "grey", curvature = -0.2, arrow = arrow(length = unit(0.25, "cm"), type = "closed")) +
+#   geom_text(x = 0.2, y = 4.75, label = "Line of No Effect", color = "grey", vjust = 0.5, hjust = 0)
+# 
+# 
+# # Custom made Forest plot I made in ggplot in ggplot. Consider using ----------------------------------
+# 
+# # 
+# # library(forcats)
+# # 
+# # 
+# # # data processing 
+# # list_df_simulated[[1]]$new_study_id_new <- list_df_simulated[[1]]$new_study_id
+# # 
+# # # prepare the label
+# # list_df_simulated[[1]]$labels_for_facet <- factor(list_df_simulated[[1]]$psy_or_med, levels = c(0, 1),
+# #                                                   labels = c("Control Arms of Anti-depressant trials" , "Control Arms of Psychotherapy trials"))
+# # 
+# # # Dataset just for controls only here
+# # list_df_simulated_for_controls_plot <- list_df_simulated[[1]] %>%
 # #   filter(arm_effect_size == "cohens_d_control") %>%
-# #   group_by(psy_or_med) %>%
-# #   summarise(max_study_count = max(as.numeric(new_study_id)))
+# #   group_by(psy_or_med)
+# # 
+# # # this attaches an extra number to the studies with two control arms
+# # list_df_simulated_for_controls_plot <- within(list_df_simulated_for_controls_plot, new_study_id <- ave(new_study_id, new_study_id_new, FUN = make.unique))
+# # 
+# # # this doesn't work at the moment, need to fix it because the y-axis changes around.
+# # # max_study_counts <- list_df_simulated_for_controls_plot %>%
+# # #   filter(arm_effect_size == "cohens_d_control") %>%
+# # #   group_by(psy_or_med) %>%
+# # #   summarise(max_study_count = max(as.numeric(new_study_id)))
+# # 
+# # 
+# # p_new <- list_df_simulated_for_controls_plot %>% 
+# #   filter(arm_effect_size == "cohens_d_control") %>% 
+# #   filter(!is.na(cohens_d)) %>% 
+# #   mutate(new_study_id = fct_reorder(new_study_id, cohens_d, .desc = TRUE)) %>%  #this to reorder
+# #   ggplot(aes(y = reorder(new_study_id, cohens_d))) + #this too
+# #   theme_classic()
+# # 
+# # # Your plotting code with facet_wrap
+# # p_new <- p_new +
+# #   geom_point(aes(x = cohens_d, colour = factor(psy_or_med)), shape = 15, size = 4) +
+# #   geom_linerange(aes(xmin = lower_conf_int, xmax = upper_conf_int)) +
+# #   geom_vline(xintercept = 0, linetype = "dashed") +
+# #   labs(x = "Standardised Mean Difference (negative is better)", y = "") +
+# #   guides(color = "none") +
+# #   ggtitle("Metanalysis of Depression Therapy: Within Group Change in the Control Conditions") +
+# #   scale_colour_manual(values = c("red", "blue")) +
+# #   facet_wrap(~ labels_for_facet, scales = "free_y", ncol = 1) +
+# #   # coord_cartesian(ylim = c(1, max(max_study_counts$max_study_count)))+
+# #   theme(
+# #     strip.text = element_text(size = 12, face = "bold"),  # Set facet label size
+# #     plot.title = element_text(size = 18)  # Set plot title size
+# #   )
+# # 
+# # df_for_plotting_Sriv <- list_df_simulated_for_controls_plot %>%
+# #   filter(arm_effect_size == "cohens_d_control" & new_study_id == "Srivastava, 2020") 
+# # 
+# # p_new <-p_new  + xlim(-3.8,1)
+# # 
+# # p_new <- p_new +  geom_segment(aes(x = cohens_d, xend = lower_conf_int, y = "Srivastava, 2020", 
+# #                                    yend = "Srivastava, 2020"), 
+# #                                data = df_for_plotting_Sriv) 
+# # p_new <- p_new +    geom_segment(aes(x = cohens_d, xend = -3.6, y = "Srivastava, 2020", 
+# #                                      yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
+# #                                  data = df_for_plotting_Sriv)  
+# # 
+# # pdf(file = "forestplot_from_metareg_control.pdf", width = 15, height = 20)
+# # p_new 
+# # dev.off()
+# # 
+# # 
+# # #### Same graph for the active condition
+# # 
+# # # data processing 
+# # list_df_simulated[[1]]$new_study_id_new <- list_df_simulated[[1]]$new_study_id
+# # 
+# # list_df_simulated[[1]]$labels_for_facet <- factor(list_df_simulated[[1]]$psy_or_med, levels = c(0, 1),
+# #                                                   labels = c("Active Arms of Anti-depressant trials" , "Active Arms of Psychotherapy trials"))
+# # 
+# # # Calculate maximum number of studies for each psy_or_med group
+# # list_df_simulated_for_active_plot <- list_df_simulated[[1]] %>%
+# #   filter(arm_effect_size == "cohens_d_active") %>%
+# #   group_by(psy_or_med)
+# # 
+# # list_df_simulated_for_active_plot <- within(list_df_simulated_for_active_plot, new_study_id <- ave(new_study_id, new_study_id_new, FUN = make.unique))
+# # 
+# # # max_study_counts <- list_df_simulated_for_controls_plot %>%
+# # #   filter(arm_effect_size == "cohens_d_control") %>%
+# # #   group_by(psy_or_med) %>%
+# # #   summarise(max_study_count = max(as.numeric(new_study_id)))
+# # 
+# # 
+# # p_new <- list_df_simulated_for_active_plot %>% 
+# #   filter(arm_effect_size == "cohens_d_active") %>% 
+# #   filter(!is.na(cohens_d)) %>% 
+# #   mutate(new_study_id = fct_reorder(new_study_id, cohens_d, .desc = TRUE)) %>%
+# #   ggplot(aes(y = reorder(new_study_id, cohens_d))) + 
+# #   theme_classic()
+# # 
+# # # Your plotting code with facet_wrap
+# # p_new <- p_new +
+# #   geom_point(aes(x = cohens_d, colour = factor(psy_or_med)), shape = 15, size = 4) +
+# #   geom_linerange(aes(xmin = lower_conf_int, xmax = upper_conf_int)) +
+# #   geom_vline(xintercept = 0, linetype = "dashed") +
+# #   labs(x = "Standardised Mean Difference (negative is better)", y = "") +
+# #   guides(color = "none") +
+# #   ggtitle("Metanalysis of Depression Therapy: Within Group Change in the Active Conditions") +
+# #   scale_colour_manual(values = c("red", "blue")) +
+# #   facet_wrap(~ labels_for_facet, scales = "free_y", ncol = 1) +
+# #   # coord_cartesian(ylim = c(1, max(max_study_counts$max_study_count)))+
+# #   theme(
+# #     strip.text = element_text(size = 12, face = "bold"),  # Set facet label size
+# #     plot.title = element_text(size = 18)  # Set plot title size
+# #   )
+# # 
+# # df_for_plotting_Sriv <- list_df_simulated_for_active_plot %>%
+# #   filter(arm_effect_size == "cohens_d_active" & new_study_id == "Srivastava, 2020") 
+# # 
+# # p_new <-p_new  + xlim(-3.8,1)
+# # 
+# # p_new <- p_new +  geom_segment(aes(x = cohens_d, xend = lower_conf_int, y = "Srivastava, 2020", 
+# #                                    yend = "Srivastava, 2020"), 
+# #                                data = df_for_plotting_Sriv) 
+# # p_new <- p_new +    geom_segment(aes(x = cohens_d, xend = -3.6, y = "Srivastava, 2020", 
+# #                                      yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
+# #                                  data = df_for_plotting_Sriv)  
+# # 
+# # pdf(file = "forestplot_from_metareg_active.pdf", width = 15, height = 20)
+# # p_new 
+# # dev.off()
+# # 
+# # 
+# # 
+# # 
+# # 
+# # 
 # 
 # 
-# p_new <- list_df_simulated_for_controls_plot %>% 
+# #### Explore a few more things
+# ####Year
+# list_df_simulated[[1]]$year <- as.integer(str_extract(list_df_simulated[[1]]$new_study_id, "\\d+"))
+# list_df_simulated[[1]] %>% 
+#      filter(arm_effect_size == "cohens_d_control") %>% 
+#      ggplot(aes(year, cohens_d, colour = as.factor(psy_or_med)))+
+#        geom_point()
+# 
+# list_df_simulated[[1]] %>% 
 #   filter(arm_effect_size == "cohens_d_control") %>% 
-#   filter(!is.na(cohens_d)) %>% 
-#   mutate(new_study_id = fct_reorder(new_study_id, cohens_d, .desc = TRUE)) %>%  #this to reorder
-#   ggplot(aes(y = reorder(new_study_id, cohens_d))) + #this too
-#   theme_classic()
-# 
-# # Your plotting code with facet_wrap
-# p_new <- p_new +
-#   geom_point(aes(x = cohens_d, colour = factor(psy_or_med)), shape = 15, size = 4) +
-#   geom_linerange(aes(xmin = lower_conf_int, xmax = upper_conf_int)) +
-#   geom_vline(xintercept = 0, linetype = "dashed") +
-#   labs(x = "Standardised Mean Difference (negative is better)", y = "") +
-#   guides(color = "none") +
-#   ggtitle("Metanalysis of Depression Therapy: Within Group Change in the Control Conditions") +
-#   scale_colour_manual(values = c("red", "blue")) +
-#   facet_wrap(~ labels_for_facet, scales = "free_y", ncol = 1) +
-#   # coord_cartesian(ylim = c(1, max(max_study_counts$max_study_count)))+
-#   theme(
-#     strip.text = element_text(size = 12, face = "bold"),  # Set facet label size
-#     plot.title = element_text(size = 18)  # Set plot title size
-#   )
-# 
-# df_for_plotting_Sriv <- list_df_simulated_for_controls_plot %>%
-#   filter(arm_effect_size == "cohens_d_control" & new_study_id == "Srivastava, 2020") 
-# 
-# p_new <-p_new  + xlim(-3.8,1)
-# 
-# p_new <- p_new +  geom_segment(aes(x = cohens_d, xend = lower_conf_int, y = "Srivastava, 2020", 
-#                                    yend = "Srivastava, 2020"), 
-#                                data = df_for_plotting_Sriv) 
-# p_new <- p_new +    geom_segment(aes(x = cohens_d, xend = -3.6, y = "Srivastava, 2020", 
-#                                      yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
-#                                  data = df_for_plotting_Sriv)  
-# 
-# pdf(file = "forestplot_from_metareg_control.pdf", width = 15, height = 20)
-# p_new 
-# dev.off()
+#   ggplot(aes(baseline_n, cohens_d, colour = as.factor(psy_or_med)))+
+#   geom_point()
 # 
 # 
-# #### Same graph for the active condition
-# 
-# # data processing 
-# list_df_simulated[[1]]$new_study_id_new <- list_df_simulated[[1]]$new_study_id
-# 
-# list_df_simulated[[1]]$labels_for_facet <- factor(list_df_simulated[[1]]$psy_or_med, levels = c(0, 1),
-#                                                   labels = c("Active Arms of Anti-depressant trials" , "Active Arms of Psychotherapy trials"))
-# 
-# # Calculate maximum number of studies for each psy_or_med group
-# list_df_simulated_for_active_plot <- list_df_simulated[[1]] %>%
-#   filter(arm_effect_size == "cohens_d_active") %>%
-#   group_by(psy_or_med)
-# 
-# list_df_simulated_for_active_plot <- within(list_df_simulated_for_active_plot, new_study_id <- ave(new_study_id, new_study_id_new, FUN = make.unique))
-# 
-# # max_study_counts <- list_df_simulated_for_controls_plot %>%
-# #   filter(arm_effect_size == "cohens_d_control") %>%
-# #   group_by(psy_or_med) %>%
-# #   summarise(max_study_count = max(as.numeric(new_study_id)))
-# 
-# 
-# p_new <- list_df_simulated_for_active_plot %>% 
-#   filter(arm_effect_size == "cohens_d_active") %>% 
-#   filter(!is.na(cohens_d)) %>% 
-#   mutate(new_study_id = fct_reorder(new_study_id, cohens_d, .desc = TRUE)) %>%
-#   ggplot(aes(y = reorder(new_study_id, cohens_d))) + 
-#   theme_classic()
-# 
-# # Your plotting code with facet_wrap
-# p_new <- p_new +
-#   geom_point(aes(x = cohens_d, colour = factor(psy_or_med)), shape = 15, size = 4) +
-#   geom_linerange(aes(xmin = lower_conf_int, xmax = upper_conf_int)) +
-#   geom_vline(xintercept = 0, linetype = "dashed") +
-#   labs(x = "Standardised Mean Difference (negative is better)", y = "") +
-#   guides(color = "none") +
-#   ggtitle("Metanalysis of Depression Therapy: Within Group Change in the Active Conditions") +
-#   scale_colour_manual(values = c("red", "blue")) +
-#   facet_wrap(~ labels_for_facet, scales = "free_y", ncol = 1) +
-#   # coord_cartesian(ylim = c(1, max(max_study_counts$max_study_count)))+
-#   theme(
-#     strip.text = element_text(size = 12, face = "bold"),  # Set facet label size
-#     plot.title = element_text(size = 18)  # Set plot title size
-#   )
-# 
-# df_for_plotting_Sriv <- list_df_simulated_for_active_plot %>%
-#   filter(arm_effect_size == "cohens_d_active" & new_study_id == "Srivastava, 2020") 
-# 
-# p_new <-p_new  + xlim(-3.8,1)
-# 
-# p_new <- p_new +  geom_segment(aes(x = cohens_d, xend = lower_conf_int, y = "Srivastava, 2020", 
-#                                    yend = "Srivastava, 2020"), 
-#                                data = df_for_plotting_Sriv) 
-# p_new <- p_new +    geom_segment(aes(x = cohens_d, xend = -3.6, y = "Srivastava, 2020", 
-#                                      yend = "Srivastava, 2020"), arrow = arrow(length = unit(0.01, "npc")),
-#                                  data = df_for_plotting_Sriv)  
-# 
-# pdf(file = "forestplot_from_metareg_active.pdf", width = 15, height = 20)
-# p_new 
-# dev.off()
-# 
-# 
-# 
-# 
-# 
-# 
-
-
-#### Explore a few more things
-####Year
-list_df_simulated[[1]]$year <- as.integer(str_extract(list_df_simulated[[1]]$new_study_id, "\\d+"))
-list_df_simulated[[1]] %>% 
-     filter(arm_effect_size == "cohens_d_control") %>% 
-     ggplot(aes(year, cohens_d, colour = as.factor(psy_or_med)))+
-       geom_point()
-
-list_df_simulated[[1]] %>% 
-  filter(arm_effect_size == "cohens_d_control") %>% 
-  ggplot(aes(baseline_n, cohens_d, colour = as.factor(psy_or_med)))+
-  geom_point()
-
-
 
 
 # ############ARGYRIS SOME OLD CODE, KEEP FOR THE TIME BEING##########
