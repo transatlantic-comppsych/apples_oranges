@@ -21,6 +21,10 @@ author:
     affiliations:
         - ref: ucl_1
     note:
+  - name: Raphaelle Delpech
+    email: raphaelle.delpech.18@ucl.ac.uk
+    affiliations:
+        - ref: ucl_1
   - name: Rudolf Uher
     email: uher@Dal.Ca
     affiliations:
@@ -41,10 +45,10 @@ author:
     affiliations:
         - ref: ucl_1
   - name: Ioannis-Marios Rokas
-    email: <rokasgiannis93@gmail.com
+    email: rokasgiannis93@gmail.com
     affiliations:
         - ref: ucl_1
-  - name: Marinos Kyriakopoulos 
+  - name: Marinos Kyriakopoulos
   - name: Lucy Foulkes
     email: lucy.foulkes@psych.ox.ac.uk
     affiliations:
@@ -159,7 +163,7 @@ Psychotherapy is recommended before medication for most cases of depression in c
 
 Should a child or an adolescent receive psychotherapy or medication for their depression, and what information should be used to guide decision-making?
 
-For adolescent depression, there are limited head-to-head trials of medication and psychotherapy, and hence recommendations are derived from indirect comparisons of treatment efficacy. The National Institute of Health and Care Excellence (NICE) guidelines for adolescent depression recommend psychotherapy (specifically cognitive behaviour therapy (CBT) or interpersonal therapy (IPT)) over medication in most cases [@niceDepressionChildrenYoung2019]. This is in keeping with two sources of evidence relating to child and adolescent depression: meta-analyses of medication randomised controlled trials (RCTs) that cast doubt on the efficacy of antidepressants, with the exception of fluoxetine [@ciprianiComparativeEfficacyTolerability2016]; and meta-analyses of psychotherapy RCTs that conclude psychotherapy to be efficacious [@cuijpersEffectsPsychologicalTreatments2021]. However, a recent network meta-analysis (NMA) [@zhouComparativeEfficacyAcceptability2020], an established method of comparing treatments using both direct and indirect (i.e. treatment A with treatment C, via studies that directly compare A with B and B with C) evidence, concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than medication control (i.e. pill placebo) or psychotherapy controls. The only head-to-head RCT comparing modalities found that fluoxetine, alone and in combination with CBT, was superior to pill placebo, though CBT alone was not [@marchFluoxetineCognitiveBehavioralTherapy2004]. Given this confusing evidence base, how should patients, carers, clinicians and policy makers make treatment decisions?
+For adolescent depression, there are limited head-to-head trials of medication and psychotherapy, and hence recommendations are derived from indirect comparisons of treatment efficacy. The National Institute of Health and Care Excellence (NICE) guidelines for adolescent depression recommend psychotherapy (specifically cognitive behaviour therapy (CBT) or interpersonal therapy (IPT)) over medication in most cases [@niceDepressionChildrenYoung2019]. This is in keeping with two sources of evidence relating to child and adolescent depression: meta-analyses of medication randomised controlled trials (RCTs) that cast doubt on the efficacy of antidepressants, with the exception of fluoxetine [@ciprianiComparativeEfficacyTolerability2016]; and meta-analyses of psychotherapy RCTs that conclude psychotherapy to be efficacious [@cuijpersEffectsPsychologicalTreatments2021]. However, a recent network meta-analysis (NMA) [@zhouComparativeEfficacyAcceptability2020], an established method of comparing treatments using both direct and indirect (i.e. treatment A with treatment C, via studies that directly compare A with B and B with C) evidence, concluded that only fluoxetine alone and fluoxetine administered together with CBT were significantly more effective than medication control (i.e. pill placebo) or psychotherapy controls. The only head-to-head RCT comparing modalities found that fluoxetine, alone and in combination with CBT, was superior to pill placebo, though CBT alone was not [@marchFluoxetineCognitiveBehavioralTherapy2004]. Also, the addition of psychotherapy to standard care did not improve outcomes (REF). Given this confusing evidence base, how should patients, carers, clinicians and policy makers make treatment decisions?
 
 In this paper, we examine whether the existing evidence for adolescent depression treatments can offer valid answers to this question. We provide a conceptual framework and test a series of hypotheses using data from existing trials. Two points are crucial to indirect comparisons of treatment modalities. First, whether the participants in trials are comparable across modalities. Second, whether key conditions of the trial, such as the effects of control conditions or the number of sites involved, are comparable.
 
@@ -253,7 +257,7 @@ Where individual studies did not report all data required to calculate the SMD, 
 
 <!-- If a study reported the standard error of the mean, the SD was obtained simply by multiplying the SE by the square root of the sample size. For conditions where the SD was missing at one time point, the baseline SD was substituted by the post-test SD, and vice versa. If the SD was not available at either time point, missing values were replaced by the mean of the SDs available for comparable cases (defined as same trial type (psy or med), same instrument, same timepoint (pre or post), and same arm (control or active)). Where there were missing means at either baseline or post-test, missing values were calculated using mean change scores, preferring the change scores reported in the paper itself, though where this was unavailable, using the change scores reported in the dataset from Cipriani et al.'s meta-analysis. -->
 
-For meta-analysis it is necessary to estimate a standard error of the SMD. This requires a correlation between the pre- and post-measures, a statistic typically not reported. To ensure that our results are not biased by misestimation, we simulated n=1000 datasets for different values (0.45 to 0.9) of this correlation and used these datasets in subsequent analyses (please refer to Supplement for full details).
+For meta-analysis it is necessary to estimate a standard error of the SMD. This requires a correlation between the pre- and post-measures, a statistic typically not reported. To ensure that our results are not biased by misestimation (REF), we simulated n=1000 datasets for different values (0.45 to 0.9) of this correlation and used these datasets in subsequent analyses (please refer to Supplement for full details).
 
 <!-- This is calculated according to: -->
 
@@ -339,7 +343,7 @@ x
 
 ```
 
-We conducted a series of sensitivity analyses where we excluded studies that 1) used waitlist as their control and 2) recruited participants with subclinical levels of depression. Next, we conducted two analyses where we included only trials that used the Children's Depression Rating Scale, Revised (CDRS-R) or the Hamilton Depression Rating Scale (HAM-D) as outcome instruments.
+We conducted a series of sensitivity analyses where we excluded studies that 1) used waitlist as their control and 2) recruited participants with subclinical levels of depression. Next, we conducted two analyses where we included only trials that used the Children's Depression Rating Scale, Revised (CDRS-R) or the Hamilton Depression Rating Scale (HAM-D) as outcome instruments. Additonally, we restricted two analyses to studies with variance below 0.02 and which reported SD at outcome respectively.
 
 Further, we tested whether the simulated values for the standard error had a substantial influence on the estimation of the differences between the medication and psychotherapy control conditions. We plotted the z-value of the difference between the two coefficients against the number of simulations. We make inference on the stability of the difference, by counting the proportion of times that the z-value is above the critical value of z = `r x` corresponding to an alpha = 0.05.
 
@@ -1290,7 +1294,7 @@ knitr::include_graphics(here("PRISMA.png"))
 
 ## Sample characteristics at baseline in medication and psychotherapy trials
 
-@tbl-baseline_results summarises the results from each of the meta-analyses examining sample characteristics at baseline. The summary statistics are provided for each subgroup (i.e. medication and psychotherapy) and the p-value derives from the test for subgroup differences.
+tbl-baseline-results summarises the results from each of the meta-analyses examining sample characteristics at baseline. The summary statistics are provided for each subgroup (i.e. medication and psychotherapy) and the p-value derives from the test for subgroup differences.
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
@@ -1668,7 +1672,7 @@ small_border = fp_border(color="lightgray", width = 1)
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-#| label: tbl-baseline_results
+#| label: tbl-baseline-results
 #| tbl-cap: "Sample characteristics at baseline across medication and psychotherapy studies: Results for overall sample and sensitivity analyses"
 #| tbl-cap-location: top
 
@@ -1707,9 +1711,9 @@ df_overall_baseline_results %>%
 
 ### Baseline severity
 
-On average, depression severity at baseline was significantly higher in medication trials compared to psychotherapy trials (see @tbl-baseline_results). When excluding RCTs that used waitlist as their control, baseline severity remained significantly higher in medication trials compared to psychotherapy trials. This difference did not reach statistical significance when excluding studies that recruited samples with sub-clinical depression.
+On average, depression severity at baseline was significantly higher in medication trials compared to psychotherapy trials (see @tbl-baseline-results). When excluding RCTs that used waitlist as their control, baseline severity remained significantly higher in medication trials compared to psychotherapy trials. This difference did not reach statistical significance when excluding studies that recruited samples with sub-clinical depression.
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 # looking at CDRS studies only, this is with only 2 levels 
 
 df_for_baseline_severity_cdrs <- df_for_baseline_severity %>%
@@ -1810,13 +1814,13 @@ For this analysis, we excluded the two psychotherapy trials which included entir
 
 ### Age
 
-As can be seen in @tbl-baseline_results, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses.
+As can be seen in tbl-baseline_results, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses.
 
 ## Trial design
 
 ### Standardised mean differences of control conditions in psychotherapy and medication studies
 
-We applied metaregression to obtain the SMDs and confidence intervals of each of the four study arms. As seen in @fig-plot-means-all there were substantial differences between the four arms of the meta-analysis with striking differences between the medication and psychotherapy control arms. In particular, pill placebo had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$upper_ci, 2)`) whereas psychotherapy controls had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$upper_ci, 2)` ).
+We applied metaregression to obtain the SMDs and confidence intervals of each of the four study arms. As seen in fig-plot-means-all there were substantial differences between the four arms of the meta-analysis with striking differences between the medication and psychotherapy control arms. In particular, pill placebo had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "medication_control", ]$upper_ci, 2)`) whereas psychotherapy controls had an SMD = `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$coef_means, 2)` (95% CI: `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$lower_ci, 2)` to `r round(df_mean_coefs_from_sim[df_mean_coefs_from_sim$condition == "psychotherapy_control", ]$upper_ci, 2)` ).
 
 ```{r, warning=FALSE, message = FALSE, echo = FALSE}
 #| label: smd-diff-control
@@ -2028,7 +2032,7 @@ We addressed potential regression to the mean by including the baseline score fo
 
 ## This data lives in this spreadsheet for psy trials, we need to merge it in
 
-df_no_sites <- readxl:: read_excel("for_despina_and_giannis_200224.xlsx")
+df_no_sites <- readxl:: read_excel(here("for_despina_and_giannis_200224.xlsx"))
 
 df_no_sites <- df_no_sites %>% 
   select(c(new_study_id, number_of_sites)) %>% 
@@ -2457,7 +2461,7 @@ as_grouped_data(control_summary, groups = "Column") %>%
   bold(part = "header") %>%   # Bold the relevant header rows
   bg(bg = "#F2F2F2", part = "header") %>%   # Add light grey background to header row %>% 
   #italic(i = 2, italic = TRUE, part = "header") %>% 
-  add_footer_row(values = as_paragraph("Abbreviations: K = number of studies, SD = standard deviation, CI = 95% confidence interval, df = degrees of freedom"), colwidths = 10) %>%
+  add_footer_row(values = as_paragraph("Abbreviations: K = number of studies, SD = standard deviation, CI = 95% confidence interval, df = degrees of freedom."), colwidths = 10) %>%
   font(fontname = "Calibri", part = "all") %>%   # Set font to Calibri
   border_remove() %>% # this is to remove borders around the caption that look strange
   hline(j = 1:4, part = "body", border = small_border) %>%  # Add light grey horizontal lines all  rows
@@ -2530,7 +2534,9 @@ Severity is particularly important as it may moderate treatment response, with s
 
 We then turned to our second question about whether trial design conditions are comparable between modalities. We found that medication trials are vastly more likely to be multi-site than their psychotherapy counterparts; in the current study, 93% of medication RCTs were multisite compared to 54% of psychotherapy RCTs. Multisite trials are associated with higher pill placebo response [@bridgePlaceboResponseRandomized2009], and are less common in publicly-funded trials which show lower pill placebo efficacy [@dechartresSingleCenterTrialsShow2011]; [@meisterPlaceboResponseRates2020]. Also, in single-site trials, principal investigators are often intellectually invested in the treatment (in psychotherapy these are often treatments developed or modified by the PI); this is in stark contrast to the incentive structure in multi-site trials where the number of recruited participants is the primary unit of reimbursement.
 
-Second, psychotherapy controls have moderate effect sizes (-0.5) whereas medication controls have very large effect sizes (-1.9). Our analysis could be critiqued as it compares within arm symptom change per trial, therefore effectively breaking randomisation. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving randomisation to balance confounders is critical. However, we note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomisation structure. Indeed, in Zhou et al. [@zhouComparativeEfficacyAcceptability2020] the estimates for psychotherapy controls, TAU and waitlist conditions favoured placebo (though CIs were broad because these were indirectly estimated), as did estimates for psychodynamic and behavioural therapy. CBT did not differentiate from placebo, a result that is likely heavily weighted by the results of their direct comparison in the TADS trial [@marchFluoxetineCognitiveBehavioralTherapy2004]. More importantly, we do not claim that these differences are genuinely due to efficacy differences; they may well be because people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the substantial disparity in the response to control conditions is reason for concern about our ability to draw inferences from comparisons of modalities. This is particularly problematic as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings, which our findings make obvious is misleading.
+Second, psychotherapy controls have moderate effect sizes (-0.5) whereas medication controls have very large effect sizes (-1.9). Our analysis could be critiqued as it compares within arm symptom change per trial, therefore effectively breaking randomisation. This criticism would apply if our aim were to draw inferences about the efficacy of each arm --- in which case preserving randomisation to balance confounders is critical. More importantly, we do not claim that these differences are genuinely due to efficacy differences; they may well be because people who attend psychotherapy and medication trials are different and therefore respond differently. In either case (difference in efficacy vs difference in trial participant profile), the substantial disparity in the response to control conditions is reason for concern about our ability to draw inferences from comparisons of modalities. This is particularly problematic as clinicians as well as policy makers often resort to between-group effect sizes to summarise findings, which our findings make obvious is misleading.
+
+We note that our findings are largely in keeping with those of the NMA, which is designed to preserve the randomisation structure. Indeed, in Zhou et al. [@zhouComparativeEfficacyAcceptability2020] the estimates for psychotherapy controls, TAU and waitlist conditions favoured placebo (though CIs were broad because these were indirectly estimated), as did estimates for psychodynamic and behavioural therapy. CBT did not differentiate from placebo, a result that is likely heavily weighted by the results of their direct comparison in the TADS trial [@marchFluoxetineCognitiveBehavioralTherapy2004]. We note that the Zhou metanalysis, which represents an admirable effort to synthesise the literature, reports on issues that may affect transitivity with tests of incoherence showing significant differences.
 
 Moving beyond comparison between modalities, we examined whether psychotherapy controls are reasonable counterfactuals to receiving treatment. An obvious disadvantage of psychotherapy trials is that they are typically unblinded (and hard to blind) yet psychotherapy trials are unlikely to fulfill some other basic conditions of the "all else is equal" assumption. In order to test that a psychological treatment is effective per se (e.g. because of the specific techniques) rather than because of generic effects (e.g. pleasant human contact), aspects such as therapist contact time should be matched. Many (24%) psychotherapy RCTs used waitlist controls, which by definition do not match for hours of therapist contact, and are often associated with disappointment bias. TAU and other psychotherapy control conditions varied drastically; 9 RCTs used controls that exactly matched the active arm in total number of contact hours, though several studies used bibliotherapy or online-only control conditions which did not involve any direct therapist contact. Importantly, controls were often poorly described, resulting in difficulties quantifying their intensity and hence evaluating their adequacy as counterfactual conditions. Overall, there is poor matching of control to active treatment conditions in psychotherapy RCTs, with the latter typically featuring considerably more contact hours, which may artificially inflate estimates of the efficacy of psychological treatments.
 
@@ -2548,7 +2554,7 @@ In summary, the current findings give cause for consternation about the state of
 
 ## Systematic review description and search terms
 
-We conducted a systematic search for medication studies published from 31 May 2015 up to 1 Jan 2021 (i.e. after the final search date of Cipriani et al.'s [@ciprianiComparativeEfficacyTolerability2016] review up to the final search date of Cuijpers et al's [@cuijpersEffectsPsychologicalTreatments2021] review). We searched PubMed, the Cochrane Central Register of Controlled Trials, Embase, Web of Science, CINAHL, PsycINFO and LiLACS for randomised controlled trials (RCTs) comparing any antidepressant with placebo in the treatment of children and adolescents with a primary diagnosis of major depressive disorder. We used the same search terms as Cipriani [@ciprianiComparativeEfficacyTolerability2016] with one additional search term to include only placebo-controlled trials (see below). We additionally applied filters to specify our date range, and to exclude reviews and non-human studies. We also searched clinical trial registers for published and unpublished studies however all RCTs meeting inclusion criteria had already been identified from the database search outlined above. Please see @fig-prisma for the PRISMA flow diagram.
+We conducted a systematic search for medication studies published from 31 May 2015 up to 1 Jan 2021 (i.e. after the final search date of Cipriani et al.'s [@ciprianiComparativeEfficacyTolerability2016] review up to the final search date of Cuijpers et al's [@cuijpersEffectsPsychologicalTreatments2021] review). We searched PubMed, the Cochrane Central Register of Controlled Trials, Embase, Web of Science, CINAHL, PsycINFO and LiLACS for randomised controlled trials (RCTs) comparing any antidepressant with placebo in the treatment of children and adolescents with a primary diagnosis of major depressive disorder. We used the same search terms as Cipriani [@ciprianiComparativeEfficacyTolerability2016] with one additional search term to include only placebo-controlled trials (see below). We additionally applied filters to specify our date range, and to exclude reviews and non-human studies. We also searched clinical trial registers for published and unpublished studies however all RCTs meeting inclusion criteria had already been identified from the database search outlined above. Please see fig-prisma for the PRISMA flow diagram.
 
 We used Covidence, an online software tool, to manage our systematic review. Our search produced 538 studies, 88 of which were duplicates and subsequently removed. Two authors screened 450 titles and abstracts, and 38 full text records. Seven studies met inclusion criteria and data extraction was completed for these papers.
 
@@ -2558,8 +2564,7 @@ Explicit search strategy: title/abstract = (depress\* or dysthymi\* or "mood dis
 
 ##References for included trials
 
-References for trials included in the existing meta-analyses drawn upon for this study can be found at <https://docs.metapsy.org/databases/depression-childadol-psyctr/>
-for psychotherapy RCTs and at <https://ora.ox.ac.uk/objects/uuid:e0b5ae23-d562-4348-94b8-84f70b7812c5> for medication RCTs. Below are references for the seven additional RCTs identified in the original systematic review conducted for the current study.
+References for trials included in the existing meta-analyses drawn upon for this study can be found at <https://docs.metapsy.org/databases/depression-childadol-psyctr/> for psychotherapy RCTs and at <https://ora.ox.ac.uk/objects/uuid:e0b5ae23-d562-4348-94b8-84f70b7812c5> for medication RCTs. Below are references for the seven additional RCTs identified in the original systematic review conducted for the current study.
 
 *Publications*
 
@@ -2601,7 +2606,7 @@ Where multiple depression rating scales were used, we selected the best availabl
 
 ## Included studies
 
-We drew upon RCTs included in two recent comprehensive meta-analyses with open data available for each medication and psychotherapy, and supplemented them with an updated systematic review. Please refer to these original meta-analyses for a detailed description of their search strategy and study selection criteria. Psychotherapy studies were drawn from a systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021] (dataset available [here](https://docs.metapsy.org/databases/depression-childadol-psyctr/)). Whilst Cuijpers et al. [@cuijpersEffectsPsychologicalTreatments2021] excluded studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below. We also included studies which had data available for other variables in interest, including number of sites or baseline demographics; hence we have more psychotherapy studies included in this review compared to the original meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuijpers et al.'s [@cuijpersEffectsPsychologicalTreatments2021] literature search.
+We drew upon RCTs included in two recent comprehensive meta-analyses with open data available for each medication and psychotherapy, and supplemented them with an updated systematic review. Please refer to these original meta-analyses for a detailed description of their search strategy and study selection criteria. Psychotherapy studies were drawn from a systematic review and meta-analysis of randomised trials comparing psychotherapy for youth depression against control conditions [@cuijpersEffectsPsychologicalTreatments2021] (dataset available at <https://docs.metapsy.org/databases/depression-childadol-psyctr/>). Whilst Cuijpers et al. [@cuijpersEffectsPsychologicalTreatments2021] excluded studies for which the primary outcome variable could not be calculated due to missing data, we included these studies and performed the imputations outlined below. We also included studies which had data available for other variables in interest, including number of sites or baseline demographics; hence we have more psychotherapy studies included in this review compared to the original meta-analysis. Whilst the online database is regularly updated, we chose to exclude studies published after the final date of Cuijpers et al.'s [@cuijpersEffectsPsychologicalTreatments2021] literature search. We also included three studies from Zhou et al. (REF) which were not covered in the previous meta-analysis whilst fitting the date range.
 
 Medication studies were drawn from a network meta-analysis examining the efficacy and tolerability of antidepressants and placebo for major depressive disorder in children and adolescents [@ciprianiComparativeEfficacyTolerability2016]. A dataset was made available online though did not include means or standard deviations at baseline or post-test. We were unable to access the full dataset used in this meta-analysis, and hence completed extraction from the included studies ourselves. We excluded three studies because they had no control arm. We were unable to locate and therefore complete extraction for two RCTs (Almeida-Montes, 2005; Eli Lilly, 1986). Many studies did not report complete data; we contacted all corresponding authors to request missing data, though did not receive any responses.
 
@@ -2619,7 +2624,7 @@ $$
 \text{outcome}_{percent} = \frac{\bar{X} - \text{scale}_{min}}{\text{scale}_{max} - \text{scale}_{min}}
 $$
 
-where, $$\bar{X}$$ is the mean score for each study arm on the primary outcome questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible values of the scale in question, respectively. The standard deviation is calculated thus:
+where, $$\bar{X}$$is the mean score for each study arm on the primary outcome questionnaire, and ${scale}_{min}$ and ${scale}_{max}$ are the minimum and maximum possible values of the scale in question, respectively. The standard deviation is calculated thus:
 
 $$
 \text{SD}_{Xpercent} = \frac{\text{SD}_{X}}{\text{scale}_{max} - \text{scale}_{min}}
@@ -2659,43 +2664,37 @@ $$Yij ∼ \mathcal{N}(\theta_{ij}, \sigma_{ij}^2)$$
 
 where,
 
-$$θij​∼N(xij​β,τi2​)$$
-
-{#eq-8}
+$$θij​∼N(xij​β,τi2​)$$ {#eq-8}
 
 where $Y_{ij}$ is the observed effect size for the $j$th arm in the $i$th study, which has a normal distribution with mean $\theta_{ij}$ and sampling error variance $\sigma_{ij}^2$. The true effect size $\theta_{ij}$ is modeled as a study-specific effect with an additional term representing the variability between arms within the study.
 
 This gives rise to the following model:
 
-$$ Yij=xijβ+ui+vij+ϵij $$
-
-{#eq-9}
+$$ Yij=xijβ+ui+vij+ϵij $$ {#eq-9}
 
 where,
 
-$$ ui​∼N(0,τ2) $$
+$$ ui​∼N(0,τ2) $$ {#eq-10}
 
-{#eq-10} describes the deviation of each study from the overall mean effect size, and
+describes the deviation of each study from the overall mean effect size, and
 
-$$vij∼N(0,τi2)$$ {#eq11}
+$$vij∼N(0,τi2)$$ {#eq-11}
 
 describes the deviation of each arm from the study-specific effect, with $\tau_{i}^2$ representing the heterogeneity within studies. Finally,
 
-$$\epsilon_{ij} \sim \mathcal{N}(0, \sigma_{ij}^2)$$
-
-{#eq-12}
+$$\epsilon_{ij} \sim \mathcal{N}(0, \sigma_{ij}^2)$$ {#eq-12}
 
 represents the sampling error.
 
 In this framework, we can model the means for each arm of the trials as follows:
 
-$$ \begin{aligned} Υ_{ij} &= \begin{cases} 0 & \text{MedControl:} \quad b_0 + u_i + v_{ij} + \epsilon_{ij}\\ 1 & \text{MedActive:} \quad b_0 + b_{1_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ 2 & \text{PsyActive:} \quad b_0 + b_{2_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ 3 & \text{PsyControl:} \quad b_0 + b_{3_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ \end{cases} \end{aligned} $$
+$$ \begin{aligned} Υ_{ij} &= \begin{cases} 0 & \text{MedControl:} \quad b_0 + u_i + v_{ij} + \epsilon_{ij}\\ 1 & \text{MedActive:} \quad b_0 + b_{1_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ 2 & \text{PsyActive:} \quad b_0 + b_{2_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ 3 & \text{PsyControl:} \quad b_0 + b_{3_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\ \end{cases} \end{aligned} $$ {#eq-13}
 
-{#eq-13} Here, the mean effect size for each level is the sum of $b_0$, the intercept for the reference category (medication control), with the coefficient for each level (e.g., $b_{3_{ij}}$ for psychotherapy controls). The variability between studies and arms within studies is captured by $u_i$ and $v_{ij}$, respectively. The confidence intervals for the means are constructed using the standard errors of the means, which account for the hierarchical structure of the data. Each coefficient represents the contrast between the reference category and each level. For example, $b_{3_{ij}}$ represents the contrast between psychotherapy and medication control arms. Inference on these contrasts is conducted using the following test statistic:
+Here, the mean effect size for each level is the sum of $b_0$, the intercept for the reference category (medication control), with the coefficient for each level (e.g., $b_{3_{ij}}$ for psychotherapy controls). The variability between studies and arms within studies is captured by $u_i$ and $v_{ij}$, respectively. The confidence intervals for the means are constructed using the standard errors of the means, which account for the hierarchical structure of the data. Each coefficient represents the contrast between the reference category and each level. For example, $b_{3_{ij}}$ represents the contrast between psychotherapy and medication control arms. Inference on these contrasts is conducted using the following test statistic:
 
-$$ z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})} $$
+$$ z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})} $$ {#eq-14}
 
-{#eq-14} This test allows us to assess the significance of the differences between treatment effects across study arms.
+This test allows us to assess the significance of the differences between treatment effects across study arms.
 
 We used maximum likelihood (ML) to estimate model and applied Hartung-Knapp adjustment to reduce the chance of false positives [@inthoutHartungKnappSidikJonkmanMethodRandom2014].
 
@@ -2729,7 +2728,7 @@ x
 
 ```
 
-We conducted a series of sensitivity analyses. For each of the meta-analyses we excluded studies that 1) used waitlist as their control and 2) recruited participants with subclinical levels of depression. Next, we conducted two analyses where we included only trials that used the Children's Depression Rating Scale, Revised (CDRS-R) or the Hamilton Depression Rating Scale (HAM-D) as outcome instruments.
+We conducted a series of sensitivity analyses. For each of the meta-analyses we excluded studies that 1) used waitlist as their control and 2) recruited participants with subclinical levels of depression. Next, we conducted two analyses where we included only trials that used the Children's Depression Rating Scale, Revised (CDRS-R) or the Hamilton Depression Rating Scale (HAM-D) as outcome instruments. Additonally, we restricted two analyses to studies with variance below 0.02 and which reported SD at outcome respectively.
 
 Further, we tested whether the simulated values for the standard error had a substantial influence on the estimation of the differences between the medication and psychotherapy control conditions. To inspect whether this is the case, we plotted the z-value of the difference between the two coefficients against the number of simulations. We make inference on the stability of the difference, by counting the proportion of times that the z-value is above the critical value of z = `r x` corresponding to an alpha = 0.05.
 
@@ -2741,7 +2740,7 @@ We ran t-tests to compare the active and control arms of psychotherapy trials on
 
 ## Summary of all included trials
 
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #| label: tbl-all-trials
 #| tbl-cap: "Summary of included RCTs"
 #| tbl-cap-location: top
@@ -3218,9 +3217,9 @@ coef_and_se_means_no_wl <- coef_and_se_means_no_wl %>%
 plot_means_no_wl <- plot_means_function(coef_and_se_means_no_wl)
 print(plot_means_no_wl)
 
- #png("plot_means_multi_no_wl.png")
- #plot_means_no_wl
- #dev.off()
+ png("plot_means_multi_no_wl.png")
+plot_means_no_wl
+ dev.off()
 
 ```
 
@@ -3264,9 +3263,9 @@ coef_and_se_means_cdrs_study <- coef_and_se_means_cdrs_study %>%
 plot_means_cdrs <- plot_means_function(coef_and_se_means_cdrs_study)
 print(plot_means_cdrs)
 
-# png("plot_means_multi_cdrs.png")
-# plot_means_cdrs
-# dev.off()
+ png("plot_means_multi_cdrs.png")
+ plot_means_cdrs
+ dev.off()
 
 ```
 
@@ -3284,36 +3283,12 @@ coef_and_se_means_hamd_study <- coef_and_se_means_hamd_study %>%
     TRUE ~ as.character(condition)))
 
 # subtitle_text_hamd <- "Metanalytic estimates of within-group changes: HAM-D studies only"
-plot_means_hamd <- plot_means_function(coef_and_se_means_hamd_study)
-print(plot_means_hamd)
+plot_means_multi_hamd <- plot_means_function(coef_and_se_means_hamd_study)
+print(plot_means_multi_hamd)
 
-# png("plot_means_multi_cdrs.png")
-# plot_means_cdrs
-# dev.off()
-
-```
-
-```{r, warning=FALSE, message = FALSE, echo=FALSE}
-#| label: fig-plot-means-hamd
-#| fig-cap: "Meta-analytic estimates of within-group changes: HAM-D studies only"
-#| fig-cap-location: top
-
-coef_and_se_means_hamd_study <- coef_and_se_means_hamd_study %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition)))
-
-# subtitle_text_hamd <- "Metanalytic estimates of within-group changes: HAM-D studies only"
-plot_means_hamd <- plot_means_function(coef_and_se_means_hamd_study)
-print(plot_means_hamd)
-
-# png("plot_means_multi_cdrs.png")
-# plot_means_cdrs
-# dev.off()
-
+ png("plot_means_multi_hamd.png")
+ plot_means_multi_hamd
+ dev.off()
 
 ```
 
@@ -3340,7 +3315,6 @@ print(plot_means_multi_sd)
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
-
 #| label: fig-plot-means-var2
 #| fig-cap: "Meta-analytic estimates of within-group changes: studies with variance <0.02"
 #| fig-cap-location: top
