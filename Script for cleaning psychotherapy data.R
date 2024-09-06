@@ -154,7 +154,7 @@ df_clean_zhou <- df_studies_from_zhou %>%
            post_mean_control, post_sd_control, baseline_mean_control) %>% 
   na.omit()
 
-  `# create and store an empty vector
+  # create and store an empty vector
 
 responders_active <- 0
 responders_control <- 0
