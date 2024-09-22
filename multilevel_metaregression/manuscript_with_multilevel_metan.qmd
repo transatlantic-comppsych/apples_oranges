@@ -872,57 +872,56 @@ i2_summary_all <- data.frame(
   mean_i2_level3 = mean(i2_results_all$i2_level3, na.rm = TRUE),
   sd_i2_level3 = sd(i2_results_all$i2_level3, na.rm = TRUE)
 )
-
 ```
 
 ```{r metaregression-fluox, warning=FALSE, message = FALSE, echo=FALSE}
-# # B. Estimate Means and CIs for CBT Fluox Esc --------------------------------
-# #  grab ids for those studies
-# cbt_fluox_esc_study_ids <-
-#   df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
-# 
-# # Use those ids to subset all dataframes in the list
-# # By searching for IDs we have mistakenly included multiple active arms. E.g. for Atkinson which has dulox and fluox. 
-# # So we need to further subset the simulated dfs. For the active arms, I am filtering out conditions that do not meet our criteria. 
-# # This leaves all the control conditions from trials where the active is cbt, fluox or esc. 
-# # We may have multiple controls per study id for this reason, though this isn't a problem 
-# # conceptually.
-# 
-# list_cbt_fluox_esc_study <- lapply(list_df_simulated, function(df) {
-#   df %>%
-#     filter(new_study_id %in% cbt_fluox_esc_study_ids) %>%
-#     filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
-# })
-# 
-# # count the number of studies
-# cbt_fluox_esc_study <- df_long_for_metan %>%
-#   filter(new_study_id %in% cbt_fluox_esc_study_ids,
-#          !(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt")))) 
-# study_count_cbt_fluox_esc_study <- count_studies(cbt_fluox_esc_study)
-# # CB checked, looks good now.
-# 
-# # apply the metareg function to the list of cbt, fluox, esc
-# model_1 <- as.formula(~ four_level_var)
-# list_model_1_cbt_fluox_esc_study <- run_multi_metaregression(list_cbt_fluox_esc_study , model_1)
-# 
-# # extract coefficients and model characteristics.
-# condition <- levels(list_df_simulated[[1]]$four_level_var)
-# aggregate_results_cbt_fluox_esc_study <-  aggregate_model_results(list_model_1_cbt_fluox_esc_study, condition)
-# aggregate_results_cbt_fluox_esc_study <- cbind(aggregate_results_cbt_fluox_esc_study, condition)
-# 
-# # extract SMDs from the list for cbt fluox escit
-# means_cbt_fluox_esc_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
-# 
-# # calculate mean SMDs and ses
-# condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
-# coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, condition)
-#  coef_and_se_means_cbt_fluox_esc_study <- data.frame(cbind(condition, coef_and_se_means_cbt_fluox_esc_study))
-# 
-# # add the ns to the dataframe
-# coef_and_se_means_cbt_fluox_esc_study <- left_join(coef_and_se_means_cbt_fluox_esc_study, study_count_cbt_fluox_esc_study[study_count_cbt_fluox_esc_study$is_missing == FALSE, ] %>% 
-#                                         ungroup() %>% 
-#                                       select(condition, n),  
-#                                     by = "condition")
+# B. Estimate Means and CIs for CBT Fluox Esc --------------------------------
+#  grab ids for those studies
+cbt_fluox_esc_study_ids <-
+  df_appl_v_orange[df_appl_v_orange$active_type == "cbt" | df_appl_v_orange$active_type == "Fluoxetine" | df_appl_v_orange$active_type == "Escitalopram",]$new_study_id
+
+# Use those ids to subset all dataframes in the list
+# By searching for IDs we have mistakenly included multiple active arms. E.g. for Atkinson which has dulox and fluox.
+# So we need to further subset the simulated dfs. For the active arms, I am filtering out conditions that do not meet our criteria.
+# This leaves all the control conditions from trials where the active is cbt, fluox or esc.
+# We may have multiple controls per study id for this reason, though this isn't a problem
+# conceptually.
+
+list_cbt_fluox_esc_study <- lapply(list_df_simulated, function(df) {
+  df %>%
+    filter(new_study_id %in% cbt_fluox_esc_study_ids) %>%
+    filter(!(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
+})
+
+# count the number of studies
+cbt_fluox_esc_study <- df_long_for_metan %>%
+  filter(new_study_id %in% cbt_fluox_esc_study_ids,
+         !(arm_effect_size == "cohens_d_active" & !(type %in% c("Fluoxetine", "Escitalopram", "cbt"))))
+study_count_cbt_fluox_esc_study <- count_studies(cbt_fluox_esc_study)
+# CB checked, looks good now.
+
+# apply the metareg function to the list of cbt, fluox, esc
+model_1 <- as.formula(~ four_level_var)
+list_model_1_cbt_fluox_esc_study <- run_multi_metaregression(list_cbt_fluox_esc_study , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_cbt_fluox_esc_study <-  aggregate_model_results(list_model_1_cbt_fluox_esc_study, condition)
+aggregate_results_cbt_fluox_esc_study <- cbind(aggregate_results_cbt_fluox_esc_study, condition)
+
+# extract SMDs from the list for cbt fluox escit
+means_cbt_fluox_esc_study <-  lapply(list_model_1_cbt_fluox_esc_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_cbt_fluox_esc_study <- calculate_mean_coefs_ses(means_cbt_fluox_esc_study, condition)
+ coef_and_se_means_cbt_fluox_esc_study <- data.frame(cbind(condition, coef_and_se_means_cbt_fluox_esc_study))
+
+# add the ns to the dataframe
+coef_and_se_means_cbt_fluox_esc_study <- left_join(coef_and_se_means_cbt_fluox_esc_study, study_count_cbt_fluox_esc_study[study_count_cbt_fluox_esc_study$is_missing == FALSE, ] %>%
+                                        ungroup() %>%
+                                      select(condition, n),
+                                    by = "condition")
 ```
 
 ```{r metaregression-nowl, warning=FALSE, message = FALSE, echo=FALSE}
@@ -2517,24 +2516,24 @@ As seen in @tbl-intensity-of-int, active conditions featured significantly more 
 
 ```{r proportion-wl, echo=FALSE}
 # Filter the dataframe
-filtered_df <- df_long_for_metan %>%
-  filter(psy_or_med == 1, arm_effect_size == "cohens_d_control")
-
-# Count the occurrences of each type
-type_counts <- filtered_df %>%
-  count(type) %>%
-  mutate(total_count = sum(n),
-         wl_sum = sum(n[type == "wl"]),
-         wl_percentage = wl_sum / total_count * 100)
-
-# how many examples of matching of active and control in number of hours
-
-instances_count <- df_descr_psy_conditions_no_wl %>%
-  filter(!is.na(total_hours)) %>%
-  group_by(new_study_id, total_hours) %>%
-  summarise(count = n()) %>%
-  filter(count > 1) %>%
-  summarise(total_instances = n())
+# filtered_df <- df_long_for_metan %>%
+#   filter(psy_or_med == 1, arm_effect_size == "cohens_d_control")
+# 
+# # Count the occurrences of each type
+# type_counts <- filtered_df %>%
+#   count(type) %>%
+#   mutate(total_count = sum(n),
+#          wl_sum = sum(n[type == "wl"]),
+#          wl_percentage = wl_sum / total_count * 100)
+# 
+# # how many examples of matching of active and control in number of hours
+# 
+# instances_count <- df_descr_psy_conditions_no_wl %>%
+#   filter(!is.na(total_hours)) %>%
+#   group_by(new_study_id, total_hours) %>%
+#   summarise(count = n()) %>%
+#   filter(count > 1) %>%
+#   summarise(total_instances = n())
 
 ```
 
@@ -3164,9 +3163,14 @@ In @tbl-results-overall, we present the regression that tests our hypothesis abo
 #| tbl-cap: "Results from metaregression with overall sample"
 #| tbl-cap-location: top
 
+#add i2 to aggregate results
+aggregate_results_overall_i2 <- cbind(aggregate_results_overall, 
+                                   i2_2 = rep(i2_summary_all$mean_i2_level2, nrow(aggregate_results_overall)),
+                                   i2_3 = rep(i2_summary_all$mean_i2_level3, nrow(aggregate_results_overall)))
+
 # Regression results
 
-aggregate_results_overall <- aggregate_results_overall %>%
+aggregate_results_overall_i2 <- aggregate_results_overall_i2 %>%
   mutate(across(where(is.numeric), ~round(., 2))) %>%
   mutate(condition = case_when(
     condition == "medication_control" ~ "Medication Control",
@@ -3176,7 +3180,7 @@ aggregate_results_overall <- aggregate_results_overall %>%
     TRUE ~ as.character(condition))) %>% 
   relocate("condition", .before = "coefficients") 
 
-new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "Upper CI", "T2", "QE", "k")
+new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "Upper CI", "T2_1", "T2_2", "QE", "k", "I2_2", "I2_3")
 
 # Assign new column names to the data frame
 colnames(aggregate_results_overall) <- new_column_names
@@ -3187,10 +3191,10 @@ table_aggregate_results_overall[1, 4] <- NA
 flextable(table_aggregate_results_overall) %>%
   set_table_properties(width = 1) %>%
   autofit() %>%
-  add_footer_row(values = as_paragraph("T", as_sup("2"), " = ", aggregate_results_overall[1, "T2"],
-                      "; ", as_i("I"), as_sup("2"), " = ", aggregate_results_overall[1, "I2"], 
-                      "; ", as_i("K"), " = ", aggregate_results_overall[1, "k"],
-                      "; ", as_i("R"), as_sup("2"), " = ", aggregate_results_overall[1, "R2"], "."), colwidths = 6) %>%
+  add_footer_row(values = as_paragraph("T", as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall[1, "T2_1"], ";", as_i("T"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall[1, "T2_2"],
+                      "; ", as_i("I"), as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall[1, "I2_3"], 
+                      "; ", as_i("I"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall[1, "I2_2"], 
+                      "; ", as_i("K"), " = ", aggregate_results_overall[1, "k"], "."), colwidths = 6) %>%
   # add_header_row(values = "Results from metaregression with overall sample", colwidths = 6) %>%
   # add_header_row(values = "Table 4", colwidths = 6) %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
@@ -3248,137 +3252,137 @@ dev.off()
 ## Metaregression sensitivity analyses
 
 ```{r supp-metaregressions, warning=FALSE, message = FALSE, echo=FALSE}
-# # G. Post SD Sensitivity Analysis ---------------------------------------
-# 
-# ##--------- Data preparation
-# 
-# #For this we need to filter the master df by missing post_sd_active and post_sd_control in df_first_row
-# 
-# #create subset of first_row
-# 
-# df_first_row <- read.csv(here("df_first_row.csv"))
-# 
-# #create new_study_ids to match master dataset
-# df_first_row  <- df_first_row  %>%
-#   mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
-#                                   .default = study ))
-# 
-# df_first_row_reduced <- df_first_row %>%
-#   filter(!(new_study_id == "March, 2004" & is.na(control_type))) %>%
-#   select(new_study_id, post_sd_active, post_sd_control)
-# 
-# #as first_row has multiple rows per study (showing different arm pairs), I will keep only one row per study
-# 
-# df_first_row_reduced <- df_first_row_reduced %>%
-#   group_by(new_study_id) %>%
-#   slice_head(n = 1) %>%
-#   ungroup()
-# 
-# #create a column in master df that shows 1 if any missing post sds in first_row
-# 
-# df_long_for_metan_with_missing <- df_long_for_metan %>%
-#   left_join(df_first_row_reduced, by = "new_study_id") %>%
-#   mutate(missing_post_sd = ifelse(is.na(post_sd_active) | is.na(post_sd_control), 1, 0)) %>%
-#   select(-post_sd_active, -post_sd_control) %>%
-#   arrange(arm_effect_size, new_study_id)
-# 
-# #all studies missing sds in active are also missing them in control, so we can go ahead and filter out all arms of these studies
-# 
-# df_long_for_metan_without_missing <- df_long_for_metan_with_missing %>%
-#   filter(missing_post_sd == 0)
-# 
-# n_distinct(df_long_for_metan_without_missing$new_study_id) #61 studies
-# n_distinct(df_long_for_metan$new_study_id) #88 studies total
-# nrow(df_long_for_metan_without_missing) #140 arms
-# nrow(df_long_for_metan) #203 arms
-# 
-# ##------------ Estimates 
-# 
-# #take study ids where study does not have missing post SD
-# sd_study_ids <-
-#   df_long_for_metan_with_missing[df_long_for_metan_with_missing$missing_post_sd ==0,]$new_study_id
-# 
-# # use those ids to subset all dataframes in the list
-# list_sd_study <- list()
-# 
-# for(i in 1: length(list_df_simulated)){
-#   
-#   list_sd_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-#                                                  %in% sd_study_ids,]
-# }
-# 
-# # count the number of studies
-# study_count_sd_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% sd_study_ids,])
-# 
-# # apply the metareg function to the list of clinical studies
-# model_1 <- as.formula(~ four_level_var)
-# list_model_1_sd_study <- run_multi_metaregression(list_sd_study , model_1)
-# 
-# # extract coefficients and model characteristics.
-# condition <- levels(list_df_simulated[[1]]$four_level_var)
-# aggregate_results_sd_study <-  aggregate_model_results(list_model_1_sd_study, condition)
-# 
-# # extract SMDs from the list for clinical studies
-# means_sd_study <-  lapply(list_model_1_sd_study, extract_coefficients_func)
-# 
-# # calculate mean SMDs and ses
-# condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
-# coef_and_se_means_sd_study <- calculate_mean_coefs_ses(means_sd_study, condition)
-# coef_and_se_means_sd_study <- data.frame(cbind(condition, coef_and_se_means_sd_study))
-# 
-# # add the ns to the dataframe
-# coef_and_se_means_sd_study <- left_join(coef_and_se_means_sd_study, study_count_sd_study[study_count_sd_study$is_missing == FALSE, ] %>% 
-#                                             ungroup() %>% 
-#                                             select(condition, n),  
-#                                           by = "condition")
-# 
-# #H. Studies with variances <.02-----------------------------
-# 
-# ##-----------Data preparation
-# 
-# #create column with variance in master df
-# df_long_for_metan$baseline_variances <- (df_long_for_metan$perc_baseline_sd)^2
-# 
-# #take study ids where variance =2 or less
-# var2_study_ids <-
-#   df_long_for_metan[df_long_for_metan$baseline_variances<=0.02,]$new_study_id
-# length(var2_study_ids)
-# 
-# ##------------Estimates
-# 
-# # use those ids to subset all dataframes in the list
-# list_var2_study <- list()
-# 
-# for(i in 1: length(list_df_simulated)){
-#   
-#   list_var2_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
-#                                                %in% var2_study_ids,]
-# }
-# 
-# # count the number of studies
-# study_count_var2_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% var2_study_ids,])
-# 
-# # apply the metareg function to the list of clinical studies
-# model_1 <- as.formula(~ four_level_var)
-# list_model_1_var2_study <- run_multi_metaregression(list_var2_study, model_1)
-# 
-# # extract coefficients and model characteristics.
-# condition <- levels(list_df_simulated[[1]]$four_level_var)
-# aggregate_results_var2_study <-  aggregate_model_results(list_model_1_var2_study, condition)
-# 
-# # extract SMDs from the list for clinical studies
-# means_var2_study <-  lapply(list_model_1_var2_study, extract_coefficients_func)
-# 
-# # calculate mean SMDs and ses
-# condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
-# coef_and_se_means_var2_study <- calculate_mean_coefs_ses(means_var2_study, condition)
-# coef_and_se_means_var2_study <- data.frame(cbind(condition, coef_and_se_means_var2_study))
-# 
-# # add the ns to the dataframe
-# coef_and_se_means_var2_study <- left_join(coef_and_se_means_var2_study, study_count_var2_study[study_count_var2_study$is_missing == FALSE, ] %>% 
-#                                           ungroup() %>% 
-#                                           select(condition, n),  
-#                                         by = "condition")
+# G. Post SD Sensitivity Analysis ---------------------------------------
+
+##--------- Data preparation
+
+#For this we need to filter the master df by missing post_sd_active and post_sd_control in df_first_row
+
+#create subset of first_row
+
+df_first_row <- read.csv(here("df_first_row.csv"))
+
+#create new_study_ids to match master dataset
+df_first_row  <- df_first_row  %>%
+  mutate(new_study_id = case_when(psy_or_med == 0 ~ paste(study,year, sep = ", "),
+                                  .default = study ))
+
+df_first_row_reduced <- df_first_row %>%
+  filter(!(new_study_id == "March, 2004" & is.na(control_type))) %>%
+  select(new_study_id, post_sd_active, post_sd_control)
+
+#as first_row has multiple rows per study (showing different arm pairs), I will keep only one row per study
+
+df_first_row_reduced <- df_first_row_reduced %>%
+  group_by(new_study_id) %>%
+  slice_head(n = 1) %>%
+  ungroup()
+
+#create a column in master df that shows 1 if any missing post sds in first_row
+
+df_long_for_metan_with_missing <- df_long_for_metan %>%
+  left_join(df_first_row_reduced, by = "new_study_id") %>%
+  mutate(missing_post_sd = ifelse(is.na(post_sd_active) | is.na(post_sd_control), 1, 0)) %>%
+  select(-post_sd_active, -post_sd_control) %>%
+  arrange(arm_effect_size, new_study_id)
+
+#all studies missing sds in active are also missing them in control, so we can go ahead and filter out all arms of these studies
+
+df_long_for_metan_without_missing <- df_long_for_metan_with_missing %>%
+  filter(missing_post_sd == 0)
+
+n_distinct(df_long_for_metan_without_missing$new_study_id) #61 studies
+n_distinct(df_long_for_metan$new_study_id) #88 studies total
+nrow(df_long_for_metan_without_missing) #140 arms
+nrow(df_long_for_metan) #203 arms
+
+##------------ Estimates
+
+#take study ids where study does not have missing post SD
+sd_study_ids <-
+  df_long_for_metan_with_missing[df_long_for_metan_with_missing$missing_post_sd ==0,]$new_study_id
+
+# use those ids to subset all dataframes in the list
+list_sd_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+
+  list_sd_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                                 %in% sd_study_ids,]
+}
+
+# count the number of studies
+study_count_sd_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% sd_study_ids,])
+
+# apply the metareg function to the list of clinical studies
+model_1 <- as.formula(~ four_level_var)
+list_model_1_sd_study <- run_multi_metaregression(list_sd_study , model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_sd_study <-  aggregate_model_results(list_model_1_sd_study, condition)
+
+# extract SMDs from the list for clinical studies
+means_sd_study <-  lapply(list_model_1_sd_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_sd_study <- calculate_mean_coefs_ses(means_sd_study, condition)
+coef_and_se_means_sd_study <- data.frame(cbind(condition, coef_and_se_means_sd_study))
+
+# add the ns to the dataframe
+coef_and_se_means_sd_study <- left_join(coef_and_se_means_sd_study, study_count_sd_study[study_count_sd_study$is_missing == FALSE, ] %>%
+                                            ungroup() %>%
+                                            select(condition, n),
+                                          by = "condition")
+
+#H. Studies with variances <.02-----------------------------
+
+##-----------Data preparation
+
+#create column with variance in master df
+df_long_for_metan$baseline_variances <- (df_long_for_metan$perc_baseline_sd)^2
+
+#take study ids where variance =2 or less
+var2_study_ids <-
+  df_long_for_metan[df_long_for_metan$baseline_variances<=0.02,]$new_study_id
+length(var2_study_ids)
+
+##------------Estimates
+
+# use those ids to subset all dataframes in the list
+list_var2_study <- list()
+
+for(i in 1: length(list_df_simulated)){
+
+  list_var2_study[[i]] <- list_df_simulated[[i]][list_df_simulated[[i]]$new_study_id
+                                               %in% var2_study_ids,]
+}
+
+# count the number of studies
+study_count_var2_study <- count_studies(df_long_for_metan[df_long_for_metan$new_study_id %in% var2_study_ids,])
+
+# apply the metareg function to the list of clinical studies
+model_1 <- as.formula(~ four_level_var)
+list_model_1_var2_study <- run_multi_metaregression(list_var2_study, model_1)
+
+# extract coefficients and model characteristics.
+condition <- levels(list_df_simulated[[1]]$four_level_var)
+aggregate_results_var2_study <-  aggregate_model_results(list_model_1_var2_study, condition)
+
+# extract SMDs from the list for clinical studies
+means_var2_study <-  lapply(list_model_1_var2_study, extract_coefficients_func)
+
+# calculate mean SMDs and ses
+condition <- levels(list_df_simulated[[1]]$four_level_var) # for the conditino argument
+coef_and_se_means_var2_study <- calculate_mean_coefs_ses(means_var2_study, condition)
+coef_and_se_means_var2_study <- data.frame(cbind(condition, coef_and_se_means_var2_study))
+
+# add the ns to the dataframe
+coef_and_se_means_var2_study <- left_join(coef_and_se_means_var2_study, study_count_var2_study[study_count_var2_study$is_missing == FALSE, ] %>%
+                                          ungroup() %>%
+                                          select(condition, n),
+                                        by = "condition")
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
