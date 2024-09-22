@@ -361,13 +361,15 @@ aggregate_model_results <- function(list_model_1_meta_reg, condition) {
   df_z_value <- matrix(NA, nrow = n_models, ncol = n_conditions)
   df_lower_ci <- matrix(NA, nrow = n_models, ncol = n_conditions)
   df_upper_ci <- matrix(NA, nrow = n_models, ncol = n_conditions)
-  tau_sq <- rep(NA, n_models)
+  tau_sq_1 <- rep(NA, n_models)
+  tau_sq_2 <- rep(NA, n_models)
   qe <- rep(NA, n_models)
   k <- rep(NA, n_models)
   
   for (i in seq_len(n_models)) {
     model <- list_model_1_meta_reg[[i]]
-    tau_sq[i] <- model$tau2
+    tau_sq_1[i] <- model$sigma2[1]
+    tau_sq_2[i] <- model$sigma2[2]
     qe[i] <- model$QE
     k[i] <- model$k
     coefs <- model$beta
@@ -393,7 +395,8 @@ aggregate_model_results <- function(list_model_1_meta_reg, condition) {
     z_value = colMeans(df_z_value, na.rm = TRUE),
     lower_ci = colMeans(df_lower_ci, na.rm = TRUE),
     upper_ci = colMeans(df_upper_ci, na.rm = TRUE),
-    tau_sq = mean(tau_sq, na.rm = TRUE),
+    tau_sq_1 = mean(tau_sq_1, na.rm.= TRUE),
+    tau_sq_2 = mean(tau_sq_2, na.rm.= TRUE),
     qe = mean(qe, na.rm = TRUE),
     k = mean(k, na.rm = TRUE)
   )
