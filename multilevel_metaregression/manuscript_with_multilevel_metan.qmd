@@ -458,7 +458,6 @@ calculate_mean_coefs_ses <- function(list_of_dfs, conditions) {
   return(df_mean_coefs_ses)
 }
 
-
 ###############6. Function for plotting the SMDs
 plot_means_function <- function(dataframe) {
   dataframe$text_label <- 0
@@ -546,6 +545,34 @@ run_metareg_and_extract <- function(dataframe, model_1, condition) {
   
   # Return the two dataframes
   return(list(baseline_metareg_results = baseline_metareg_results, df_baseline_means_with_cis = df_baseline_means_with_cis))
+}
+
+###########8. Function for extracting multilevel I2 estimates
+
+extract_i2_values <- function(list_of_models) {
+  # Initialize vectors to store I2 values
+  i2_level2 <- numeric(length(list_of_models))
+  i2_level3 <- numeric(length(list_of_models))
+
+  # Loop through each fitted model from the list
+  for (i in seq_along(list_of_models)) {
+    model <- list_of_models[[i]]
+    
+    # Calculate variance distribution using the existing function
+    i2_results <- dmetar::var.comp(model)
+    
+    # Extract I2 values for level 2 and level 3 from the results
+    i2_level2[i] <- as.numeric(i2_results$results$I2[2]) # I2 for level 2
+    i2_level3[i] <- as.numeric(i2_results$results$I2[3]) # I2 for level 3
+  }
+
+  # Combine I2 values into a data frame
+  i2_data <- data.frame(
+    i2_level2 = i2_level2,
+    i2_level3 = i2_level3
+  )
+
+  return(i2_data)
 }
 
 ```
@@ -834,6 +861,18 @@ df_mean_coefs_from_sim <- left_join(df_mean_coefs_from_sim, df_count_studies[df_
                                         ungroup() %>% 
                                       select(condition, n),  
                                     by = "condition")
+
+# Extract I2 values for each dataset
+i2_results_all <- extract_i2_values(list_model_1_meta_reg)
+
+# Calculate the mean and standard deviation of I2 values for each level
+i2_summary_all <- data.frame(
+  mean_i2_level2 = mean(i2_results_all$i2_level2, na.rm = TRUE),
+  sd_i2_level2 = sd(i2_results_all$i2_level2, na.rm = TRUE),
+  mean_i2_level3 = mean(i2_results_all$i2_level3, na.rm = TRUE),
+  sd_i2_level3 = sd(i2_results_all$i2_level3, na.rm = TRUE)
+)
+
 ```
 
 ```{r metaregression-fluox, warning=FALSE, message = FALSE, echo=FALSE}
