@@ -559,7 +559,7 @@ extract_i2_values <- function(list_of_models) {
     model <- list_of_models[[i]]
     
     # Calculate variance distribution using the existing function
-    i2_results <- dmetar::var.comp(model)
+    i2_results <- var.comp(model)
     
     # Extract I2 values for level 2 and level 3 from the results
     i2_level2[i] <- as.numeric(i2_results$results$I2[2]) # I2 for level 2
@@ -1853,9 +1853,6 @@ list_df_simulated[[1]] %>%
     axis.title.y = element_blank()
   )
 
- png("plot_means_multi_all.png")
- plot_means_multi_all
- dev.off()
 ```
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE}
@@ -3183,18 +3180,18 @@ aggregate_results_overall_i2 <- aggregate_results_overall_i2 %>%
 new_column_names <- c("Condition", "Coefficient", "SE", "z value", "Lower CI", "Upper CI", "T2_1", "T2_2", "QE", "k", "I2_2", "I2_3")
 
 # Assign new column names to the data frame
-colnames(aggregate_results_overall) <- new_column_names
+colnames(aggregate_results_overall_i2) <- new_column_names
 
-table_aggregate_results_overall <- aggregate_results_overall[, 1:6]
-table_aggregate_results_overall[1, 4] <- NA
+table_aggregate_results_overall_i2 <- aggregate_results_overall_i2[, 1:6]
+table_aggregate_results_overall_i2[1, 4] <- NA
 
-flextable(table_aggregate_results_overall) %>%
+flextable(table_aggregate_results_overall_i2) %>%
   set_table_properties(width = 1) %>%
   autofit() %>%
-  add_footer_row(values = as_paragraph("T", as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall[1, "T2_1"], ";", as_i("T"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall[1, "T2_2"],
-                      "; ", as_i("I"), as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall[1, "I2_3"], 
-                      "; ", as_i("I"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall[1, "I2_2"], 
-                      "; ", as_i("K"), " = ", aggregate_results_overall[1, "k"], "."), colwidths = 6) %>%
+  add_footer_row(values = as_paragraph("T", as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall_i2[1, "T2_1"], ";", as_i("T"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall_i2[1, "T2_2"],
+                      "; ", as_i("I"), as_sup("2"), as_sub("L3"), " = ", aggregate_results_overall_i2[1, "I2_3"], 
+                      "; ", as_i("I"), as_sup("2"), as_sub("L2"), " = ", aggregate_results_overall_i2[1, "I2_2"], 
+                      "; ", as_i("K"), " = ", aggregate_results_overall_i2[1, "k"], "."), colwidths = 6) %>%
   # add_header_row(values = "Results from metaregression with overall sample", colwidths = 6) %>%
   # add_header_row(values = "Table 4", colwidths = 6) %>% 
   bold(part = "header") %>%   # Bold the relevant header rows
@@ -3206,7 +3203,7 @@ flextable(table_aggregate_results_overall) %>%
   border_outer(border = small_border, part = "body" ) %>%  # Add outer borders
   hline(part = "header", border = big_border) %>% 
   # padding(i = 2, padding.bottom = 15, part = "header") %>% 
-  align(j = 2:ncol(table_aggregate_results_overall), align = "center", part = "all") %>% 
+  align(j = 2:ncol(table_aggregate_results_overall_i2), align = "center", part = "all") %>% 
   align(j = 1, align = "left", part = "all") %>% 
   font(fontname = "Calibri", part = "all") %>% 
   paginate(init = TRUE, hdr_ftr = TRUE) %>% 
