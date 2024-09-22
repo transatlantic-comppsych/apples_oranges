@@ -1634,6 +1634,47 @@ df_overall_baseline_results %>%
 
 ```
 
+```{r baseline-severity, echo=FALSE, message=FALSE, warning=FALSE}
+
+mean_psych_overall <- 0.37
+mean_med_overall <- 0.42
+se_psych_overall <- 0.02
+se_med_overall <- 0.01
+n_psych_overall <- 49
+n_med_overall <- 31
+
+# Calculate standard deviation
+sd_psych_overall <- se_psych_overall * sqrt(n_psych_overall)
+sd_med_overall <- se_med_overall * sqrt(n_med_overall)
+
+#formula with pooled sd
+pooled_sd_overall <- sqrt(((sd_psych_overall^2 + sd_med_overall^2)/2))
+
+# Calculate Cohen's d
+cohens_d_overall <- (mean_psych_overall - mean_med_overall) / pooled_sd_overall
+
+## without subclinical
+
+mean_psych_sub <- 0.39
+mean_med_sub <- 0.42
+se_psych_sub <- 0.02
+se_med_sub <- 0.01
+n_psych_sub <- 41
+n_med_sub <- 31
+
+# Calculate standard deviation
+sd_psych_sub <- se_psych_sub * sqrt(n_psych_sub)
+sd_med_sub <- se_med_sub * sqrt(n_med_sub)
+
+#formula with pooled sd
+pooled_sd_sub <- sqrt(((sd_psych_sub^2 + sd_med_sub^2)/2))
+
+# Calculate Cohen's d
+cohens_d_sub <- (mean_psych_sub - mean_med_sub) / pooled_sd_sub
+cohens_d_sub
+cohens_d_overall
+```
+
 ### Baseline severity
 
 On average, depression severity at baseline was significantly higher in medication trials compared to psychotherapy trials (see @tbl-baseline-results). When excluding RCTs that used waitlist as their control, baseline severity remained significantly higher in medication trials compared to psychotherapy trials. This difference did not reach statistical significance when excluding studies that recruited samples with sub-clinical depression.
@@ -1739,7 +1780,7 @@ For this analysis, we excluded the two psychotherapy trials which included entir
 
 ### Age
 
-As can be seen in tbl-baseline_results, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = `r``round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2)`) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses.
+As can be seen in tbl-baseline_results, mean age was `r round(results_met_age$TE_random[results_met_age$subgroup == 1][[2]],2)` (*SE* = ``` r``round(results_met_age$seTE_random[results_met_age$subgroup == 1][[2]],2) ```) across psychotherapy trials and `r round(results_met_age$TE_random[results_met_age$subgroup == 0][[2]],2)` (*SE* = `r round(results_met_age$seTE_random[results_met_age$subgroup == 0][[2]],2)`) across medication trials, with no significant between group differences. There were no significant differences in mean age between modalities on further sensitivity analyses.
 
 ## Trial design
 
@@ -2446,12 +2487,12 @@ type_counts <- filtered_df %>%
 
 # how many examples of matching of active and control in number of hours
 
-# instances_count <- df_descr_psy_conditions_no_wl %>%
-#   filter(!is.na(total_hours)) %>%
-#   group_by(new_study_id, total_hours) %>%
-#   summarise(count = n()) %>%
-#   filter(count > 1) %>%
-#   summarise(total_instances = n())
+instances_count <- df_descr_psy_conditions_no_wl %>%
+  filter(!is.na(total_hours)) %>%
+  group_by(new_study_id, total_hours) %>%
+  summarise(count = n()) %>%
+  filter(count > 1) %>%
+  summarise(total_instances = n())
 
 ```
 

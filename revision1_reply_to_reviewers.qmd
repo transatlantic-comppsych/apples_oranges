@@ -1,11 +1,17 @@
 ---
 title: "Comparing Apples and Oranges in Youth Depression Treatments? A Quantitative Critique of the Evidence Base and Guidelines"
 subtitle: "Major Revision: Letter to Reviewers"
-format: docx
-editor: visual
+format: 
+  docx:
+    fig-width: 9
+    fig-height: 7
+    fig_caption: true
+    tbl_caption: true
+    number-sections: true
+fig-cap-location: top
 ---
 
-```{r}
+```{r, include=FALSE}
 library(tidyverse)
 library(truncnorm)
 library(metafor)
@@ -22,7 +28,7 @@ library(effsize)
 library(here)
 
 #set source
-load("my_environment.RData")
+load("my_environment.RData") #image that contains objects after main qmd has been run
 ```
 
 ### Reviewer 1
@@ -33,10 +39,9 @@ I could not see the rational for excluding the all female trials in the sex anal
 
 #### Response to 1.7
 
-This is to not unduly bias the results. We now present the analyses with all studies included in the Supplemental Materials.
+This is to not unduly bias the results. We now present the analyses with all studies included in the Supplemental Materials (see @tbl-all-studies-percfemale-results).
 
 ```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"}
-
 #| label: tbl-all-studies-percfemale-results
 #| tbl-cap: "Percentage female at baseline across medication and psychotherapy studies: Results for sample including all female studies"
 #| tbl-cap-location: top
@@ -95,7 +100,7 @@ The presence of effect modification depends on which measure is used in the stud
 To make this clear, we reproduce the table above, only adding another two column, one is the Odds Ratio (OR) another relative/multiplicative measure of relative risk that the reviewer also refers to as "more generalizable", and that of absolute risk, AR (i.e. the risk difference), an additive measure.
 
 |         |                          |                               |     |     |      |
-|------------|------------|-------------|------------|------------|------------|
+|---------|--------------------------|-------------------------------|-----|-----|------|
 |         | Control event rate (CER) | Experimental event rate (EER) | RR  | OR  | AR   |
 | Trial 1 | 5/100                    | 10/100                        | 2.0 | 2.1 | 0.05 |
 | Trial 2 | 30/100                   | 60/100                        | 2.0 | 3.5 | 0.3  |
@@ -146,27 +151,25 @@ Since the AR is the same in each case, and one might conclude that we should be 
 
 All these considerations are very important and relevant to our paper and in the spirit of being very clear with the primary data, we have added, in addition to the  figure with the summary SMDs, this figure which presents the SMD of each study separately.
 
-```{r, warning=F}
+```{r, warning=FALSE, message = FALSE, echo=FALSE, ft.align="left"} #  #}
 
-list_df_simulated[[1]] %>% 
-  filter(arm_effect_size == "cohens_d_control") %>% 
-  ggplot(aes(x = cohens_d, y = 0, color = as.factor(psy_or_med), size = baseline_n)) +
-  geom_jitter(height = 0.2, alpha = 0.7) +
-  geom_point(alpha = 0.7) +
+list_df_simulated[[1]] %>%  
+  filter(arm_effect_size == "cohens_d_control") %>%  
+  ggplot(aes(x = cohens_d, y = 0, color = as.factor(psy_or_med), size = baseline_n)) + 
+  geom_jitter(height = 0.2, alpha = 0.7) + 
+  geom_point(alpha = 0.7) + 
   labs(
     title = "Pre-Post Standardised Mean Differences (SMD) of Control Arms",
     x = "SMD",
     y = "",
     color = "Type of Study",
-    size = "Baseline n"
-  ) +
-  scale_color_discrete(name = "Type of Study", labels = c("Medication", "Psychological Therapy")) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(),
-    axis.title.y = element_blank()
-  )
+    size = "Baseline n") +
+    scale_color_discrete(name = "Type of Study", labels = c("Medication", "Psychological Therapy")) +
+      theme_minimal() +
+      theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
 ```
 
 Given this finding, there must be two possibilities about such a difference (given what we have written above). First, the difference may be due to differences the method of control. It is easy to conceive of this as a difference in the quality of the controls, i.e. how well they were blinded, or what exactly participants in the trial were told. 
@@ -220,63 +223,65 @@ We thank the reviewer for pointing this out. The key question is whether the bas
 
 First, we plot the mean differences (endpoint -- baseline) of the min-max transformed scores. As can be seen these are substantial, indicating that the difference is unlikely to stem simply from a difference in standard deviation calculation.
 
-```{r, warning=F}
-
-df_long_for_metan %>%
-  filter(arm_effect_size == "cohens_d_control") %>%
-  mutate(mean_dif = perc_post_mean - perc_baseline_mean) %>%
-  ggplot(aes(y = mean_dif, x = as.factor(psy_or_med), size = baseline_n)) +
-  geom_jitter(width = 0.2) + # Add jitter to points
-  ggtitle("Post-Pre Differences in Mean Min-Max Scores") +
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
+mean_diff_min_max_scores <- df_long_for_metan %>% 
+  filter(arm_effect_size == "cohens_d_control") %>% 
+  mutate(mean_dif = perc_post_mean - perc_baseline_mean) %>% 
+  ggplot(aes(y = mean_dif, x = as.factor(psy_or_med), size = baseline_n)) + 
+  geom_jitter(width = 0.2) + 
+  ggtitle("Post-Pre Differences in Mean Min-Max Scores") + 
   ylab("Post-Pre Difference") +
   xlab("Type of Study") +
-  scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) + # Customize x-axis labels
-  theme_minimal()
+  scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) +   theme_minimal() 
+
+print(mean_diff_min_max_scores) 
+png("mean_diff_min_max_scores.png")
+mean_diff_min_max_scores 
+dev.off()
 
 ```
 
 Second, we plot below the baseline variances (i.e. squared sds), which largely overlap, making it unlikely that differences in baseline SD is the cause of the difference in the outcome.
 
-```{r, warning=F}
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
 # create baseline variances
-df_long_for_metan$variances <- (df_long_for_metan$perc_baseline_sd)^2
+df_long_for_metan$variances <- (df_long_for_metan$perc_baseline_sd)^2 
 
-df_long_for_metan %>%
-  filter(arm_effect_size == "cohens_d_control") %>%
-  mutate(mean_dif = perc_post_mean - perc_baseline_mean) %>%
-  ggplot(aes(y = variances, x = as.factor(psy_or_med), size = baseline_n)) +
-  geom_jitter(width = 0.2) + # Add jitter to points
-  ggtitle("Post-Pre Differences in Study Baseline Variances") +
-  ylab("Baseline Variance") +
-  xlab("Type of Study") +
-  scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) + # Customize x-axis labels
-  theme_minimal()
+plot_baseline_var <- df_long_for_metan %>% 
+  filter(arm_effect_size == "cohens_d_control") %>% 
+  mutate(mean_dif = perc_post_mean - perc_baseline_mean) %>% 
+  ggplot(aes(y = variances, x = as.factor(psy_or_med), size = baseline_n)) + geom_jitter(width = 0.2) +  
+  ggtitle("Post-Pre Differences in Study Baseline Variances") + 
+  ylab("Baseline Variance") + 
+  xlab("Type of Study") + 
+  scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) + theme_minimal() 
+
+print(plot_baseline_var)
+png("plot_baseline_var.png")
+plot_baseline_var 
+dev.off()
+
 
 ```
 
 Third, we conducted an addition analysis, restricting to studies with variances below 0.02 (see graph above).
 
 ```{r, warning=F}
-
 #| label: fig-plot-means-var2
-#| fig-cap: "Meta-analytic estimates of within-group changes: studies with variance <0.02"
-#| fig-cap-location: top
+#| fig-cap: "Meta-analytic estimates of within-group changes: studies with variance <0.02" 
+#| fig-cap-location: top 
 
-coef_and_se_means_var2_study <- coef_and_se_means_var2_study %>%
-  mutate(condition = case_when(
-    condition == "medication_control" ~ "Medication Control",
-    condition == "medication_active" ~ "Medication Active",
-    condition == "psychotherapy_control" ~ "Psychotherapy Control",
-    condition == "psychotherapy_active" ~ "Psychotherapy Active",
-    TRUE ~ as.character(condition)))
+coef_and_se_means_var2_study <- coef_and_se_means_var2_study %>% 
+  mutate(
+    condition = case_when(condition == "medication_control" ~ "Medication Control", condition == "medication_active" ~ "Medication Active", condition == "psychotherapy_control" ~ "Psychotherapy Control",
+condition == "psychotherapy_active" ~ "Psychotherapy Active", TRUE ~ as.character(condition))) 
 
-# subtitle_text_hamd <- "Metanalytic estimates of within-group changes: HAM-D studies only"
+subtitle_text_hamd <- "Metanalytic estimates of within-group changes: HAM-D studies only"
 plot_means_multi_var2 <- plot_means_function(coef_and_se_means_var2_study)
 print(plot_means_multi_var2)
+png("plot_means_multi_var2.png")
+plot_means_multi_var2 # # dev.off() #  #
 
-# png("plot_means_multi_var2.png")
-# plot_means_multi_var2
-# dev.off()
 
 ```
 
@@ -288,7 +293,7 @@ print(plot_means_multi_var2)
 
 Actually, we have endpoint SDs in 61 (69.3% of) trials. To address the reviewer's point, we have now reanalysed our data restricted to just those studies and as can be seen below, the same inferences hold as before. We include this figure now as Fig XXX in the Supplement.
 
-```{r, warning=F}
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
 #| label: fig-plot-means-var2
 #| fig-cap: "Meta-analytic estimates of within-group changes: studies with post SD"
 #| fig-cap-location: top
@@ -312,7 +317,7 @@ print(plot_means_multi_sd)
 
 Coefficients across simulations (not sure in which response to add this):
 
-```{r, warning=F}
+```{r, warning=FALSE, message = FALSE, echo=FALSE}
 
 coefs_test <- do.call(rbind, lapply(list_dummy_var_means, function(sim) sim$coefficients))
 df_coefs_test <- data.frame(coefs_test)
