@@ -1880,7 +1880,7 @@ df_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
 plot_means_multi_all <- plot_means_function(df_mean_coefs_from_sim)
 print(plot_means_multi_all)
 
- png("plot_means_multi_all.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_all.png", width=6.5, height=6, units="in", res=300)
  plot_means_multi_all
  dev.off()
 
@@ -3408,7 +3408,7 @@ coef_and_se_means_no_wl <- coef_and_se_means_no_wl %>%
 plot_means_no_wl <- plot_means_function(coef_and_se_means_no_wl)
 print(plot_means_no_wl)
 
- png("plot_means_multi_no_wl.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_no_wl.png", width=6.5, height=6, units="in", res=300)
 plot_means_no_wl
  dev.off()
 
@@ -3431,7 +3431,7 @@ coef_and_se_means_clin_study <- coef_and_se_means_clin_study %>%
 plot_means_clin <- plot_means_function(coef_and_se_means_clin_study)
 print(plot_means_clin)
 
-png("plot_means_multi_clin.png", width=6.5, height=4, units="in", res=300)
+png("plot_means_multi_clin.png", width=6.5, height=6, units="in", res=300)
 plot_means_clin
 dev.off()
 
@@ -3454,7 +3454,7 @@ coef_and_se_means_cdrs_study <- coef_and_se_means_cdrs_study %>%
 plot_means_cdrs <- plot_means_function(coef_and_se_means_cdrs_study)
 print(plot_means_cdrs)
 
- png("plot_means_multi_cdrs.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_cdrs.png", width=6.5, height=6, units="in", res=300)
  plot_means_cdrs
  dev.off()
 
@@ -3477,7 +3477,7 @@ coef_and_se_means_hamd_study <- coef_and_se_means_hamd_study %>%
 plot_means_multi_hamd <- plot_means_function(coef_and_se_means_hamd_study)
 print(plot_means_multi_hamd)
 
- png("plot_means_multi_hamd.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_hamd.png", width=6.5, height=6, units="in", res=300)
  plot_means_multi_hamd
  dev.off()
 
@@ -3500,7 +3500,7 @@ coef_and_se_means_sd_study <- coef_and_se_means_sd_study %>%
 plot_means_multi_sd <- plot_means_function(coef_and_se_means_sd_study)
 print(plot_means_multi_sd)
 
- png("plot_means_multi_sd.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_sd.png", width=6.5, height=6, units="in", res=300)
  plot_means_multi_sd
  dev.off()
 ```
@@ -3522,7 +3522,7 @@ coef_and_se_means_var2_study <- coef_and_se_means_var2_study %>%
 plot_means_multi_var2 <- plot_means_function(coef_and_se_means_var2_study)
 print(plot_means_multi_var2)
 
- png("plot_means_multi_var2.png", width=6.5, height=4, units="in", res=300)
+ png("plot_means_multi_var2.png", width=6.5, height=6, units="in", res=300)
  plot_means_multi_var2
  dev.off()
 ```
