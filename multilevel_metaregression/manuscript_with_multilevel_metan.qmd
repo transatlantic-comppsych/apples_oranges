@@ -1834,7 +1834,7 @@ We applied metaregression to obtain the SMDs and confidence intervals of each of
 #| fig-cap: "Pre-Post Standardised Mean Differences (SMD) of Control Arms"
 #| fig-cap-location: top
 
-list_df_simulated[[1]] %>%
+plot_smd_diff_control <- list_df_simulated[[1]] %>%
   filter(arm_effect_size == "cohens_d_control") %>%
   ggplot(aes(x = cohens_d, y = 0, color = as.factor(psy_or_med), size = baseline_n)) +
   geom_jitter(height = 0.2, alpha = 0.7) +
@@ -1852,6 +1852,14 @@ list_df_simulated[[1]] %>%
     axis.ticks.y = element_blank(),
     axis.title.y = element_blank()
   )
+
+print(plot_smd_diff_control)
+
+
+png("plot_smd_diff_control.png", width=6.5, height=4, units="in", res=300)
+ plot_smd_diff_control
+ dev.off()
+
 
 ```
 
@@ -1872,7 +1880,7 @@ df_mean_coefs_from_sim <- df_mean_coefs_from_sim %>%
 plot_means_multi_all <- plot_means_function(df_mean_coefs_from_sim)
 print(plot_means_multi_all)
 
- png("plot_means_multi_all.png")
+ png("plot_means_multi_all.png", width=6.5, height=4, units="in", res=300)
  plot_means_multi_all
  dev.off()
 
@@ -3222,7 +3230,7 @@ mean_diff_min_max_scores <- df_long_for_metan %>%
   scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) +   theme_minimal() 
 
 print(mean_diff_min_max_scores) 
-png("mean_diff_min_max_scores.png")
+png("mean_diff_min_max_scores.png", width=6.5, height=4, units="in", res=300)
 mean_diff_min_max_scores
 dev.off()
 ```
@@ -3241,7 +3249,7 @@ plot_baseline_var <- df_long_for_metan %>%
   scale_x_discrete(labels = c("0" = "Medication", "1" = "Psychological Therapy")) + theme_minimal() 
 
 print(plot_baseline_var)
-png("plot_baseline_var.png")
+png("plot_baseline_var.png", width=6.5, height=4, units="in", res=300)
 plot_baseline_var
 dev.off()
 ```
@@ -3400,7 +3408,7 @@ coef_and_se_means_no_wl <- coef_and_se_means_no_wl %>%
 plot_means_no_wl <- plot_means_function(coef_and_se_means_no_wl)
 print(plot_means_no_wl)
 
- png("plot_means_multi_no_wl.png")
+ png("plot_means_multi_no_wl.png", width=6.5, height=4, units="in", res=300)
 plot_means_no_wl
  dev.off()
 
@@ -3423,7 +3431,7 @@ coef_and_se_means_clin_study <- coef_and_se_means_clin_study %>%
 plot_means_clin <- plot_means_function(coef_and_se_means_clin_study)
 print(plot_means_clin)
 
-png("plot_means_multi_clin.png")
+png("plot_means_multi_clin.png", width=6.5, height=4, units="in", res=300)
 plot_means_clin
 dev.off()
 
@@ -3446,7 +3454,7 @@ coef_and_se_means_cdrs_study <- coef_and_se_means_cdrs_study %>%
 plot_means_cdrs <- plot_means_function(coef_and_se_means_cdrs_study)
 print(plot_means_cdrs)
 
- png("plot_means_multi_cdrs.png")
+ png("plot_means_multi_cdrs.png", width=6.5, height=4, units="in", res=300)
  plot_means_cdrs
  dev.off()
 
@@ -3469,7 +3477,7 @@ coef_and_se_means_hamd_study <- coef_and_se_means_hamd_study %>%
 plot_means_multi_hamd <- plot_means_function(coef_and_se_means_hamd_study)
 print(plot_means_multi_hamd)
 
- png("plot_means_multi_hamd.png")
+ png("plot_means_multi_hamd.png", width=6.5, height=4, units="in", res=300)
  plot_means_multi_hamd
  dev.off()
 
@@ -3492,7 +3500,7 @@ coef_and_se_means_sd_study <- coef_and_se_means_sd_study %>%
 plot_means_multi_sd <- plot_means_function(coef_and_se_means_sd_study)
 print(plot_means_multi_sd)
 
- png("plot_means_multi_sd.png")
+ png("plot_means_multi_sd.png", width=6.5, height=4, units="in", res=300)
  plot_means_multi_sd
  dev.off()
 ```
@@ -3514,7 +3522,7 @@ coef_and_se_means_var2_study <- coef_and_se_means_var2_study %>%
 plot_means_multi_var2 <- plot_means_function(coef_and_se_means_var2_study)
 print(plot_means_multi_var2)
 
- png("plot_means_multi_var2.png")
+ png("plot_means_multi_var2.png", width=6.5, height=4, units="in", res=300)
  plot_means_multi_var2
  dev.off()
 ```
