@@ -1,0 +1,75 @@
+---
+title: "section_for_multi_level_metareg"
+format: html
+editor: visual
+---
+
+### 
+
+### Multilevel Model Metaregression
+
+We estimated pooled standardized mean differences for each arm by using multilevel models implemented in R's metafor package. Unlike the traditional random effects meta-analysis, which assumes that each study’s true effect size $\theta_{k}$ varies due to heterogeneity between studies, our multilevel model accounts for the hierarchical structure of the data, with study arms nested within study IDs. This allows us to model variability at both the study level and the study arm level.
+
+The multilevel model assumes that each study's true effect size $\theta_{ij}$ (where $i$ indexes the study and $j$ indexes the study arm) is influenced by both the variability between studies and the variability between arms within each study. The model can be expressed as:
+
+$$Yij ∼ \mathcal{N}(\theta_{ij}, \sigma_{ij}^2)$$
+{#eq-7}
+
+where,
+
+$$θij​∼N(xij​β,τi2​)$$
+
+{#eq-8}
+
+where $Y_{ij}$ is the observed effect size for the $j$th arm in the $i$th study, which has a normal distribution with mean $\theta_{ij}$ and sampling error variance $\sigma_{ij}^2$. The true effect size $\theta_{ij}$ is modeled as a study-specific effect with an additional term representing the variability between arms within the study.
+
+This gives rise to the following model:
+
+$$
+Yij=xijβ+ui+vij+ϵij
+$$
+
+{#eq-9}
+
+where,
+
+$$
+ui​∼N(0,τ2)
+$$
+
+{#eq-10}
+describes the deviation of each study from the overall mean effect size, and
+
+$$vij∼N(0,τi2)$$
+{#eq11}
+
+describes the deviation of each arm from the study-specific effect, with $\tau_{i}^2$ representing the heterogeneity within studies. Finally,
+
+$$\epsilon_{ij} \sim \mathcal{N}(0, \sigma_{ij}^2)$$
+
+{#eq-12}
+
+represents the sampling error.
+
+In this framework, we can model the means for each arm of the trials as follows:
+
+$$ \begin{aligned} Υ_{ij} &=
+\begin{cases}
+0 & \text{MedControl:} \quad b_0 + u_i + v_{ij} + \epsilon_{ij}\\
+1 & \text{MedActive:} \quad b_0 + b_{1_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\
+2 & \text{PsyActive:} \quad b_0 + b_{2_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\
+3 & \text{PsyControl:} \quad b_0 + b_{3_{ij}} + u_i + v_{ij} + \epsilon_{ij} \\
+\end{cases}
+\end{aligned}
+$$
+
+{#eq-13}
+Here, the mean effect size for each level is the sum of $b_0$, the intercept for the reference category (medication control), with the coefficient for each level (e.g., $b_{3_{ij}}$ for psychotherapy controls). The variability between studies and arms within studies is captured by $u_i$ and $v_{ij}$, respectively. The confidence intervals for the means are constructed using the standard errors of the means, which account for the hierarchical structure of the data.
+Each coefficient represents the contrast between the reference category and each level. For example, $b_{3_{ij}}$ represents the contrast between psychotherapy and medication control arms. Inference on these contrasts is conducted using the following test statistic:
+
+$$
+z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
+$$
+
+{#eq-14}
+This test allows us to assess the significance of the differences between treatment effects across study arms.
